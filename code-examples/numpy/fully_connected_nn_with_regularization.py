@@ -412,6 +412,11 @@ class DeepNeuralNetwork:
         grads = {}
         m = AL.shape[1]
 
+        # Carried from one iteration to the next: layer l reads the dA that
+        # layer l+1 produced. Bound here so the handoff is visible rather than
+        # implied by the loop.
+        dA_next = None
+
         for l in reversed(range(1, self.L + 1)):
             A_prev, Z, A, bn_cache, dropout_cache = caches[l - 1]
 
@@ -440,8 +445,7 @@ class DeepNeuralNetwork:
             grads[f"dW{l}"] = dW
             grads[f"db{l}"] = db
 
-            if l > 1:
-                dA_next = dA_prev
+            dA_next = dA_prev
 
         return grads
 

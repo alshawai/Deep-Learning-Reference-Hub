@@ -13,7 +13,7 @@
       - [Tier 2: Important Hyperparameters (Medium Impact)](#tier-2-important-hyperparameters-medium-impact)
       - [Tier 3: Fine-tuning Hyperparameters (Lower Impact)](#tier-3-fine-tuning-hyperparameters-lower-impact)
     - [Modern Hyperparameter Categories](#modern--hyperparameter--categories)
-      - [Transformer-Specific Hyperparameters (Post-2017)](#transformer-specific-hyperparameters-post-2017)
+      - [Transformer-Specific Hyperparameters](#transformer-specific-hyperparameters)
   - [Traditional Tuning Strategies](#traditional-tuning-strategies)
     - [1. Manual Search](#1--manual--search)
     - [2. Grid Search](#2--grid--search)
@@ -24,7 +24,7 @@
     - [3. Population-Based Training (PBT)](#3--population-based--training--pbt)
     - [4. Automated Machine Learning (AutoML)](#4--automated--machine--learning--automl)
   - [Practical Guidelines and Best Practices](#practical-guidelines-and-best-practices)
-    - [2024-2025 Best Practices](#2024-2025--best--practices)
+    - [Recent Best Practices](#recent--best--practices)
       - [Starting Strategy (Modern Recommended Approach)](#starting-strategy-modern-recommended-approach)
       - [Resource-Aware Tuning](#resource-aware-tuning)
       - [Domain-Specific Guidelines](#domain-specific-guidelines)
@@ -564,19 +564,19 @@ def analyze_hyperparameter_importance(X_params, y_scores):
 ### Individual Techniques:
 > #### **[Learning Rate Scheduler](../code-examples/numpy/learning_rate_schedulers.py)** - Collection of learning rate scheduling strategies including step decay, exponential decay, and cosine annealing.
 >
-> #### **[Bayesian Optimization](../code-examples/numpy/hyperparameter-tuning/bayesian_optimization.py)** - Implementation using Gaussian Process surrogate models with Expected Improvement acquisition function for efficient hyperparameter search.
+> #### **[Bayesian Optimization](../code-examples/numpy/hyperparameter_tuning/bayesian_optimization.py)** - Implementation using Gaussian Process surrogate models with Expected Improvement acquisition function for efficient hyperparameter search.
 > 
-> #### **[Random Search](../code-examples/numpy/hyperparameter-tuning/random_search.py)** - Comprehensive random search implementation with proper probability distributions and parallel evaluation support.
+> #### **[Random Search](../code-examples/numpy/hyperparameter_tuning/random_search.py)** - Comprehensive random search implementation with proper probability distributions and parallel evaluation support.
 > 
-> #### **[Learning Rate Finder](../code-examples/numpy/hyperparameter-tuning/learning_rate_finder.py)** - Automated learning rate range testing to find optimal learning rate ranges before full training.
+> #### **[Learning Rate Finder](../code-examples/numpy/learning_rate_finder.py)** - Automated learning rate range testing to find optimal learning rate ranges before full training.
 
 ### Advanced Implementations:
-> #### **[Multi-Fidelity Optimization](../code-examples/numpy/hyperparameter-tuning/multifidelity_optimization.py)** - ASHA (Asynchronous Successive Halving) implementation for efficient resource allocation across hyperparameter candidates.
+> #### **[Multi-Fidelity Optimization](../code-examples/numpy/hyperparameter_tuning/multifidelity_optimization.py)** - ASHA (Asynchronous Successive Halving) implementation for efficient resource allocation across hyperparameter candidates.
 > 
-> #### **[Population-Based Training](../code-examples/numpy/hyperparameter-tuning/population_based_training.py)** - Complete PBT implementation with online hyperparameter adaptation during training.
+> #### **[Population-Based Training](../code-examples/numpy/hyperparameter_tuning/population_based_training.py)** - Complete PBT implementation with online hyperparameter adaptation during training.
 
 ### Complete Frameworks:
-> #### **[Modern Hyperparameter Tuning Framework](../code-examples/numpy/hyperparameter-tuning/complete_tuning_framework.py)** - Production-ready framework integrating multiple optimization strategies with experiment tracking and statistical analysis.
+> #### **[Modern Hyperparameter Tuning Framework](../code-examples/numpy/hyperparameter_tuning/complete_tuning_framework.py)** - Production-ready framework integrating multiple optimization strategies with experiment tracking and statistical analysis.
 
 ---
 

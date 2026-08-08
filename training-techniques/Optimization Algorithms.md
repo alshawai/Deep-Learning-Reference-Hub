@@ -112,7 +112,7 @@ for epoch in range(num_epochs):
     
     for i in range(m):  # No. of training examples
         gradient = compute_gradient(X_shuffled[i], y_shuffled[i], theta)
-        theta -=- learning_rate * gradient
+        theta -= learning_rate * gradient
 ```
 
 **Mathematical Formulation:**  
@@ -486,17 +486,17 @@ optimizer = tf.keras.optimizers.SGD(learning_rate=0.01, momentum=0.9)
 ## Implementation Examples
 
 ### Complete Implementations:
-> #### **[Mini-batch Gradient Descent](../code-examples/numpy/mini_batch_gradient_descent.py)** - Implements efficient mini-batch processing with proper shuffling and batch creation for neural network training.
-> #### **[Momentum Optimizer](../code-examples/numpy/momentum_optimizer.py)** - Complete implementation of gradient descent with momentum, including exponential weighted averages and bias correction.
-> #### **[RMSprop Optimizer](../code-examples/numpy/rmsprop_optimizer.py)** - Adaptive learning rate optimization with squared gradient accumulation and parameter-wise learning rate adjustment.
-> #### **[Adam Optimizer](../code-examples/numpy/adam_optimizer.py)** - Full implementation of the Adam algorithm combining momentum and RMSprop with bias correction.
+> #### **[Mini-batch Gradient Descent](../code-examples/numpy/optimization_algorithms/mini_batch_gradient_descent.py)** - Implements efficient mini-batch processing with proper shuffling and batch creation for neural network training.
+> #### **[Momentum Optimizer](../code-examples/numpy/optimization_algorithms/momentum_optimizer.py)** - Complete implementation of gradient descent with momentum, including exponential weighted averages and bias correction.
+> #### **[RMSprop Optimizer](../code-examples/numpy/optimization_algorithms/rmsprop_optimizer.py)** - Adaptive learning rate optimization with squared gradient accumulation and parameter-wise learning rate adjustment.
+> #### **[Adam Optimizer](../code-examples/numpy/optimization_algorithms/adam_optimizer.py)** - Full implementation of the Adam algorithm combining momentum and RMSprop with bias correction.
 
 ### Utility Functions:
-> #### **[Exponential Weighted Averages](../code-examples/numpy/exponential_weighted_averages.py)** - Standalone implementation of EWA with bias correction for understanding the mathematical foundation.
+> #### **[Exponential Weighted Averages](../code-examples/numpy/optimization_algorithms/exponential_weighted_averages.py)** - Standalone implementation of EWA with bias correction for understanding the mathematical foundation.
 > #### **[Learning Rate Schedulers](../code-examples/numpy/learning_rate_schedulers.py)** - Collection of learning rate scheduling strategies including step decay, exponential decay, and cosine annealing.
 
 ### Complete Training Examples:
-> #### **[Optimization Comparison](../code-examples/numpy/optimization_comparison.py)** - Side-by-side comparison of different optimizers on the same problem, visualizing convergence behavior and final performance.
+> #### **[Optimization Comparison](../code-examples/numpy/optimization_algorithms/optimization_comparison.py)** - Side-by-side comparison of different optimizers on the same problem, visualizing convergence behavior and final performance.
 
 ---
 
