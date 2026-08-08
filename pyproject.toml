@@ -1,0 +1,61 @@
+[tool.ruff]
+line-length = 88
+target-version = "py310"
+extend-exclude = ["tools", ".claude"]
+
+[tool.ruff.lint]
+# Defects, not style. This selection earns its place by catching things that are
+# actually wrong. It was chosen after a run over the whole tree turned up one
+# genuine finding and no false positives: F821 undefined name `dA_next` in a
+# backward pass, where the name was bound only by a guarded assignment in the
+# previous loop iteration. It happened to work, and it was one edit away from a
+# NameError that no test covered.
+# A gate that is green today and would have caught that is worth more than a
+# comprehensive gate nobody can turn green.
+select = ["E9", "F63", "F7", "F82", "F401", "F811", "D"]
+# The ignored D rules are the ones that police docstring shape rather than
+# docstring presence: a missing summary line, a first line that does not end in a
+# period, an imperative-mood check. None of them can catch a wrong equation, and
+# each one turns the gate red for prose the reader is happy with. Drop entries
+# from this list after a docstring pass and the convention tightens with no
+# other change.
+ignore = ["D107", "D205", "D400", "D401", "D204", "D105"]
+
+# Deliberately NOT selected. These are real, mostly mechanical, and each belongs
+# to one steward migration commit — not to a per-file drift, and not to a CI gate
+# that is red from the start:
+#   W291/W293  trailing and blank-line whitespace  (ruff format fixes these)
+#   E501       long lines
+#   NPY002     legacy np.random.* calls
+#   F841       unused variables
+#   B028       warnings.warn without stacklevel
+#   E741       ambiguous names (l, I, O)
+#   UP006/UP035  typing.Dict vs dict — see the deviation note below
+#
+# For the current cost of clearing any of them:
+#   ruff check --select W291,W293,E501,NPY002,F841,B028,E741,UP006,UP035 --statistics .
+#
+# UP006/UP035 stay off until a single commit migrates every module at once. The
+# modules in the tree consistently use typing.Dict / Optional / Tuple and put
+# third-party imports before stdlib. That is recorded debt, documented in
+# .claude/references/house-style.md: a consistent tree outweighs one line of
+# policy. Do not let the linter split the difference one file at a time.
+
+[tool.ruff.lint.pydocstyle]
+# NumPy style. Stated here because general-purpose Python tooling and skills
+# default to Google style, and a preference in prose is something an agent can be
+# talked out of mid-task. This is the mechanism.
+convention = "numpy"
+
+[tool.ruff.format]
+# ruff format implements Black's style, so the formatting contributors already
+# expect is the formatting they get, from a tool that also lints.
+# docstring-code-format reformats the code inside doctest blocks too. Worth it
+# in a teaching repository, where a docstring example is often the thing a
+# reader copies — but it means a formatting pass rewrites docstrings as well as
+# code. Expect that in the diff.
+docstring-code-format = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
