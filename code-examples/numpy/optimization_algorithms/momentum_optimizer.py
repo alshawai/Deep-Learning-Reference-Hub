@@ -15,8 +15,7 @@ MIT
 """
 
 import numpy as np
-from typing import Dict, Any, Optional, List, Tuple
-import copy
+from typing import Dict, Any, Tuple
 
 
 class MomentumOptimizer:

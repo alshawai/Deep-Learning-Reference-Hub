@@ -36,7 +36,6 @@ from typing import Dict, List, Tuple, Callable, Optional, Any
 from dataclasses import dataclass, field
 from abc import ABC, abstractmethod
 import time
-import heapq
 from concurrent.futures import ThreadPoolExecutor, as_completed
 import threading
 from collections import defaultdict
@@ -509,11 +508,9 @@ class ASHAOptimizer:
             while iteration < max_iterations and (
                 timeout is None or time.time() - start_time < timeout
             ):
-
                 while len(active_futures) < self.max_concurrent and (
                     work_queue or self._get_next_config_to_evaluate()
                 ):
-
                     # Get next work item
                     if work_queue:
                         config_id, hyperparams, fidelity = work_queue.pop(0)
@@ -679,28 +676,28 @@ def asha_optimize(
     --------
     >>> def evaluate_model(hyperparams, fidelity):
     ...     # Simulate training with given hyperparameters and fidelity
-    ...     lr = hyperparams['learning_rate']
-    ...     wd = hyperparams['weight_decay']
+    ...     lr = hyperparams["learning_rate"]
+    ...     wd = hyperparams["weight_decay"]
     ...
     ...     # Simulate performance improving with fidelity
-    ...     base_score = 0.7 - (lr - 0.001)**2 - (wd - 0.0001)**2
+    ...     base_score = 0.7 - (lr - 0.001) ** 2 - (wd - 0.0001) ** 2
     ...     fidelity_bonus = 0.2 * (1 - np.exp(-fidelity / 20))
     ...     noise = np.random.normal(0, 0.01)
     ...
     ...     score = base_score + fidelity_bonus + noise
-    ...     metadata = {'fidelity_used': fidelity}
+    ...     metadata = {"fidelity_used": fidelity}
     ...
     ...     return score, metadata
     >>>
     >>> configs = [
-    ...     {'learning_rate': 0.001, 'weight_decay': 0.0001},
-    ...     {'learning_rate': 0.01, 'weight_decay': 0.001},
-    ...     {'learning_rate': 0.0001, 'weight_decay': 0.00001}
+    ...     {"learning_rate": 0.001, "weight_decay": 0.0001},
+    ...     {"learning_rate": 0.01, "weight_decay": 0.001},
+    ...     {"learning_rate": 0.0001, "weight_decay": 0.00001},
     ... ]
     >>>
-    >>> result = asha_optimize(evaluate_model, configs,
-    ...                       min_fidelity=1, max_fidelity=27,
-    ...                       max_iterations=20)
+    >>> result = asha_optimize(
+    ...     evaluate_model, configs, min_fidelity=1, max_fidelity=27, max_iterations=20
+    ... )
     """
     evaluator = FunctionEvaluator(eval_function, min_fidelity, max_fidelity)
 
@@ -923,7 +920,10 @@ if __name__ == "__main__":
         return best_score, best_config, total_budget
 
     baseline_score, baseline_config, baseline_budget = random_search_baseline(
-        nn_eval, nn_configs, 81, 10  # 10 full evaluations
+        nn_eval,
+        nn_configs,
+        81,
+        10,  # 10 full evaluations
     )
 
     print(f"Random Search Baseline (10 full evaluations):")

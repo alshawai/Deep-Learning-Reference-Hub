@@ -496,9 +496,9 @@ class PopulationBasedTrainer:
                     ].model_state
 
                 self.population[worst_idx].performance_history = []
-                self.population[worst_idx].metadata[
-                    "generation_created"
-                ] = self.generation
+                self.population[worst_idx].metadata["generation_created"] = (
+                    self.generation
+                )
 
             self._perturb_hyperparams(worst_idx)
 
@@ -572,7 +572,6 @@ class PopulationBasedTrainer:
             and self.generation < max_generations
             and (timeout is None or time.time() - start_time < timeout)
         ):
-
             scores = self._evaluate_population(workers)
             self.total_steps += self.population_size * self.eval_interval
 
@@ -793,13 +792,13 @@ def pbt_optimize(
     >>> # Define training functions
     >>> def train_step(hyperparams, steps):
     ...     # Simulate training
-    ...     lr = hyperparams['learning_rate']
+    ...     lr = hyperparams["learning_rate"]
     ...     # Performance improves with more steps but depends on lr
-    ...     performance = 0.8 - (lr - 0.001)**2 + steps * 0.001
-    ...     return performance, {'step': steps}
+    ...     performance = 0.8 - (lr - 0.001) ** 2 + steps * 0.001
+    ...     return performance, {"step": steps}
     >>>
     >>> def save_state():
-    ...     return getattr(save_state, 'state', {})
+    ...     return getattr(save_state, "state", {})
     >>>
     >>> def load_state(state):
     ...     save_state.state = state
@@ -809,17 +808,24 @@ def pbt_optimize(
     >>>
     >>> # Define hyperparameters
     >>> initial_configs = [
-    ...     {'learning_rate': 0.001},
-    ...     {'learning_rate': 0.01},
-    ...     {'learning_rate': 0.0001}
+    ...     {"learning_rate": 0.001},
+    ...     {"learning_rate": 0.01},
+    ...     {"learning_rate": 0.0001},
     ... ]
     >>>
     >>> distributions = {
-    ...     'learning_rate': LogUniformPerturbation((0.8, 1.2), (1e-5, 1e-1))
+    ...     "learning_rate": LogUniformPerturbation((0.8, 1.2), (1e-5, 1e-1))
     ... }
     >>>
-    >>> result = pbt_optimize(train_step, save_state, load_state, reset,
-    ...                      initial_configs, distributions, population_size=5)
+    >>> result = pbt_optimize(
+    ...     train_step,
+    ...     save_state,
+    ...     load_state,
+    ...     reset,
+    ...     initial_configs,
+    ...     distributions,
+    ...     population_size=5,
+    ... )
     """
 
     def worker_factory():
@@ -1209,7 +1215,7 @@ if __name__ == "__main__":
     print(f"  Fixed hyperparams best score: {fixed_best:.6f}")
     if pbt_best > -np.inf and fixed_best > -np.inf:
         print(
-            f"  Improvement: {(pbt_best - fixed_best):.6f} ({100*(pbt_best - fixed_best)/fixed_best:.2f}%)"
+            f"  Improvement: {(pbt_best - fixed_best):.6f} ({100 * (pbt_best - fixed_best) / fixed_best:.2f}%)"
         )
 
     if pbt_best > fixed_best:

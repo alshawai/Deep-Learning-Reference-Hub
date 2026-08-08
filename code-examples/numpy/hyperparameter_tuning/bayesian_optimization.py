@@ -404,7 +404,7 @@ class BayesianOptimizer:
                     self.best_params = params.copy()
 
                 if verbose >= 1:
-                    print(f"  {i+1}/{self.n_initial}: Score = {score:.4f}")
+                    print(f"  {i + 1}/{self.n_initial}: Score = {score:.4f}")
 
         if len(self.X_observed) == 0:
             raise RuntimeError("All initial evaluations failed")
@@ -433,13 +433,15 @@ class BayesianOptimizer:
                     self.best_params = params_next.copy()
 
                     if verbose >= 1:
-                        print(f"  Iter {iteration+1}: Score = {score:.4f} (NEW BEST!)")
+                        print(
+                            f"  Iter {iteration + 1}: Score = {score:.4f} (NEW BEST!)"
+                        )
                 else:
                     if verbose >= 2:
-                        print(f"  Iter {iteration+1}: Score = {score:.4f}")
+                        print(f"  Iter {iteration + 1}: Score = {score:.4f}")
             else:
                 if verbose >= 1:
-                    print(f"  Iter {iteration+1}: Evaluation failed")
+                    print(f"  Iter {iteration + 1}: Evaluation failed")
 
         convergence_data = {
             "n_evaluations": len(self.history),
@@ -504,17 +506,15 @@ def optimize_hyperparameters(
     --------
     >>> def objective(params):
     ...     # Simulate training a model and return validation accuracy
-    ...     lr, wd = params['learning_rate'], params['weight_decay']
+    ...     lr, wd = params["learning_rate"], params["weight_decay"]
     ...     # Dummy objective (replace with actual model training)
-    ...     return -(lr - 0.001)**2 - (wd - 0.0001)**2 + np.random.normal(0, 0.01)
+    ...     return -((lr - 0.001) ** 2) - (wd - 0.0001) ** 2 + np.random.normal(0, 0.01)
     >>>
-    >>> search_space = {
-    ...     'learning_rate': (1e-5, 1e-1),
-    ...     'weight_decay': (1e-6, 1e-2)
-    ... }
+    >>> search_space = {"learning_rate": (1e-5, 1e-1), "weight_decay": (1e-6, 1e-2)}
     >>>
-    >>> result = optimize_hyperparameters(objective, search_space,
-    ...                                  n_iterations=30, random_state=42)
+    >>> result = optimize_hyperparameters(
+    ...     objective, search_space, n_iterations=30, random_state=42
+    ... )
     >>> print(f"Best parameters: {result.best_params}")
     """
     optimizer = BayesianOptimizer(
@@ -529,6 +529,7 @@ def optimize_hyperparameters(
 
 
 if __name__ == "__main__":
+
     def quadratic_objective(params):
         """Example objective function - quadratic with noise."""
         x, y = params["x"], params["y"]

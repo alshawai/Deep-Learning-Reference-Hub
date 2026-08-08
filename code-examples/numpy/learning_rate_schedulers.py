@@ -25,7 +25,7 @@ MIT
 
 import numpy as np
 import math
-from typing import Union, Callable, Dict, List, Optional, Any
+from typing import Dict, Optional, Any
 from enum import Enum
 import warnings
 
