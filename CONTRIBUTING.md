@@ -34,10 +34,11 @@ Be respectful and constructive. Discussions should stay technical and educationa
 ## ⚙️ Getting Started
 
 1. Fork the repository and clone it locally.
-2. Install dependencies:
+2. Install the hub and its development tools:
 ```bash
-pip install -r requirements.txt
+pip install -e ".[dev]"
 ```
+This installs `dlhub` in editable mode, so an edit to a module is live in the next test run with no reinstall. Add the frameworks with `pip install -e ".[dev,frameworks]"` if you are working on a port.
 3. Create a new branch for your changes:
 ```bash
 git checkout -b feature/my-new-feature
@@ -69,7 +70,7 @@ python -m pytest -q            # tests
 If a command is missing, install the development tools:
 
 ```bash
-pip install -r requirements.txt
+pip install -e ".[dev]"
 ```
 
 ### Tests

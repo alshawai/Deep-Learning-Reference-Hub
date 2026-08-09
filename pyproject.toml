@@ -11,9 +11,14 @@ requires-python = ">=3.10"
 license = { file = "LICENSE" }
 dependencies = ["numpy>=1.26.0", "scipy>=1.11.0", "matplotlib>=3.8.0"]
 
-# Split out because most of the hub does not need them. `requirements.txt` listed
-# both frameworks unconditionally, so the docs-and-NumPy CI job installed
-# TensorFlow and PyTorch to run tests that import neither.
+# Split out because most of the hub does not need them. These were once listed
+# unconditionally alongside NumPy, so the docs-and-NumPy CI job installed
+# TensorFlow and PyTorch in order to run tests that import neither.
+#
+# `frameworks` is for a reader who wants everything with one command. CI does not
+# use it: plain `torch` resolves to the CUDA build, which is gigabytes of wheel a
+# CPU runner will never execute, so the parity job installs CPU builds by index
+# instead. Do not "simplify" that job to this extra.
 [project.optional-dependencies]
 frameworks = ["torch>=2.3.0", "tensorflow>=2.17.0"]
 dev = ["ruff>=0.6.0", "pytest>=8.0.0"]
