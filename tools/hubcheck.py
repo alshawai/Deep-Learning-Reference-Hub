@@ -68,6 +68,7 @@ def _find_root(start: Path) -> Path:
 
 TOOLS_DIR = Path(__file__).resolve().parent
 ROOT = _find_root(TOOLS_DIR)
+TESTS_DIR = ROOT / "tests"
 
 # Consulted only when git is unavailable. With git present, .gitignore decides.
 FALLBACK_SKIP_DIRS = {".git", ".claude", "__pycache__", ".ruff_cache", ".vscode"}
@@ -212,8 +213,11 @@ def published_docs() -> List[Path]:
 def code_modules() -> List[Path]:
     """Return published Python modules that count as code examples.
 
-    Excludes this tool's own directory, test modules, and dunder files, all
-    determined from the file's own position rather than a hardcoded path.
+    Excludes this tool's own directory, the test suite, and dunder files, all
+    determined from the file's own position rather than a hardcoded path. The
+    whole `tests/` tree is excluded rather than just `test_*.py`, so a shared
+    fixture or helper alongside the tests is not counted as an implementation
+    the README is claiming to publish.
 
     Returns
     -------
@@ -225,6 +229,7 @@ def code_modules() -> List[Path]:
         for p in repo_files()
         if p.suffix == ".py"
         and TOOLS_DIR not in p.parents
+        and TESTS_DIR not in p.parents
         and not p.name.startswith("test_")
         and not p.name.startswith("__")
     ]

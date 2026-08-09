@@ -95,11 +95,13 @@ The practical documents include implementations using modern frameworks and tech
 # Example: He Initialization in TensorFlow/Keras
 import tensorflow as tf
 
-model = tf.keras.Sequential([
-    tf.keras.layers.Dense(256, input_shape=(784,),
-                         kernel_initializer='he_normal',
-                         activation='relu')
-])
+model = tf.keras.Sequential(
+    [
+        tf.keras.layers.Dense(
+            256, input_shape=(784,), kernel_initializer="he_normal", activation="relu"
+        )
+    ]
+)
 ```
 ---
 

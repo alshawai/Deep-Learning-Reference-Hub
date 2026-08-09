@@ -78,6 +78,8 @@ A new implementation needs tests. Put them in `tests/`, named after the module t
 
 Test the mathematics, not the plumbing. A test that only checks an output's shape still passes when the sign of the update is backwards. Assert against a value you worked out by hand, a closed-form result, or a finite-difference gradient check.
 
+Name a test after the property it holds the code to, and reserve the docstring for what breaks when it fails. `test_the_population_thins_by_the_reduction_factor_at_each_rung` tells a reader what is being claimed; `"""Test the population."""` tells them nothing, which is why `tests/` is exempt from the docstring-presence rules in `pyproject.toml`.
+
 A framework port needs a parity test: the same fixture through the NumPy reference and through the port, compared within a stated tolerance. Declare the tolerance in the test, and say why it is the number it is. CI runs parity tests in a separate job that installs PyTorch and TensorFlow, since most authoring environments do not have them.
 
 A parity test that skips itself when a dependency is missing is worse than no test at all, because it reports green. Let it fail instead.
@@ -97,13 +99,13 @@ Use the following format for all module-level docstrings:
 <Module Title>
 =========================
 
-A brief but clear description of what this module does, its purpose, and context 
+A brief but clear description of what this module does, its purpose, and context
 in deep learning. Mention if it's an implementation, utility, or theoretical demonstration.
 
 References
 ----------
 - <Author(s)>. <Title of Paper or Book>. <Publisher/Conference>, <Year>.
-  <URL if applicable> 
+  <URL if applicable>
 
 Author
 ------
@@ -161,6 +163,7 @@ class AdamOptimizer:
     beta2 : float, default=0.999
         Exponential decay rate for second moment estimates.
     """
+
 
 def update_parameters(params: Dict, grads: Dict, t: int) -> Dict:
     """
