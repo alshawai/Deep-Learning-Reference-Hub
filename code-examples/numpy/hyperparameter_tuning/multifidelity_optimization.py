@@ -31,16 +31,17 @@ Multi-fidelity optimization is particularly effective when:
 4. Computational resources can be allocated dynamically
 """
 
-import numpy as np
-from typing import Dict, List, Tuple, Callable, Optional, Any
-from dataclasses import dataclass, field
-from abc import ABC, abstractmethod
-import time
-import heapq
-from concurrent.futures import ThreadPoolExecutor, as_completed
 import threading
-from collections import defaultdict
+import time
 import warnings
+from abc import ABC, abstractmethod
+from collections import defaultdict
+from collections.abc import Callable
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from dataclasses import dataclass, field
+from typing import Any
+
+import numpy as np
 
 
 @dataclass
@@ -88,11 +89,11 @@ class CandidateResult:
     """
 
     config_id: int
-    hyperparams: Dict[str, Any]
+    hyperparams: dict[str, Any]
     fidelity: int
     score: float
     training_time: float
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    metadata: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass
@@ -118,13 +119,13 @@ class MultiFidelityResult:
         Optimization statistics and analysis
     """
 
-    best_config: Dict[str, Any]
+    best_config: dict[str, Any]
     best_score: float
     best_fidelity: int
-    all_results: List[CandidateResult]
+    all_results: list[CandidateResult]
     total_time: float
     total_budget_used: int
-    statistics: Dict[str, Any] = field(default_factory=dict)
+    statistics: dict[str, Any] = field(default_factory=dict)
 
 
 class FidelityEvaluator(ABC):
@@ -137,8 +138,8 @@ class FidelityEvaluator(ABC):
 
     @abstractmethod
     def evaluate(
-        self, hyperparams: Dict[str, Any], fidelity: int
-    ) -> Tuple[float, Dict[str, Any]]:
+        self, hyperparams: dict[str, Any], fidelity: int
+    ) -> tuple[float, dict[str, Any]]:
         """
         Evaluate hyperparameters at given fidelity.
 
@@ -158,7 +159,7 @@ class FidelityEvaluator(ABC):
         pass
 
     @abstractmethod
-    def get_fidelity_range(self) -> Tuple[int, int]:
+    def get_fidelity_range(self) -> tuple[int, int]:
         """
         Get the valid fidelity range.
 
@@ -195,12 +196,12 @@ class FunctionEvaluator(FidelityEvaluator):
         self.max_fidelity = max_fidelity
 
     def evaluate(
-        self, hyperparams: Dict[str, Any], fidelity: int
-    ) -> Tuple[float, Dict[str, Any]]:
+        self, hyperparams: dict[str, Any], fidelity: int
+    ) -> tuple[float, dict[str, Any]]:
         """Evaluate using wrapped function."""
         return self.eval_function(hyperparams, fidelity)
 
-    def get_fidelity_range(self) -> Tuple[int, int]:
+    def get_fidelity_range(self) -> tuple[int, int]:
         """Get fidelity range."""
         return self.min_fidelity, self.max_fidelity
 
@@ -238,7 +239,7 @@ class ASHAOptimizer:
         max_budget: int = 81,
         grace_period: int = 1,
         max_concurrent: int = 4,
-        random_state: Optional[int] = None,
+        random_state: int | None = None,
     ):
 
         self.evaluator = evaluator
@@ -270,7 +271,7 @@ class ASHAOptimizer:
         self.total_budget_used = 0
         self.best_result = None
 
-    def _create_rungs(self) -> List[Dict]:
+    def _create_rungs(self) -> list[dict]:
         """
         Create ASHA rungs (fidelity levels and promotion thresholds).
 
@@ -292,59 +293,22 @@ class ASHAOptimizer:
             rungs.append(rung)
             current_budget *= self.reduction_factor
 
-        # Set promotion requirements for each rung
-        for i, rung in enumerate(rungs[:-1]):  # All except last rung
-            next_rung = rungs[i + 1]
-            rung["n_required"] = max(1, len(rungs) - i)
+        # A rung promotes its top 1 / reduction_factor, so it needs at least
+        # reduction_factor results before that fraction means anything. The
+        # threshold is a property of the reduction factor, not of how many rungs
+        # the ladder happens to have: deriving it from the rung count made a
+        # taller ladder demand more results at the bottom and stall there.
+        for rung in rungs[:-1]:  # The last rung promotes nowhere
+            rung["n_required"] = self.reduction_factor
 
         return rungs
 
-    def _get_rung_for_budget(self, budget: int) -> Optional[int]:
+    def _get_rung_for_budget(self, budget: int) -> int | None:
         """Get rung index for given budget."""
         for i, rung in enumerate(self.rungs):
             if rung["budget"] == budget:
                 return i
         return None
-
-    def _should_promote(self, rung_idx: int, score: float) -> bool:
-        """
-        Check if a configuration should be promoted to next rung.
-
-        Parameters
-        ----------
-        rung_idx : int
-            Current rung index
-        score : float
-            Score achieved by configuration
-
-        Returns
-        -------
-        bool
-            True if configuration should be promoted
-        """
-        if rung_idx >= len(self.rungs) - 1:  # Last rung
-            return False
-
-        rung = self.rungs[rung_idx]
-
-        # Need enough configurations to make promotion decision
-        if len(rung["candidates"]) < rung["n_required"]:
-            return False
-
-        # Sort candidates by score (descending)
-        sorted_candidates = sorted(rung["candidates"], key=lambda x: x[1], reverse=True)
-
-        # Promote top 1/reduction_factor configurations
-        n_promote = max(1, len(sorted_candidates) // self.reduction_factor)
-
-        # Check if current score is in top n_promote
-        for i in range(min(n_promote, len(sorted_candidates))):
-            if sorted_candidates[i][1] <= score:
-                config_id = sorted_candidates[i][0]
-                if config_id not in rung["promoted"]:
-                    return True
-
-        return False
 
     def _add_result(self, result: CandidateResult) -> None:
         """Add result and check for promotions."""
@@ -360,9 +324,14 @@ class ASHAOptimizer:
                 rung = self.rungs[rung_idx]
                 rung["candidates"].append((result.config_id, result.score))
 
-    def _get_next_config_to_evaluate(self) -> Optional[Tuple[int, Dict[str, Any], int]]:
+    def _get_next_config_to_evaluate(self) -> tuple[int, dict[str, Any], int] | None:
         """
-        Get next configuration to evaluate.
+        Claim the next promotion and return the work it implies.
+
+        This is the only place the promotion rule lives, and calling it is not a
+        query: the returned configuration is recorded as promoted so that
+        concurrent workers cannot claim it twice. Callers must therefore use
+        what they get rather than calling it to ask whether work exists.
 
         Returns
         -------
@@ -398,7 +367,7 @@ class ASHAOptimizer:
             return None
 
     def _evaluate_config(
-        self, config_id: int, hyperparams: Dict[str, Any], fidelity: int
+        self, config_id: int, hyperparams: dict[str, Any], fidelity: int
     ) -> CandidateResult:
         """Evaluate a single configuration."""
         start_time = time.time()
@@ -433,7 +402,7 @@ class ASHAOptimizer:
             )
 
     def suggest_initial_configurations(
-        self, configurations: List[Dict[str, Any]]
+        self, configurations: list[dict[str, Any]]
     ) -> None:
         """
         Add initial configurations to start evaluation.
@@ -447,23 +416,15 @@ class ASHAOptimizer:
             for config in configurations:
                 config_id = self.config_counter
                 self.config_counter += 1
-
-                result = CandidateResult(
-                    config_id=config_id,
-                    hyperparams=config.copy(),
-                    fidelity=0,  # Will be updated when actually evaluated
-                    score=-np.inf,  # Will be updated
-                    training_time=0.0,
-                    metadata={"status": "pending"},
-                )
-
-                self.active_evaluations[config_id] = (config, self.min_budget)
+                # Queued at the lowest rung. Every configuration earns its way
+                # up from here, which is what makes the search cheap.
+                self.active_evaluations[config_id] = (config.copy(), self.min_budget)
 
     def optimize(
         self,
-        initial_configurations: List[Dict[str, Any]],
+        initial_configurations: list[dict[str, Any]],
         max_iterations: int = 100,
-        timeout: Optional[float] = None,
+        timeout: float | None = None,
         verbose: bool = True,
     ) -> MultiFidelityResult:
         """
@@ -509,12 +470,11 @@ class ASHAOptimizer:
             while iteration < max_iterations and (
                 timeout is None or time.time() - start_time < timeout
             ):
-
-                while len(active_futures) < self.max_concurrent and (
-                    work_queue or self._get_next_config_to_evaluate()
-                ):
-
-                    # Get next work item
+                # `_get_next_config_to_evaluate` marks what it returns as
+                # promoted, so it is called once per work item and its result is
+                # kept. Calling it again as a loop condition would consume a
+                # promotion and drop the configuration on the floor.
+                while len(active_futures) < self.max_concurrent:
                     if work_queue:
                         config_id, hyperparams, fidelity = work_queue.pop(0)
                     else:
@@ -529,6 +489,9 @@ class ASHAOptimizer:
                     )
                     active_futures[future] = (config_id, hyperparams, fidelity)
                     iteration += 1
+
+                    if iteration >= max_iterations:
+                        break
 
                 if active_futures:
                     completed_futures = []
@@ -561,11 +524,15 @@ class ASHAOptimizer:
 
                 # Break if no more work and no active evaluations
                 if not active_futures and not work_queue:
+                    # Requeued rather than discarded: this call promotes the
+                    # configuration it returns, so dropping it would lose the
+                    # promotion and end the run one rung short.
                     next_work = self._get_next_config_to_evaluate()
                     if next_work is None:
                         if verbose:
                             print("No more configurations to evaluate - stopping")
                         break
+                    work_queue.append(next_work)
 
         total_time = time.time() - start_time
 
@@ -589,7 +556,7 @@ class ASHAOptimizer:
             statistics=statistics,
         )
 
-    def _compute_statistics(self) -> Dict[str, Any]:
+    def _compute_statistics(self) -> dict[str, Any]:
         """Compute optimization statistics."""
         if not self.results_history:
             return {}
@@ -633,15 +600,15 @@ class ASHAOptimizer:
 
 
 def asha_optimize(
-    eval_function: Callable[[Dict, int], Tuple[float, Dict]],
-    initial_configurations: List[Dict[str, Any]],
+    eval_function: Callable[[dict, int], tuple[float, dict]],
+    initial_configurations: list[dict[str, Any]],
     min_fidelity: int = 1,
     max_fidelity: int = 81,
     reduction_factor: int = 3,
     max_iterations: int = 100,
     max_concurrent: int = 4,
-    timeout: Optional[float] = None,
-    random_state: Optional[int] = None,
+    timeout: float | None = None,
+    random_state: int | None = None,
     verbose: bool = True,
 ) -> MultiFidelityResult:
     """
@@ -679,28 +646,28 @@ def asha_optimize(
     --------
     >>> def evaluate_model(hyperparams, fidelity):
     ...     # Simulate training with given hyperparameters and fidelity
-    ...     lr = hyperparams['learning_rate']
-    ...     wd = hyperparams['weight_decay']
+    ...     lr = hyperparams["learning_rate"]
+    ...     wd = hyperparams["weight_decay"]
     ...
     ...     # Simulate performance improving with fidelity
-    ...     base_score = 0.7 - (lr - 0.001)**2 - (wd - 0.0001)**2
+    ...     base_score = 0.7 - (lr - 0.001) ** 2 - (wd - 0.0001) ** 2
     ...     fidelity_bonus = 0.2 * (1 - np.exp(-fidelity / 20))
     ...     noise = np.random.normal(0, 0.01)
     ...
     ...     score = base_score + fidelity_bonus + noise
-    ...     metadata = {'fidelity_used': fidelity}
+    ...     metadata = {"fidelity_used": fidelity}
     ...
     ...     return score, metadata
     >>>
     >>> configs = [
-    ...     {'learning_rate': 0.001, 'weight_decay': 0.0001},
-    ...     {'learning_rate': 0.01, 'weight_decay': 0.001},
-    ...     {'learning_rate': 0.0001, 'weight_decay': 0.00001}
+    ...     {"learning_rate": 0.001, "weight_decay": 0.0001},
+    ...     {"learning_rate": 0.01, "weight_decay": 0.001},
+    ...     {"learning_rate": 0.0001, "weight_decay": 0.00001},
     ... ]
     >>>
-    >>> result = asha_optimize(evaluate_model, configs,
-    ...                       min_fidelity=1, max_fidelity=27,
-    ...                       max_iterations=20)
+    >>> result = asha_optimize(
+    ...     evaluate_model, configs, min_fidelity=1, max_fidelity=27, max_iterations=20
+    ... )
     """
     evaluator = FunctionEvaluator(eval_function, min_fidelity, max_fidelity)
 
@@ -721,7 +688,7 @@ def asha_optimize(
     )
 
 
-def analyze_fidelity_correlation(result: MultiFidelityResult) -> Dict[str, float]:
+def analyze_fidelity_correlation(result: MultiFidelityResult) -> dict[str, float]:
     """
     Analyze correlation between different fidelity levels.
 
@@ -765,8 +732,8 @@ if __name__ == "__main__":
     print("Example 1: Quadratic Function with Fidelity")
 
     def quadratic_eval(
-        hyperparams: Dict[str, Any], fidelity: int
-    ) -> Tuple[float, Dict[str, Any]]:
+        hyperparams: dict[str, Any], fidelity: int
+    ) -> tuple[float, dict[str, Any]]:
         """Simulate model evaluation with fidelity-dependent performance."""
         x, y = hyperparams["x"], hyperparams["y"]
 
@@ -817,8 +784,8 @@ if __name__ == "__main__":
     print("Example 2: Neural Network Hyperparameter Optimization")
 
     def nn_eval(
-        hyperparams: Dict[str, Any], fidelity: int
-    ) -> Tuple[float, Dict[str, Any]]:
+        hyperparams: dict[str, Any], fidelity: int
+    ) -> tuple[float, dict[str, Any]]:
         """Simulate neural network training with different fidelities."""
         lr = hyperparams["learning_rate"]
         wd = hyperparams["weight_decay"]
@@ -923,7 +890,10 @@ if __name__ == "__main__":
         return best_score, best_config, total_budget
 
     baseline_score, baseline_config, baseline_budget = random_search_baseline(
-        nn_eval, nn_configs, 81, 10  # 10 full evaluations
+        nn_eval,
+        nn_configs,
+        81,
+        10,  # 10 full evaluations
     )
 
     print(f"Random Search Baseline (10 full evaluations):")

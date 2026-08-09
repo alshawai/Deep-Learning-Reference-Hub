@@ -3,7 +3,7 @@
 _A comprehensive collection of deep learning concepts, techniques, and best practices - carefully curated and documented for practitioners and researchers._
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Last Updated](https://img.shields.io/badge/Last%20Updated-October%202025-blue.svg)](https://github.com/yourusername/deep-learning-reference-hub)
+[![Last Updated](https://img.shields.io/github/last-commit/eima40x4c/Deep-Learning-Reference-Hub?label=Last%20Updated&color=blue)](https://github.com/eima40x4c/Deep-Learning-Reference-Hub/commits/main)
 
 ---
 
@@ -95,11 +95,13 @@ The practical documents include implementations using modern frameworks and tech
 # Example: He Initialization in TensorFlow/Keras
 import tensorflow as tf
 
-model = tf.keras.Sequential([
-    tf.keras.layers.Dense(256, input_shape=(784,),
-                         kernel_initializer='he_normal',
-                         activation='relu')
-])
+model = tf.keras.Sequential(
+    [
+        tf.keras.layers.Dense(
+            256, input_shape=(784,), kernel_initializer="he_normal", activation="relu"
+        )
+    ]
+)
 ```
 ---
 
@@ -200,10 +202,9 @@ We welcome contributions from the community! Please see our [Contributing Guidel
 
 ## 📊 Repository Statistics
 
-- **Total Documents**: 3 (and growing)
-- **Code Examples**: 8+ implementations
-- **Frameworks Covered**: PyTorch, TensorFlow, NumPy
-- **Last Updated**: July 2025
+- **Total Documents**: 5
+- **Code Examples**: 16 implementations
+- **Frameworks Covered**: NumPy
 
 ---
 

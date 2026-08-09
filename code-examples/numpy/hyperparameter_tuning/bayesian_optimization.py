@@ -30,11 +30,13 @@ which provide more robust implementations with additional features.
 """
 
 import warnings
+from collections.abc import Callable
+from dataclasses import dataclass
+from typing import Any
+
 import numpy as np
-from typing import Dict, List, Tuple, Callable, Optional, Any
 from scipy.optimize import minimize
 from scipy.stats import norm
-from dataclasses import dataclass
 
 
 @dataclass
@@ -54,10 +56,10 @@ class BayesianOptimizationResult:
         Convergence statistics and diagnostics
     """
 
-    best_params: Dict[str, Any]
+    best_params: dict[str, Any]
     best_score: float
-    history: List[Tuple[Dict[str, Any], float]]
-    convergence_data: Dict[str, Any]
+    history: list[tuple[dict[str, Any], float]]
+    convergence_data: dict[str, Any]
 
 
 class GaussianProcess:
@@ -137,7 +139,7 @@ class GaussianProcess:
             warnings.warn("Kernel matrix is singular, using pseudo-inverse")
             self.K_inv = np.linalg.pinv(K)
 
-    def predict(self, X: np.ndarray) -> Tuple[np.ndarray, np.ndarray]:
+    def predict(self, X: np.ndarray) -> tuple[np.ndarray, np.ndarray]:
         """
         Make predictions with uncertainty estimates.
 
@@ -198,13 +200,13 @@ class BayesianOptimizer:
 
     def __init__(
         self,
-        objective_function: Callable[[Dict], float],
-        search_space: Dict[str, Tuple[float, float]],
+        objective_function: Callable[[dict], float],
+        search_space: dict[str, tuple[float, float]],
         acquisition: str = "ei",
         kappa: float = 2.576,
         xi: float = 0.01,
         n_initial: int = 5,
-        random_state: Optional[int] = None,
+        random_state: int | None = None,
     ):
 
         self.objective_function = objective_function
@@ -213,6 +215,14 @@ class BayesianOptimizer:
         self.kappa = kappa
         self.xi = xi
         self.n_initial = n_initial
+
+        # Checked here rather than where the acquisition is first evaluated,
+        # which is after the initial design has run. Each of those evaluations
+        # is a full training run, so a misspelled name must not cost them.
+        if self.acquisition not in ("ei", "ucb"):
+            raise ValueError(
+                f"Unknown acquisition function: {acquisition!r}. Use 'ei' or 'ucb'."
+            )
 
         if random_state is not None:
             np.random.seed(random_state)
@@ -235,7 +245,7 @@ class BayesianOptimizer:
         """Denormalize parameters from [0, 1] to original range."""
         return X_norm * (self.bounds[:, 1] - self.bounds[:, 0]) + self.bounds[:, 0]
 
-    def _array_to_dict(self, X: np.ndarray) -> Dict[str, float]:
+    def _array_to_dict(self, X: np.ndarray) -> dict[str, float]:
         """Convert parameter array to dictionary."""
         return {name: float(val) for name, val in zip(self.param_names, X)}
 
@@ -330,7 +340,7 @@ class BayesianOptimizer:
                 if result.fun < best_val:
                     best_val = result.fun
                     best_x = result.x
-            except:
+            except Exception:
                 continue
 
         if best_x is None:
@@ -338,7 +348,7 @@ class BayesianOptimizer:
 
         return best_x
 
-    def _evaluate_objective(self, params: Dict[str, float]) -> float:
+    def _evaluate_objective(self, params: dict[str, float]) -> float:
         """
         Evaluate objective function and handle exceptions.
 
@@ -371,8 +381,9 @@ class BayesianOptimizer:
         ----------
         n_iterations : int, default=20
             Maximum number of optimization iterations
-        verbose : bool, default=True
-            Whether to print progress information
+        verbose : int, default=1
+            Reporting level: 0 is silent, 1 prints phases and new bests, 2 adds
+            every evaluation and the final configuration.
 
         Returns
         -------
@@ -404,7 +415,7 @@ class BayesianOptimizer:
                     self.best_params = params.copy()
 
                 if verbose >= 1:
-                    print(f"  {i+1}/{self.n_initial}: Score = {score:.4f}")
+                    print(f"  {i + 1}/{self.n_initial}: Score = {score:.4f}")
 
         if len(self.X_observed) == 0:
             raise RuntimeError("All initial evaluations failed")
@@ -433,26 +444,34 @@ class BayesianOptimizer:
                     self.best_params = params_next.copy()
 
                     if verbose >= 1:
-                        print(f"  Iter {iteration+1}: Score = {score:.4f} (NEW BEST!)")
+                        print(
+                            f"  Iter {iteration + 1}: Score = {score:.4f} (NEW BEST!)"
+                        )
                 else:
                     if verbose >= 2:
-                        print(f"  Iter {iteration+1}: Score = {score:.4f}")
+                        print(f"  Iter {iteration + 1}: Score = {score:.4f}")
             else:
                 if verbose >= 1:
-                    print(f"  Iter {iteration+1}: Evaluation failed")
+                    print(f"  Iter {iteration + 1}: Evaluation failed")
 
+        successful_initial = [s for _, s in self.history[: self.n_initial]]
         convergence_data = {
             "n_evaluations": len(self.history),
             "n_failed": n_iterations + self.n_initial - len(self.history),
+            # The initial design is random, so its mean is what an equal budget
+            # of random search would have averaged. Guarded because every
+            # initial point can fail while later ones succeed, and a mean over
+            # an empty list is a nan that propagates into the whole summary.
             "improvement_over_random": (
-                self.best_score
-                - np.mean([s for _, s in self.history[: self.n_initial]])
+                self.best_score - float(np.mean(successful_initial))
+                if successful_initial
+                else 0.0
             ),
             "scores": [score for _, score in self.history],
         }
 
         if verbose >= 1:
-            print(f"\nOptimization completed!")
+            print("\nOptimization completed!")
             print(f"Best score: {self.best_score:.4f}")
         if verbose >= 2:
             print(f"Best parameters: {self.best_params}")
@@ -467,13 +486,13 @@ class BayesianOptimizer:
 
 
 def optimize_hyperparameters(
-    objective_function: Callable[[Dict], float],
-    search_space: Dict[str, Tuple[float, float]],
+    objective_function: Callable[[dict], float],
+    search_space: dict[str, tuple[float, float]],
     n_iterations: int = 20,
     n_initial: int = 5,
     acquisition: str = "ei",
-    random_state: Optional[int] = None,
-    verbose: bool = True,
+    random_state: int | None = None,
+    verbose: int = 1,
 ) -> BayesianOptimizationResult:
     """
     Convenience function for Bayesian hyperparameter optimization.
@@ -492,8 +511,8 @@ def optimize_hyperparameters(
         Acquisition function ('ei' or 'ucb')
     random_state : int, optional
         Random seed for reproducibility
-    verbose : bool, default=True
-        Whether to print progress
+    verbose : int, default=1
+        Reporting level, as in :meth:`BayesianOptimizer.optimize`
 
     Returns
     -------
@@ -504,17 +523,15 @@ def optimize_hyperparameters(
     --------
     >>> def objective(params):
     ...     # Simulate training a model and return validation accuracy
-    ...     lr, wd = params['learning_rate'], params['weight_decay']
+    ...     lr, wd = params["learning_rate"], params["weight_decay"]
     ...     # Dummy objective (replace with actual model training)
-    ...     return -(lr - 0.001)**2 - (wd - 0.0001)**2 + np.random.normal(0, 0.01)
+    ...     return -((lr - 0.001) ** 2) - (wd - 0.0001) ** 2 + np.random.normal(0, 0.01)
     >>>
-    >>> search_space = {
-    ...     'learning_rate': (1e-5, 1e-1),
-    ...     'weight_decay': (1e-6, 1e-2)
-    ... }
+    >>> search_space = {"learning_rate": (1e-5, 1e-1), "weight_decay": (1e-6, 1e-2)}
     >>>
-    >>> result = optimize_hyperparameters(objective, search_space,
-    ...                                  n_iterations=30, random_state=42)
+    >>> result = optimize_hyperparameters(
+    ...     objective, search_space, n_iterations=30, random_state=42
+    ... )
     >>> print(f"Best parameters: {result.best_params}")
     """
     optimizer = BayesianOptimizer(
@@ -529,13 +546,14 @@ def optimize_hyperparameters(
 
 
 if __name__ == "__main__":
+
     def quadratic_objective(params):
         """Example objective function - quadratic with noise."""
         x, y = params["x"], params["y"]
         # Global minimum at (2, -1) with value -5
         return -((x - 2) ** 2) - (y + 1) ** 2 - 5 + np.random.normal(0, 0.1)
 
-    search_space: Dict[str, Tuple[float, float]] = {"x": (-5, 5), "y": (-5, 5)}
+    search_space: dict[str, tuple[float, float]] = {"x": (-5, 5), "y": (-5, 5)}
 
     print("Example: Optimizing quadratic function")
     print("True optimum: x=2, y=-1, value=-5")

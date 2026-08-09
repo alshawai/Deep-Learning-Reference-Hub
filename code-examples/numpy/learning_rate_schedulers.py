@@ -23,11 +23,12 @@ License
 MIT
 """
 
-import numpy as np
 import math
-from typing import Union, Callable, Dict, List, Optional, Any
-from enum import Enum
 import warnings
+from enum import Enum
+from typing import Any
+
+import numpy as np
 
 
 class SchedulerType(Enum):
@@ -80,7 +81,7 @@ class LearningRateScheduler:
         self,
         initial_lr: float,
         scheduler_type: SchedulerType = SchedulerType.CONSTANT,
-        total_steps: Optional[int] = None,
+        total_steps: int | None = None,
         **kwargs,
     ):
         if initial_lr <= 0:
@@ -101,6 +102,7 @@ class LearningRateScheduler:
         self._best_metric = None
         self._cycle_count = 0
         self._restart_count = 0
+        self._cooldown_counter = 0
 
         self._validate_parameters()
 
@@ -184,7 +186,7 @@ class LearningRateScheduler:
             if "custom_func" not in self.kwargs:
                 raise ValueError("custom_func required for CUSTOM scheduler")
 
-    def step(self, metric: Optional[float] = None) -> float:
+    def step(self, metric: float | None = None) -> float:
         """
         Update the learning rate for one step.
 
@@ -282,14 +284,19 @@ class LearningRateScheduler:
         T_mult = self.kwargs["T_mult"]
         eta_min = self.kwargs["eta_min"]
 
-        # Find which cycle we're in
+        # The cycle is recomputed from step_count on every call, so the restart
+        # count has to be assigned, not accumulated: incrementing inside this
+        # loop adds the whole cycle history again at every step.
         T_cur = self.step_count
         T_i = T_0
+        restarts = 0
 
         while T_cur >= T_i:
             T_cur -= T_i
             T_i *= T_mult
-            self._restart_count += 1
+            restarts += 1
+
+        self._restart_count = restarts
 
         return (
             eta_min
@@ -305,6 +312,7 @@ class LearningRateScheduler:
 
         cycle = math.floor(1 + self.step_count / (2 * step_size_up))
         x = abs(self.step_count / step_size_up - 2 * cycle + 1)
+        self._cycle_count = cycle
 
         if mode == "triangular":
             scale_fn = lambda x: 1.0
@@ -361,7 +369,7 @@ class LearningRateScheduler:
                     / 2
                 )
 
-    def _reduce_on_plateau(self, metric: Optional[float]) -> float:
+    def _reduce_on_plateau(self, metric: float | None) -> float:
         """Reduce on plateau scheduler."""
         if metric is None:
             warnings.warn("Metric required for REDUCE_ON_PLATEAU scheduler")
@@ -387,14 +395,24 @@ class LearningRateScheduler:
         if improved:
             self._best_metric = metric
             self._plateau_count = 0
-        else:
-            self._plateau_count += 1
+            return self.current_lr
+
+        # A reduction takes time to show up in the metric, so `cooldown` steps
+        # after one are not counted against patience. Without this the next
+        # reduction can fire before the previous one has had any effect.
+        if self._cooldown_counter > 0:
+            self._cooldown_counter -= 1
+            self._plateau_count = 0
+            return self.current_lr
+
+        self._plateau_count += 1
 
         # Reduce learning rate if patience exceeded
         if self._plateau_count > patience:
             new_lr = max(self.current_lr * factor, min_lr)
             if new_lr < self.current_lr:
                 self._plateau_count = 0
+                self._cooldown_counter = cooldown
             return new_lr
 
         return self.current_lr
@@ -440,8 +458,9 @@ class LearningRateScheduler:
         self._best_metric = None
         self._cycle_count = 0
         self._restart_count = 0
+        self._cooldown_counter = 0
 
-    def get_config(self) -> Dict[str, Any]:
+    def get_config(self) -> dict[str, Any]:
         """Get scheduler configuration."""
         return {
             "initial_lr": self.initial_lr,
@@ -451,7 +470,7 @@ class LearningRateScheduler:
             "kwargs": self.kwargs.copy(),
         }
 
-    def get_state(self) -> Dict[str, Any]:
+    def get_state(self) -> dict[str, Any]:
         """Get complete scheduler state."""
         return {
             "config": self.get_config(),
@@ -461,9 +480,10 @@ class LearningRateScheduler:
             "best_metric": self._best_metric,
             "cycle_count": self._cycle_count,
             "restart_count": self._restart_count,
+            "cooldown_counter": self._cooldown_counter,
         }
 
-    def load_state(self, state: Dict[str, Any]) -> None:
+    def load_state(self, state: dict[str, Any]) -> None:
         """Load scheduler state."""
         config = state["config"]
         self.initial_lr = config["initial_lr"]
@@ -478,6 +498,7 @@ class LearningRateScheduler:
         self._best_metric = state["best_metric"]
         self._cycle_count = state["cycle_count"]
         self._restart_count = state["restart_count"]
+        self._cooldown_counter = state.get("cooldown_counter", 0)
 
 
 # Factory functions for common schedulers

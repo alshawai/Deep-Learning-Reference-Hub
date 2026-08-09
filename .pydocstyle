@@ -1,3 +1,0 @@
-[pydocstyle]
-convention = numpy
-add-ignore = D107,D205,D400,D401

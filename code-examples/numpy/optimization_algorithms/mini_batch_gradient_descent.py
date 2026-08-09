@@ -14,9 +14,10 @@ License
 MIT
 """
 
-import numpy as np
-from typing import List, Tuple, Optional, Dict, Any
 import random
+from typing import Any
+
+import numpy as np
 
 
 class MiniBatchGradientDescent:
@@ -54,7 +55,7 @@ class MiniBatchGradientDescent:
         learning_rate: float = 0.001,
         batch_size: int = 64,
         shuffle: bool = True,
-        random_seed: Optional[int] = None,
+        random_seed: int | None = None,
     ):
         self.learning_rate = learning_rate
         self.batch_size = batch_size
@@ -67,7 +68,7 @@ class MiniBatchGradientDescent:
 
     def create_mini_batches(
         self, X: np.ndarray, Y: np.ndarray
-    ) -> List[Tuple[np.ndarray, np.ndarray]]:
+    ) -> list[tuple[np.ndarray, np.ndarray]]:
         """
         Create mini-batches from training data with optional shuffling.
 
@@ -118,8 +119,8 @@ class MiniBatchGradientDescent:
         return mini_batchs
 
     def update_parameters(
-        self, parameters: Dict[str, np.ndarray], gradients: Dict[str, np.ndarray]
-    ) -> Dict[str, np.ndarray]:
+        self, parameters: dict[str, np.ndarray], gradients: dict[str, np.ndarray]
+    ) -> dict[str, np.ndarray]:
         """
         Update model parameters using gradient descent.
 
@@ -153,11 +154,11 @@ class MiniBatchGradientDescent:
         self,
         X: np.ndarray,
         Y: np.ndarray,
-        parameters: Dict[str, np.ndarray],
+        parameters: dict[str, np.ndarray],
         forward_propagation_fn: callable,
         backward_propagation_fn: callable,
         compute_cost_fn: callable,
-    ) -> Tuple[Dict[str, np.ndarray], float]:
+    ) -> tuple[dict[str, np.ndarray], float]:
         """
         Train for one epoch using mini-batch gradient descent.
 
@@ -201,14 +202,14 @@ class MiniBatchGradientDescent:
         self,
         X: np.ndarray,
         Y: np.ndarray,
-        parameters: Dict[str, np.ndarray],
+        parameters: dict[str, np.ndarray],
         forward_propagation_fn: callable,
         backward_propagation_fn: callable,
         compute_cost_fn: callable,
         epochs: int = 1000,
         print_cost: bool = True,
         print_every: int = 100,
-    ) -> Dict[str, np.ndarray]:
+    ) -> dict[str, np.ndarray]:
         """
         Train the model using mini-batch gradient descent.
 
@@ -260,7 +261,7 @@ class MiniBatchGradientDescent:
 
         return parameters
 
-    def get_config(self) -> Dict[str, Any]:
+    def get_config(self) -> dict[str, Any]:
         """
         Get optimizer configuration.
 
@@ -278,7 +279,7 @@ class MiniBatchGradientDescent:
 
 
 # Example usage and utility functions
-def initialize_parameters(layer_dims: List[int]) -> Dict[str, np.ndarray]:
+def initialize_parameters(layer_dims: list[int]) -> dict[str, np.ndarray]:
     """
     Initialize parameters for a neural network with given layer dimensions.
 

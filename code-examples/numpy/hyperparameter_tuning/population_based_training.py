@@ -31,14 +31,16 @@ PBT is particularly effective for:
 4. Large-scale distributed training with multiple workers
 """
 
-import numpy as np
-from typing import Dict, List, Tuple, Callable, Optional, Any
-from dataclasses import dataclass, field
-from abc import ABC, abstractmethod
-import time
 import copy
 import threading
+import time
 import warnings
+from abc import ABC, abstractmethod
+from collections.abc import Callable
+from dataclasses import dataclass, field
+from typing import Any
+
+import numpy as np
 
 
 @dataclass
@@ -63,11 +65,11 @@ class WorkerState:
     """
 
     worker_id: int
-    hyperparams: Dict[str, Any]
-    performance_history: List[float] = field(default_factory=list)
+    hyperparams: dict[str, Any]
+    performance_history: list[float] = field(default_factory=list)
     training_step: int = 0
     model_state: Any = None
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    metadata: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass
@@ -92,11 +94,11 @@ class PBTResult:
     """
 
     best_worker: WorkerState
-    final_population: List[WorkerState]
-    population_history: List[List[WorkerState]]
+    final_population: list[WorkerState]
+    population_history: list[list[WorkerState]]
     total_training_time: float
     total_steps: int
-    statistics: Dict[str, Any] = field(default_factory=dict)
+    statistics: dict[str, Any] = field(default_factory=dict)
 
 
 class HyperparameterDistribution(ABC):
@@ -146,8 +148,8 @@ class LogUniformPerturbation(HyperparameterDistribution):
 
     def __init__(
         self,
-        factor_range: Tuple[float, float] = (0.8, 1.2),
-        bounds: Optional[Tuple[float, float]] = None,
+        factor_range: tuple[float, float] = (0.8, 1.2),
+        bounds: tuple[float, float] | None = None,
     ):
         self.factor_range = factor_range
         self.bounds = bounds
@@ -182,7 +184,7 @@ class UniformPerturbation(HyperparameterDistribution):
     """
 
     def __init__(
-        self, noise_std: float = 0.1, bounds: Optional[Tuple[float, float]] = None
+        self, noise_std: float = 0.1, bounds: tuple[float, float] | None = None
     ):
         self.noise_std = noise_std
         self.bounds = bounds
@@ -215,7 +217,7 @@ class ChoicePerturbation(HyperparameterDistribution):
         Probability of changing to a different value
     """
 
-    def __init__(self, choices: List[Any], change_probability: float = 0.3):
+    def __init__(self, choices: list[Any], change_probability: float = 0.3):
         self.choices = choices
         self.change_probability = change_probability
 
@@ -243,8 +245,8 @@ class WorkerInterface(ABC):
 
     @abstractmethod
     def train_step(
-        self, hyperparams: Dict[str, Any], steps: int = 1
-    ) -> Tuple[float, Any]:
+        self, hyperparams: dict[str, Any], steps: int = 1
+    ) -> tuple[float, Any]:
         """
         Train for specified number of steps.
 
@@ -323,8 +325,8 @@ class FunctionWorker(WorkerInterface):
         self.reset_function = reset_function
 
     def train_step(
-        self, hyperparams: Dict[str, Any], steps: int = 1
-    ) -> Tuple[float, Any]:
+        self, hyperparams: dict[str, Any], steps: int = 1
+    ) -> tuple[float, Any]:
         """Train using wrapped function."""
         return self.train_function(hyperparams, steps)
 
@@ -373,14 +375,14 @@ class PopulationBasedTrainer:
     def __init__(
         self,
         worker_factory: Callable[[], WorkerInterface],
-        initial_hyperparams: List[Dict[str, Any]],
-        hyperparam_distributions: Dict[str, HyperparameterDistribution],
+        initial_hyperparams: list[dict[str, Any]],
+        hyperparam_distributions: dict[str, HyperparameterDistribution],
         population_size: int = 10,
         eval_interval: int = 100,
         exploit_fraction: float = 0.2,
         explore_fraction: float = 0.2,
         truncation_selection: bool = True,
-        random_state: Optional[int] = None,
+        random_state: int | None = None,
     ):
 
         self.worker_factory = worker_factory
@@ -424,7 +426,7 @@ class PopulationBasedTrainer:
             )
             self.population.append(worker_state)
 
-    def _evaluate_population(self, workers: List[WorkerInterface]) -> List[float]:
+    def _evaluate_population(self, workers: list[WorkerInterface]) -> list[float]:
         """
         Evaluate current performance of all workers.
 
@@ -446,6 +448,13 @@ class PopulationBasedTrainer:
                     self.population[i].hyperparams, self.eval_interval
                 )
 
+                # A diverged run reports nan, and nan sorts to the end of
+                # np.argsort -- so the worker that just blew up would be read as
+                # the population's best and have its hyperparameters copied into
+                # everyone else. Treated as the worst possible score instead.
+                if not np.isfinite(score):
+                    score = -np.inf
+
                 # Update worker state
                 self.population[i].performance_history.append(score)
                 self.population[i].training_step += self.eval_interval
@@ -460,7 +469,7 @@ class PopulationBasedTrainer:
         return scores
 
     def _exploit_and_explore(
-        self, workers: List[WorkerInterface], scores: List[float]
+        self, workers: list[WorkerInterface], scores: list[float]
     ) -> None:
         """
         Perform exploitation and exploration step.
@@ -476,7 +485,13 @@ class PopulationBasedTrainer:
             return
 
         sorted_indices = np.argsort(scores)
+
+        # Truncation selection needs the two ends to be disjoint. Above half the
+        # population they overlap, which puts a top performer in the list of
+        # workers to overwrite: its state is replaced and then perturbed, so the
+        # generation's best result is destroyed by the step meant to spread it.
         n_exploit = max(1, int(self.exploit_fraction * len(scores)))
+        n_exploit = min(n_exploit, len(scores) // 2)
 
         worst_indices = sorted_indices[:n_exploit]
         best_indices = sorted_indices[-n_exploit:]
@@ -496,9 +511,9 @@ class PopulationBasedTrainer:
                     ].model_state
 
                 self.population[worst_idx].performance_history = []
-                self.population[worst_idx].metadata[
-                    "generation_created"
-                ] = self.generation
+                self.population[worst_idx].metadata["generation_created"] = (
+                    self.generation
+                )
 
             self._perturb_hyperparams(worst_idx)
 
@@ -526,7 +541,7 @@ class PopulationBasedTrainer:
         self,
         max_steps: int = 10000,
         max_generations: int = 100,
-        timeout: Optional[float] = None,
+        timeout: float | None = None,
         verbose: bool = True,
     ) -> PBTResult:
         """
@@ -572,7 +587,6 @@ class PopulationBasedTrainer:
             and self.generation < max_generations
             and (timeout is None or time.time() - start_time < timeout)
         ):
-
             scores = self._evaluate_population(workers)
             self.total_steps += self.population_size * self.eval_interval
 
@@ -672,7 +686,7 @@ class PopulationBasedTrainer:
             statistics=statistics,
         )
 
-    def _compute_diversity_metrics(self) -> Dict[str, float]:
+    def _compute_diversity_metrics(self) -> dict[str, float]:
         """Compute population diversity metrics."""
         if not self.population_history:
             return {}
@@ -710,7 +724,7 @@ class PopulationBasedTrainer:
             ),
         }
 
-    def _find_convergence_generation(self) -> Optional[int]:
+    def _find_convergence_generation(self) -> int | None:
         """Find the generation where population converged."""
         if len(self.population_history) < 5:
             return None
@@ -737,18 +751,18 @@ class PopulationBasedTrainer:
 
 
 def pbt_optimize(
-    train_function: Callable[[Dict, int], Tuple[float, Any]],
+    train_function: Callable[[dict, int], tuple[float, Any]],
     save_function: Callable[[], Any],
     load_function: Callable[[Any], None],
     reset_function: Callable[[], None],
-    initial_hyperparams: List[Dict[str, Any]],
-    hyperparam_distributions: Dict[str, HyperparameterDistribution],
+    initial_hyperparams: list[dict[str, Any]],
+    hyperparam_distributions: dict[str, HyperparameterDistribution],
     population_size: int = 10,
     max_steps: int = 10000,
     eval_interval: int = 100,
     exploit_fraction: float = 0.2,
     explore_fraction: float = 0.2,
-    random_state: Optional[int] = None,
+    random_state: int | None = None,
     verbose: bool = True,
 ) -> PBTResult:
     """
@@ -793,13 +807,13 @@ def pbt_optimize(
     >>> # Define training functions
     >>> def train_step(hyperparams, steps):
     ...     # Simulate training
-    ...     lr = hyperparams['learning_rate']
+    ...     lr = hyperparams["learning_rate"]
     ...     # Performance improves with more steps but depends on lr
-    ...     performance = 0.8 - (lr - 0.001)**2 + steps * 0.001
-    ...     return performance, {'step': steps}
+    ...     performance = 0.8 - (lr - 0.001) ** 2 + steps * 0.001
+    ...     return performance, {"step": steps}
     >>>
     >>> def save_state():
-    ...     return getattr(save_state, 'state', {})
+    ...     return getattr(save_state, "state", {})
     >>>
     >>> def load_state(state):
     ...     save_state.state = state
@@ -809,17 +823,24 @@ def pbt_optimize(
     >>>
     >>> # Define hyperparameters
     >>> initial_configs = [
-    ...     {'learning_rate': 0.001},
-    ...     {'learning_rate': 0.01},
-    ...     {'learning_rate': 0.0001}
+    ...     {"learning_rate": 0.001},
+    ...     {"learning_rate": 0.01},
+    ...     {"learning_rate": 0.0001},
     ... ]
     >>>
     >>> distributions = {
-    ...     'learning_rate': LogUniformPerturbation((0.8, 1.2), (1e-5, 1e-1))
+    ...     "learning_rate": LogUniformPerturbation((0.8, 1.2), (1e-5, 1e-1))
     ... }
     >>>
-    >>> result = pbt_optimize(train_step, save_state, load_state, reset,
-    ...                      initial_configs, distributions, population_size=5)
+    >>> result = pbt_optimize(
+    ...     train_step,
+    ...     save_state,
+    ...     load_state,
+    ...     reset,
+    ...     initial_configs,
+    ...     distributions,
+    ...     population_size=5,
+    ... )
     """
 
     def worker_factory():
@@ -846,7 +867,7 @@ if __name__ == "__main__":
 
     worker_states_simple = {}
 
-    def simple_train_step(hyperparams: Dict[str, Any], steps: int) -> Tuple[float, Any]:
+    def simple_train_step(hyperparams: dict[str, Any], steps: int) -> tuple[float, Any]:
         """Simulate training step with time-varying optimal hyperparameters."""
         worker_id = threading.current_thread().ident
 
@@ -924,7 +945,7 @@ if __name__ == "__main__":
 
     worker_states_nn = {}
 
-    def nn_train_step(hyperparams: Dict[str, Any], steps: int) -> Tuple[float, Any]:
+    def nn_train_step(hyperparams: dict[str, Any], steps: int) -> tuple[float, Any]:
         """Simulate neural network training with multiple hyperparameters."""
         worker_id = threading.current_thread().ident
 
@@ -1129,8 +1150,8 @@ if __name__ == "__main__":
     worker_states_fixed = {}
 
     def fixed_nn_train_step(
-        hyperparams: Dict[str, Any], steps: int
-    ) -> Tuple[float, Any]:
+        hyperparams: dict[str, Any], steps: int
+    ) -> tuple[float, Any]:
         """Simulate neural network training with fixed hyperparameters."""
         worker_id = threading.current_thread().ident
 
@@ -1209,7 +1230,7 @@ if __name__ == "__main__":
     print(f"  Fixed hyperparams best score: {fixed_best:.6f}")
     if pbt_best > -np.inf and fixed_best > -np.inf:
         print(
-            f"  Improvement: {(pbt_best - fixed_best):.6f} ({100*(pbt_best - fixed_best)/fixed_best:.2f}%)"
+            f"  Improvement: {(pbt_best - fixed_best):.6f} ({100 * (pbt_best - fixed_best) / fixed_best:.2f}%)"
         )
 
     if pbt_best > fixed_best:

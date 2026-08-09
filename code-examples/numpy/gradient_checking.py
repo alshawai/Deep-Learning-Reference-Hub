@@ -28,16 +28,17 @@ Notes
 - Use small ε (e.g. 1e-7), and expect relative difference < 1e-7.
 """
 
+from collections.abc import Callable
+
 import numpy as np
-from typing import Dict, Tuple
 
 
 def gradient_check(
-    parameters: Dict[str, np.ndarray],
-    gradients: Dict[str, np.ndarray],
+    parameters: dict[str, np.ndarray],
+    gradients: dict[str, np.ndarray],
     X: np.ndarray,
     Y: np.ndarray,
-    cost_function: callable,
+    cost_function: Callable[[np.ndarray, np.ndarray, dict[str, np.ndarray]], float],
     epsilon: float = 1e-7,
 ) -> float:
     """
@@ -55,7 +56,7 @@ def gradient_check(
         True labels
     cost_function : callable
         Function that computes cost given (X, Y, parameters)
-    epsilon : float, defualt=1e-7
+    epsilon : float, default=1e-7
         Small value for numerical differentiation
 
     Returns
@@ -73,15 +74,16 @@ def gradient_check(
     num_parameters = params_vector.shape[0]
     gradapprox = np.zeros((num_parameters, 1))
 
-    # Assuming `cost_function` is already implemented
+    # Each parameter is shifted in a fresh copy of the vector, so the caller's
+    # `parameters` is never left holding a perturbed value.
     for i in range(num_parameters):
         theta_plus = np.copy(params_vector)
         theta_plus[i] = theta_plus[i] + epsilon
-        J_plus = cost_function(vector_to_dictionary(theta_plus, param_shapes))
+        J_plus = cost_function(X, Y, vector_to_dictionary(theta_plus, param_shapes))
 
         theta_minus = np.copy(params_vector)
         theta_minus[i] = theta_minus[i] - epsilon
-        J_minus = cost_function(vector_to_dictionary(theta_minus, param_shapes))
+        J_minus = cost_function(X, Y, vector_to_dictionary(theta_minus, param_shapes))
 
         gradapprox[i] = (J_plus - J_minus) / (2 * epsilon)  # Numerical Gradient
 
@@ -93,7 +95,7 @@ def gradient_check(
         return 0.0
     difference = numerator / denominator
 
-    print(f"Gradient Check Results:")
+    print("Gradient Check Results:")
     print(f"  Numerical gradient norm: {np.linalg.norm(gradapprox):.6f}")
     print(f"  Analytical gradient norm: {np.linalg.norm(grad_vector):.6f}")
     print(f"  Relative difference: {difference:.2e}")
@@ -111,19 +113,19 @@ def gradient_check(
 
 
 def dictionary_to_vector(
-    parameters: Dict[str, np.ndarray],
-) -> Tuple[np.ndarray, Dict[str, tuple]]:
+    parameters: dict[str, np.ndarray],
+) -> tuple[np.ndarray, dict[str, tuple]]:
     """
     Convert parameter dictionary to a single vector while preserving shape information.
 
     Parameters
     ----------
-    parameters : Dict[str, np.ndarray]
+    parameters : dict[str, np.ndarray]
         Dictionary with parameter names as keys and numpy arrays as values
 
     Returns
     -------
-    Tuple[np.ndarray, Dict[str, tuple]]: (theta, shapes) where:
+    tuple[np.ndarray, dict[str, tuple]]: (theta, shapes) where:
         - theta: Single column vector containing all parameters
         - shapes: Dictionary mapping parameter names to their original shapes
     """
@@ -143,8 +145,8 @@ def dictionary_to_vector(
 
 
 def vector_to_dictionary(
-    theta: np.ndarray, shapes: Dict[str, np.ndarray]
-) -> Dict[str, np.ndarray]:
+    theta: np.ndarray, shapes: dict[str, tuple]
+) -> dict[str, np.ndarray]:
     """
     Convert a parameter vector back to dictionary format using stored shapes.
 
@@ -152,12 +154,12 @@ def vector_to_dictionary(
     ----------
     theta : np.ndarray
         Column vector containing all parameters
-    shapes : Dict[str, np.ndarray]
+    shapes : dict[str, tuple]
         Dictionary mapping parameter names to their original shapes
 
     Returns
     -------
-    Dict[str, np.ndarray]
+    dict[str, np.ndarray]
         Dictionary with parameter names as keys and reshaped arrays as values
     """
     parameters = {}

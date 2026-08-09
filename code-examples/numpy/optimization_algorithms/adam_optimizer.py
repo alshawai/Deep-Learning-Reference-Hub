@@ -19,9 +19,9 @@ License
 MIT
 """
 
-import numpy as np
-from typing import Dict, Optional, Tuple
 import warnings
+
+import numpy as np
 
 
 class AdamOptimizer:
@@ -75,8 +75,8 @@ class AdamOptimizer:
         epsilon: float = 1e-8,
         weight_decay: float = 0.0,
         amsgrad: bool = False,
-        gradient_clip_norm: Optional[float] = None,
-        gradient_clip_value: Optional[float] = None,
+        gradient_clip_norm: float | None = None,
+        gradient_clip_value: float | None = None,
     ):
         if not 0.0 < learning_rate <= 1.0:
             raise ValueError(f"Invalid learning rate: {learning_rate}")
@@ -98,9 +98,9 @@ class AdamOptimizer:
         self.gradient_clip_norm = gradient_clip_norm
         self.gradient_clip_value = gradient_clip_value
 
-        self.m: Dict[str, np.ndarray] = {}
-        self.v: Dict[str, np.ndarray] = {}
-        self.v_hat_max: Dict[str, np.ndarray] = {}
+        self.m: dict[str, np.ndarray] = {}
+        self.v: dict[str, np.ndarray] = {}
+        self.v_hat_max: dict[str, np.ndarray] = {}
         self.t = 0
 
         self.history = {
@@ -111,7 +111,7 @@ class AdamOptimizer:
         }
 
     def _initialize_moments(
-        self, param_name: str, param_shape: Tuple[int, ...]
+        self, param_name: str, param_shape: tuple[int, ...]
     ) -> None:
         """Initialize moment estimates for a parameter."""
         if param_name not in self.m:
@@ -121,8 +121,8 @@ class AdamOptimizer:
                 self.v_hat_max[param_name] = np.zeros(param_shape, dtype=np.float64)
 
     def _clip_gradients(
-        self, gradients: Dict[str, np.ndarray]
-    ) -> Dict[str, np.ndarray]:
+        self, gradients: dict[str, np.ndarray]
+    ) -> dict[str, np.ndarray]:
         """
         Apply gradient clipping if specified.
 
@@ -157,8 +157,8 @@ class AdamOptimizer:
         return gradients
 
     def update(
-        self, parameters: Dict[str, np.ndarray], gradients: Dict[str, np.ndarray]
-    ) -> Dict[str, np.ndarray]:
+        self, parameters: dict[str, np.ndarray], gradients: dict[str, np.ndarray]
+    ) -> dict[str, np.ndarray]:
         """
         Perform a single optimization step.
 
@@ -226,7 +226,7 @@ class AdamOptimizer:
 
         return updated_parameters
 
-    def get_config(self) -> Dict:
+    def get_config(self) -> dict:
         """
         Get optimizer configuration.
 
@@ -260,7 +260,7 @@ class AdamOptimizer:
             "learning_rate": [],
         }
 
-    def get_state(self) -> Dict:
+    def get_state(self) -> dict:
         """
         Get complete optimizer state.
 
@@ -279,7 +279,7 @@ class AdamOptimizer:
             "history": self.history.copy(),
         }
 
-    def load_state(self, state: Dict) -> None:
+    def load_state(self, state: dict) -> None:
         """
         Load optimizer state.
 

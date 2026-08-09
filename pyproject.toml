@@ -1,0 +1,50 @@
+[tool.ruff]
+line-length = 88
+target-version = "py310"
+extend-exclude = ["tools", ".claude"]
+
+[tool.ruff.lint]
+# Defects first, then the two conventions that are worth enforcing mechanically.
+#
+# `I` (import order) and `UP` (modern syntax) are style, not defects, and they are
+# selected anyway. Both describe conventions every Python reader already knows, so
+# enforcing them costs a contributor nothing and spares every future reviewer the
+# argument.
+select = ["E9", "F63", "F7", "F82", "F401", "F811", "D", "I", "UP"]
+# The ignored D rules are the ones that police docstring shape rather than
+# docstring presence: a missing summary line, a first line that does not end in a
+# period, an imperative-mood check. None of them can catch a wrong equation, and
+# each one turns the gate red for prose the reader is happy with.
+ignore = ["D107", "D205", "D400", "D401", "D204", "D105"]
+
+# For the current cost of clearing any of them:
+#   ruff check --select W291,W293,E501,NPY002,F841,B028,E741 --statistics .
+#
+# The rule for adding one: clear it across the tree in a single commit, then
+# select it here so it cannot come back. Never let the linter split a migration
+# one file at a time.
+
+[tool.ruff.lint.pydocstyle]
+# NumPy style. Stated here because general-purpose Python tooling and skills
+# default to Google style.
+convention = "numpy"
+
+[tool.ruff.lint.per-file-ignores]
+# Docstring-presence rules are aimed at the teaching implementations, where a
+# reader arrives at a function needing to be told what it computes. A test states
+# its subject in its own name, and the tests that need more carry a docstring
+# explaining what breaks when the assertion fails -- which is the part worth
+# writing and the part no linter can check for. Requiring one on all 300-odd of
+# them would buy `"""Test that the population thins."""` above
+# `test_the_population_thins`, and a red gate until every one was written.
+#
+# Module docstrings (D100) are still required: each test file opens with why the
+# module is worth testing this way.
+"tests/*" = ["D101", "D102", "D103"]
+
+[tool.ruff.format]
+docstring-code-format = true
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
