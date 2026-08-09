@@ -26,9 +26,10 @@ Notes
 - Includes optional gradient checking and loss tracking
 """
 
-import numpy as np
+from typing import Any
+
 import matplotlib.pyplot as plt
-from typing import Tuple, List, Optional, Dict, Any
+import numpy as np
 
 
 class DeepNeuralNetwork:
@@ -89,9 +90,9 @@ class DeepNeuralNetwork:
 
     def __init__(
         self,
-        layer_dims: List[int],
+        layer_dims: list[int],
         initialization: str = "he",
-        regularization: Optional[str] = None,
+        regularization: str | None = None,
         lambda_reg: float = 0.01,
         keep_prob: float = 0.8,
         use_batch_norm: bool = True,
@@ -129,9 +130,9 @@ class DeepNeuralNetwork:
 
     def _validate_inputs(
         self,
-        layer_dims: List[int],
+        layer_dims: list[int],
         initialization: str,
-        regularization: Optional[str],
+        regularization: str | None,
         lambda_reg: float,
         keep_prob: float,
     ) -> None:
@@ -154,7 +155,7 @@ class DeepNeuralNetwork:
         if not 0 < keep_prob <= 1:
             raise ValueError("Keep probability must be in (0, 1]")
 
-    def _initialize_parameters(self, method: str) -> Dict[str, np.ndarray]:
+    def _initialize_parameters(self, method: str) -> dict[str, np.ndarray]:
         """
         Initialize network parameters using specified method.
 
@@ -187,7 +188,7 @@ class DeepNeuralNetwork:
 
         return parameters
 
-    def _initialize_batch_norm(self) -> Dict[str, np.ndarray]:
+    def _initialize_batch_norm(self) -> dict[str, np.ndarray]:
         """
         Initialize batch normalization parameters.
 
@@ -226,7 +227,7 @@ class DeepNeuralNetwork:
 
     def forward_propagation(
         self, X: np.ndarray, training: bool = True
-    ) -> Tuple[np.ndarray, List]:
+    ) -> tuple[np.ndarray, list]:
         """
         Perform forward propagation through the network.
 
@@ -283,7 +284,7 @@ class DeepNeuralNetwork:
 
     def _batch_norm_forward(
         self, Z: np.ndarray, l: int, training: bool, eps: float = 1e-8
-    ) -> Tuple[np.ndarray, Optional[Tuple]]:
+    ) -> tuple[np.ndarray, tuple | None]:
         """
         Batch normalization forward pass.
 
@@ -295,7 +296,7 @@ class DeepNeuralNetwork:
             Layer index
         training : bool, default=True
             Whether in training mode
-        eps : float, defualt=1e-8
+        eps : float, default=1e-8
             Small constant for numerical stability
 
         Returns
@@ -329,7 +330,7 @@ class DeepNeuralNetwork:
 
     def _dropout_forward(
         self, A: np.ndarray, keep_prob: float
-    ) -> Tuple[np.ndarray, np.ndarray]:
+    ) -> tuple[np.ndarray, np.ndarray]:
         """
         Dropout forward pass.
 
@@ -390,8 +391,8 @@ class DeepNeuralNetwork:
         return np.squeeze(cost)
 
     def backward_propagation(
-        self, AL: np.ndarray, Y: np.ndarray, caches: List
-    ) -> Dict[str, np.ndarray]:
+        self, AL: np.ndarray, Y: np.ndarray, caches: list
+    ) -> dict[str, np.ndarray]:
         """
         Perform backward propagation to compute gradients.
 
@@ -450,7 +451,7 @@ class DeepNeuralNetwork:
         return grads
 
     def _batch_norm_backward(
-        self, dZ_out: np.ndarray, cache: Tuple, l: int
+        self, dZ_out: np.ndarray, cache: tuple, l: int
     ) -> np.ndarray:
         """
         Batch normalization backward pass.
@@ -494,7 +495,7 @@ class DeepNeuralNetwork:
 
         return dZ
 
-    def _clip_gradients(self, grads: Dict[str, np.ndarray]) -> Dict[str, np.ndarray]:
+    def _clip_gradients(self, grads: dict[str, np.ndarray]) -> dict[str, np.ndarray]:
         """
         Apply gradient clipping to prevent exploding gradients.
 
@@ -521,7 +522,7 @@ class DeepNeuralNetwork:
         return grads
 
     def update_parameters(
-        self, grads: Dict[str, np.ndarray], learning_rate: float
+        self, grads: dict[str, np.ndarray], learning_rate: float
     ) -> None:
         """
         Update network parameters using gradients.
@@ -580,7 +581,7 @@ class DeepNeuralNetwork:
         decay_step: int = 100,
         early_stopping: bool = True,
         patience: int = 50,
-    ) -> Dict[str, List]:
+    ) -> dict[str, list]:
         """
         Train the neural network with advanced techniques.
 
@@ -709,7 +710,7 @@ class DeepNeuralNetwork:
         AL, _ = self.forward_propagation(X, training=False)
         return AL
 
-    def plot_training_history(self, figsize: Tuple[int, int] = (15, 5)) -> None:
+    def plot_training_history(self, figsize: tuple[int, int] = (15, 5)) -> None:
         """
         Plot training history including cost and accuracy curves.
 
@@ -747,7 +748,7 @@ class DeepNeuralNetwork:
         plt.tight_layout()
         plt.show()
 
-    def get_model_info(self) -> Dict[str, Any]:
+    def get_model_info(self) -> dict[str, Any]:
         """
         Get comprehensive model information.
 
@@ -777,7 +778,7 @@ class DeepNeuralNetwork:
 # Example usage and testing
 def create_sample_data(
     n_features: int = 128, n_train: int = 1000, n_val: int = 200
-) -> Tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
+) -> tuple[np.ndarray, np.ndarray, np.ndarray, np.ndarray]:
     """
     Create sample dataset for testing.
 
@@ -785,7 +786,7 @@ def create_sample_data(
     ----------
     n_features : int, default=128
         Number of input features
-    n_train : int, defualt=1000
+    n_train : int, default=1000
         Number of training samples
     n_val : int, default=200
         Number of validation samples

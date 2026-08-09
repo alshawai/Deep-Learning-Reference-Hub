@@ -31,11 +31,13 @@ The learning rate finder is particularly useful for:
 4. Setting appropriate learning rates for different optimizers
 """
 
-import numpy as np
-import matplotlib.pyplot as plt
-from typing import Dict, Tuple, Callable, Optional, Any
-from dataclasses import dataclass
 from abc import ABC, abstractmethod
+from collections.abc import Callable
+from dataclasses import dataclass
+from typing import Any
+
+import matplotlib.pyplot as plt
+import numpy as np
 
 
 @dataclass
@@ -64,7 +66,7 @@ class LearningRateFinderResult:
     smoothed_losses: np.ndarray
     suggested_lr: float
     min_gradient_lr: float
-    analysis: Dict[str, Any]
+    analysis: dict[str, Any]
 
 
 class BaseTrainer(ABC):
@@ -175,12 +177,14 @@ class LearningRateFinder:
         self.smooth_beta = smooth_beta
         self.divergence_threshold = divergence_threshold
 
-        # Validate parameters
+        # Validated against the normalized value, not the raw argument: lowering
+        # the case and then rejecting the un-lowered form makes the normalization
+        # unreachable and turns "EXP" into an error.
         if min_lr >= max_lr:
             raise ValueError("min_lr must be less than max_lr")
         if not 0 < smooth_beta < 1:
             raise ValueError("smooth_beta must be between 0 and 1")
-        if step_mode not in ["exp", "linear"]:
+        if self.step_mode not in ["exp", "linear"]:
             raise ValueError("step_mode must be 'exp' or 'linear'")
 
     def _generate_learning_rates(self) -> np.ndarray:
@@ -245,14 +249,16 @@ class LearningRateFinder:
         min_loss = np.min(losses[: iteration + 1])
         current_loss = losses[iteration]
 
-        return current_loss > self.divergence_threshold * min_loss
+        # Cast to a plain bool, as annotated. The comparison yields np.bool_,
+        # which is falsy-correct but fails an `is False` identity check.
+        return bool(current_loss > self.divergence_threshold * min_loss)
 
     def _analyze_results(
         self,
         learning_rates: np.ndarray,
         losses: np.ndarray,
         smoothed_losses: np.ndarray,
-    ) -> Dict[str, Any]:
+    ) -> dict[str, Any]:
         """
         Analyze learning rate finder results.
 
@@ -376,7 +382,7 @@ class LearningRateFinder:
         analysis = self._analyze_results(learning_rates, losses, smoothed_losses)
 
         if verbose:
-            print(f"\nLearning Rate Finder completed!")
+            print("\nLearning Rate Finder completed!")
             print(f"Suggested learning rate: {analysis['suggested_lr']:.2e}")
             print(
                 f"Learning rate with steepest gradient: {analysis['min_gradient_lr']:.2e}"
@@ -396,8 +402,8 @@ class LearningRateFinder:
     def plot_results(
         self,
         result: LearningRateFinderResult,
-        figsize: Tuple[int, int] = (12, 8),
-        save_path: Optional[str] = None,
+        figsize: tuple[int, int] = (12, 8),
+        save_path: str | None = None,
     ) -> None:
         """
         Plot learning rate finder results.
@@ -597,7 +603,7 @@ def find_learning_rate(
 
 def suggest_learning_rate_schedule(
     result: LearningRateFinderResult, schedule_type: str = "onecycle"
-) -> Dict[str, Any]:
+) -> dict[str, Any]:
     """
     Suggest learning rate schedule based on finder results.
 
@@ -786,7 +792,7 @@ if __name__ == "__main__":
             f"  Coefficient of variation: {result.analysis['coefficient_of_variation']:.3f}"
         )
 
-    print(f"\nComparison:")
+    print("\nComparison:")
     exp_result = results["exp"]
     lin_result = results["linear"]
     print(f"  Exponential stepping found LR: {exp_result.suggested_lr:.2e}")

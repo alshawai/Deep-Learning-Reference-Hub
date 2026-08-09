@@ -14,8 +14,9 @@ License
 MIT
 """
 
+from typing import Any
+
 import numpy as np
-from typing import Dict, Any, Tuple
 
 
 class MomentumOptimizer:
@@ -70,7 +71,7 @@ class MomentumOptimizer:
         self.t = 0  # Time step
         self.history = {"loss": [], "gradient_norm": []}
 
-    def initialize_velocity(self, parameters: Dict[str, np.ndarray]) -> None:
+    def initialize_velocity(self, parameters: dict[str, np.ndarray]) -> None:
         """
         Initialize velocity (momentum) estimates for all parameters.
 
@@ -87,8 +88,8 @@ class MomentumOptimizer:
             self.v[key] = np.zeros_like(parameters[key])
 
     def update_parameters(
-        self, parameters: Dict[str, np.ndarray], gradients: Dict[str, np.ndarray]
-    ) -> Dict[str, np.ndarray]:
+        self, parameters: dict[str, np.ndarray], gradients: dict[str, np.ndarray]
+    ) -> dict[str, np.ndarray]:
         """
         Update parameters using momentum-based gradient descent.
 
@@ -130,7 +131,7 @@ class MomentumOptimizer:
 
         return updated_parameters
 
-    def compute_gradient_norm(self, gradients: Dict[str, np.ndarray]) -> float:
+    def compute_gradient_norm(self, gradients: dict[str, np.ndarray]) -> float:
         """
         Compute the L2 norm of gradients for monitoring convergence.
 
@@ -153,11 +154,11 @@ class MomentumOptimizer:
         self,
         X: np.ndarray,
         Y: np.ndarray,
-        parameters: Dict[str, np.ndarray],
+        parameters: dict[str, np.ndarray],
         forward_propagation_fn: callable,
         backward_propagation_fn: callable,
         compute_cost_fn: callable,
-    ) -> Tuple[Dict[str, np.ndarray]]:
+    ) -> tuple[dict[str, np.ndarray]]:
         """
         Perform one training step with momentum optimizer.
 
@@ -195,14 +196,14 @@ class MomentumOptimizer:
         self,
         X: np.ndarray,
         Y: np.ndarray,
-        parameters: Dict[str, np.ndarray],
+        parameters: dict[str, np.ndarray],
         forward_propagation_fn: callable,
         backward_propagation_fn: callable,
         compute_cost_fn: callable,
         epochs: int = 1000,
         print_cost: bool = True,
         print_every: int = 100,
-    ) -> Dict[str, np.ndarray]:
+    ) -> dict[str, np.ndarray]:
         """
         Train the model using momentum optimizer.
 
@@ -252,7 +253,7 @@ class MomentumOptimizer:
 
         return parameters
 
-    def get_momentum_statistics(self) -> Dict[str, Dict[str, float]]:
+    def get_momentum_statistics(self) -> dict[str, dict[str, float]]:
         """
         Get statistics about momentum estimates.
 
@@ -278,7 +279,7 @@ class MomentumOptimizer:
         self.t = 0
         self.history = {"loss": [], "gradient_norm": []}
 
-    def get_config(self) -> Dict[str, Any]:
+    def get_config(self) -> dict[str, Any]:
         """
         Get optimizer configuration.
 

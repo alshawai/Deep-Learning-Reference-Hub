@@ -15,8 +15,9 @@ License
 MIT
 """
 
+from typing import Any
+
 import numpy as np
-from typing import Dict, Any, Tuple
 
 
 class RMSpropOptimizer:
@@ -81,7 +82,7 @@ class RMSpropOptimizer:
             "rms_grad": [],
         }
 
-    def initialize_second_moments(self, parameters: Dict[str, np.ndarray]) -> None:
+    def initialize_second_moments(self, parameters: dict[str, np.ndarray]) -> None:
         """
         Initialize second moment estimates for all parameters.
 
@@ -109,8 +110,8 @@ class RMSpropOptimizer:
             self.learning_rate = self.initial_learning_rate / (1 + self.decay * self.t)
 
     def update_parameters(
-        self, parameters: Dict[str, np.ndarray], gradients: Dict[str, np.ndarray]
-    ) -> Dict[str, np.ndarray]:
+        self, parameters: dict[str, np.ndarray], gradients: dict[str, np.ndarray]
+    ) -> dict[str, np.ndarray]:
         """
         Update parameters using RMSprop optimization.
 
@@ -167,7 +168,7 @@ class RMSpropOptimizer:
 
         return updated_parameters
 
-    def compute_gradient_norm(self, gradients: Dict[str, np.ndarray]) -> float:
+    def compute_gradient_norm(self, gradients: dict[str, np.ndarray]) -> float:
         """
         Compute the L2 norm of gradients for monitoring convergence.
 
@@ -187,8 +188,8 @@ class RMSpropOptimizer:
         return np.sqrt(total_norm)
 
     def get_effective_learning_rates(
-        self, parameters: Dict[str, np.ndarray]
-    ) -> Dict[str, np.ndarray]:
+        self, parameters: dict[str, np.ndarray]
+    ) -> dict[str, np.ndarray]:
         """
         Compute effective learning rates for each parameter.
 
@@ -224,11 +225,11 @@ class RMSpropOptimizer:
         self,
         X: np.ndarray,
         Y: np.ndarray,
-        parameters: Dict[str, np.ndarray],
+        parameters: dict[str, np.ndarray],
         forward_propagation_fn: callable,
         backward_propagation_fn: callable,
         compute_cost_fn: callable,
-    ) -> Tuple[Dict[str, np.ndarray], float]:
+    ) -> tuple[dict[str, np.ndarray], float]:
         """
         Perform one training step with RMSprop optimizer.
 
@@ -266,14 +267,14 @@ class RMSpropOptimizer:
         self,
         X: np.ndarray,
         Y: np.ndarray,
-        parameters: Dict[str, np.ndarray],
+        parameters: dict[str, np.ndarray],
         forward_propagation_fn: callable,
         backward_propagation_fn: callable,
         compute_cost_fn: callable,
         epochs: int = 1000,
         print_cost: bool = True,
         print_every: int = 100,
-    ) -> Dict[str, np.ndarray]:
+    ) -> dict[str, np.ndarray]:
         """
         Train the model using RMSprop optimizer.
 
@@ -328,7 +329,7 @@ class RMSpropOptimizer:
 
         return parameters
 
-    def get_second_moment_statistics(self) -> Dict[str, Dict[str, float]]:
+    def get_second_moment_statistics(self) -> dict[str, dict[str, float]]:
         """
         Get statistics about second moment estimates.
 
@@ -360,7 +361,7 @@ class RMSpropOptimizer:
             "rms_grad": [],
         }
 
-    def get_config(self) -> Dict[str, Any]:
+    def get_config(self) -> dict[str, Any]:
         """
         Get optimizer configuration.
 
@@ -381,7 +382,7 @@ class RMSpropOptimizer:
 
 
 def adaptive_learning_rate_analysis(
-    optimizer: RMSpropOptimizer, parameters: Dict[str, np.ndarray]
+    optimizer: RMSpropOptimizer, parameters: dict[str, np.ndarray]
 ) -> None:
     """
     Analyze and visualize adaptive learning rates in RMSprop.

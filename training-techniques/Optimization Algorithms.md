@@ -108,8 +108,10 @@ $$\theta_{t+1} = \theta_t - \alpha \frac{1}{m} \sum_{i=1}^{m} \nabla_\theta J(\t
 **Algorithm:**
 ```python
 for epoch in range(num_epochs):
-    X_shuffled, y_shuffled = shuffle(X_train, y_train)  # To ensure randomness in data pattern
-    
+    X_shuffled, y_shuffled = shuffle(
+        X_train, y_train
+    )  # To ensure randomness in data pattern
+
     for i in range(m):  # No. of training examples
         gradient = compute_gradient(X_shuffled[i], y_shuffled[i], theta)
         theta -= learning_rate * gradient
@@ -134,8 +136,10 @@ $$\theta_{t+1} = \theta_t - \alpha \nabla_\theta J(\theta_t, x^{(i)}, y^{(i)})$$
 **Algorithm:**
 ```python
 for epoch in range(num_epochs):
-    mini_batches = create_mini_batches(X_train, y_train, batch_size)  # To ensure random batches
-    
+    mini_batches = create_mini_batches(
+        X_train, y_train, batch_size
+    )  # To ensure random batches
+
     for mini_batch in mini_batches:
         X_batch, y_batch = mini_batch
         gradient = compute_gradient(X_batch, y_batch, theta)
@@ -447,12 +451,14 @@ scheduler = CosineAnnealingLR(optimizer, T_max=epochs)
 for epoch in range(epochs):
     for batch in train_loader:
         loss = model(batch)
-        
+
         optimizer.zero_grad()
         loss.backward()
-        
-        torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=1.0)  # Gradient clipping - optional
-        
+
+        torch.nn.utils.clip_grad_norm_(
+            model.parameters(), max_norm=1.0
+        )  # Gradient clipping - optional
+
         optimizer.step()
     scheduler.step()
 ```

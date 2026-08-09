@@ -35,13 +35,13 @@ All optimizers include proper bias correction and handle edge cases gracefully.
 Visualization utilities require matplotlib and are designed for Jupyter notebooks.
 """
 
-import numpy as np
-import matplotlib.pyplot as plt
-from typing import Dict, List
 import time
+import warnings
 from dataclasses import dataclass
 from enum import Enum
-import warnings
+
+import matplotlib.pyplot as plt
+import numpy as np
 
 warnings.filterwarnings("ignore", category=RuntimeWarning)
 
@@ -77,8 +77,8 @@ class OptimizationResult:
     """
 
     optimizer_name: str
-    losses: List[float]
-    parameters: List[Dict]
+    losses: list[float]
+    parameters: list[dict]
     convergence_time: float
     final_loss: float
     iterations_to_converge: int
@@ -98,7 +98,7 @@ class BaseOptimizer:
         self.learning_rate = learning_rate
         self.name = "BaseOptimizer"
 
-    def update_parameters(self, params: Dict, grads: Dict, t: int) -> Dict:
+    def update_parameters(self, params: dict, grads: dict, t: int) -> dict:
         """
         Update parameters using optimization algorithm.
 
@@ -140,7 +140,7 @@ class SGDOptimizer(BaseOptimizer):
         super().__init__(learning_rate)
         self.name = "SGD"
 
-    def update_parameters(self, params: Dict, grads: Dict, t: int) -> Dict:
+    def update_parameters(self, params: dict, grads: dict, t: int) -> dict:
         """
         Update parameters using vanilla gradient descent.
 
@@ -185,7 +185,7 @@ class MomentumOptimizer(BaseOptimizer):
         self.name = "Momentum"
         self.v = {}
 
-    def update_parameters(self, params: Dict, grads: Dict, t: int) -> Dict:
+    def update_parameters(self, params: dict, grads: dict, t: int) -> dict:
         """
         Update parameters using momentum-based gradient descent.
 
@@ -246,7 +246,7 @@ class RMSpropOptimizer(BaseOptimizer):
         self.name = "RMSprop"
         self.s = {}
 
-    def update_parameters(self, params: Dict, grads: Dict, t: int) -> Dict:
+    def update_parameters(self, params: dict, grads: dict, t: int) -> dict:
         """
         Update parameters using RMSprop adaptive learning rates.
 
@@ -318,7 +318,7 @@ class AdamOptimizer(BaseOptimizer):
         self.v = {}
         self.t = 0
 
-    def update_parameters(self, params: Dict, grads: Dict, t: int) -> Dict:
+    def update_parameters(self, params: dict, grads: dict, t: int) -> dict:
         """
         Update parameters using Adam optimization algorithm.
 
@@ -378,7 +378,7 @@ class OptimizationProblem:
     def __init__(self, name: str):
         self.name = name
 
-    def loss_function(self, params: Dict) -> float:
+    def loss_function(self, params: dict) -> float:
         """
         Compute loss for given parameters.
 
@@ -394,7 +394,7 @@ class OptimizationProblem:
         """
         raise NotImplementedError("Subclasses must implement loss_function")
 
-    def gradients(self, params: Dict) -> Dict:
+    def gradients(self, params: dict) -> dict:
         """
         Compute gradients for given parameters.
 
@@ -410,7 +410,7 @@ class OptimizationProblem:
         """
         raise NotImplementedError("Subclasses must implement gradients")
 
-    def initial_parameters(self) -> Dict:
+    def initial_parameters(self) -> dict:
         """
         Get initial parameter values for optimization.
 
@@ -441,17 +441,17 @@ class QuadraticBowl(OptimizationProblem):
         self.a = a
         self.b = b
 
-    def loss_function(self, params: Dict) -> float:
+    def loss_function(self, params: dict) -> float:
         """Compute quadratic loss: ax² + by²."""
         x, y = params["x"], params["y"]
         return self.a * x**2 + self.b * y**2
 
-    def gradients(self, params: Dict) -> Dict:
+    def gradients(self, params: dict) -> dict:
         """Compute gradients: [2ax, 2by]."""
         x, y = params["x"], params["y"]
         return {"x": 2 * self.a * x, "y": 2 * self.b * y}
 
-    def initial_parameters(self) -> Dict:
+    def initial_parameters(self) -> dict:
         """Initialize at (5, 5) for clear visualization."""
         return {"x": 5.0, "y": 5.0}
 
@@ -476,19 +476,19 @@ class RosenbrockFunction(OptimizationProblem):
         self.a = a
         self.b = b
 
-    def loss_function(self, params: Dict) -> float:
+    def loss_function(self, params: dict) -> float:
         """Compute Rosenbrock function value."""
         x, y = params["x"], params["y"]
         return (self.a - x) ** 2 + self.b * (y - x**2) ** 2
 
-    def gradients(self, params: Dict) -> Dict:
+    def gradients(self, params: dict) -> dict:
         """Compute Rosenbrock gradients analytically."""
         x, y = params["x"], params["y"]
         dx = -2 * (self.a - x) - 4 * self.b * x * (y - x**2)
         dy = 2 * self.b * (y - x**2)
         return {"x": dx, "y": dy}
 
-    def initial_parameters(self) -> Dict:
+    def initial_parameters(self) -> dict:
         """Initialize away from minimum for interesting optimization path."""
         return {"x": -2.0, "y": 2.0}
 
@@ -504,7 +504,7 @@ class BealeFunction(OptimizationProblem):
     def __init__(self):
         super().__init__("Beale Function")
 
-    def loss_function(self, params: Dict) -> float:
+    def loss_function(self, params: dict) -> float:
         """Compute Beale function value."""
         x, y = params["x"], params["y"]
         term1 = (1.5 - x + x * y) ** 2
@@ -512,7 +512,7 @@ class BealeFunction(OptimizationProblem):
         term3 = (2.625 - x + x * y**3) ** 2
         return term1 + term2 + term3
 
-    def gradients(self, params: Dict) -> Dict:
+    def gradients(self, params: dict) -> dict:
         """Compute Beale function gradients analytically."""
         x, y = params["x"], params["y"]
 
@@ -531,7 +531,7 @@ class BealeFunction(OptimizationProblem):
 
         return {"x": dx, "y": dy}
 
-    def initial_parameters(self) -> Dict:
+    def initial_parameters(self) -> dict:
         """Initialize at challenging starting point."""
         return {"x": 4.0, "y": 4.0}
 
@@ -661,8 +661,8 @@ class OptimizationComparison:
         return result
 
     def compare_optimizers(
-        self, problem: OptimizationProblem, optimizer_configs: Dict[OptimizerType, Dict]
-    ) -> Dict[str, OptimizationResult]:
+        self, problem: OptimizationProblem, optimizer_configs: dict[OptimizerType, dict]
+    ) -> dict[str, OptimizationResult]:
         """
         Compare multiple optimizers on a single problem.
 
@@ -691,7 +691,7 @@ class OptimizationComparison:
 
         return results
 
-    def run_comprehensive_comparison(self) -> Dict[str, Dict[str, OptimizationResult]]:
+    def run_comprehensive_comparison(self) -> dict[str, dict[str, OptimizationResult]]:
         """
         Run comprehensive comparison across multiple problems and optimizers.
 
@@ -725,7 +725,7 @@ class OptimizationComparison:
 
     def plot_convergence_comparison(
         self,
-        results: Dict[str, OptimizationResult],
+        results: dict[str, OptimizationResult],
         problem_name: str,
         log_scale: bool = True,
     ):
@@ -776,7 +776,7 @@ class OptimizationComparison:
 
     def plot_optimization_paths(
         self,
-        results: Dict[str, OptimizationResult],
+        results: dict[str, OptimizationResult],
         problem: OptimizationProblem,
         contour_levels: int = 20,
     ):
@@ -858,7 +858,7 @@ class OptimizationComparison:
         plt.show()
 
     def generate_summary_table(
-        self, all_results: Dict[str, Dict[str, OptimizationResult]]
+        self, all_results: dict[str, dict[str, OptimizationResult]]
     ) -> None:
         """
         Generate formatted summary table of optimization results.
@@ -953,7 +953,7 @@ class OptimizationAnalytics:
     """
 
     @staticmethod
-    def compute_convergence_metrics(result: OptimizationResult) -> Dict[str, float]:
+    def compute_convergence_metrics(result: OptimizationResult) -> dict[str, float]:
         """
         Compute detailed convergence metrics for a single optimization run.
 
@@ -997,8 +997,8 @@ class OptimizationAnalytics:
 
     @staticmethod
     def rank_optimizers(
-        all_results: Dict[str, Dict[str, OptimizationResult]],
-    ) -> Dict[str, Dict[str, int]]:
+        all_results: dict[str, dict[str, OptimizationResult]],
+    ) -> dict[str, dict[str, int]]:
         """
         Rank optimizers across different problems and metrics.
 
@@ -1049,7 +1049,7 @@ class OptimizationAnalytics:
 
     @staticmethod
     def generate_performance_heatmap(
-        all_results: Dict[str, Dict[str, OptimizationResult]],
+        all_results: dict[str, dict[str, OptimizationResult]],
     ):
         """
         Generate performance heatmap comparing optimizers across problems.

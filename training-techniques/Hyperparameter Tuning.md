@@ -155,7 +155,7 @@ $$\Theta = \{\theta_1^{(1)}, \theta_1^{(2)}, ...\} \times \{\theta_2^{(1)}, \the
 
 **Example Implementation:**
 ```python
-learning_rates = [0.1, 0.01, 0.001]  
+learning_rates = [0.1, 0.01, 0.001]
 batch_sizes = [32, 64, 128]
 hidden_units = [128, 256, 512]
 
@@ -194,14 +194,16 @@ Random search is more efficient than grid search because:
 import numpy as np
 from scipy.stats import loguniform, uniform
 
+
 def sample_hyperparameters():
     return {
-        'learning_rate': loguniform.rvs(1e-5, 1e-1),
-        'batch_size': np.random.choice([16, 32, 64, 128, 256]),
-        'hidden_units': np.random.randint(64, 512),
-        'dropout_rate': uniform.rvs(0.1, 0.4),
-        'weight_decay': loguniform.rvs(1e-6, 1e-2)
+        "learning_rate": loguniform.rvs(1e-5, 1e-1),
+        "batch_size": np.random.choice([16, 32, 64, 128, 256]),
+        "hidden_units": np.random.randint(64, 512),
+        "dropout_rate": uniform.rvs(0.1, 0.4),
+        "weight_decay": loguniform.rvs(1e-6, 1e-2),
     }
+
 
 # Sample N random configurations
 configurations = [sample_hyperparameters() for _ in range(100)]
@@ -276,19 +278,19 @@ Use cheaper approximations (lower fidelity) to guide the search, then evaluate p
 def successive_halving(configurations, budget):
     active_configs = configurations.copy()
     budget_per_config = budget // len(configurations)
-    
+
     while len(active_configs) > 1:
         # Train all active configurations with current budget
         results = []
         for config in active_configs:
             score = train_model(config, budget=budget_per_config)
             results.append((config, score))
-        
+
         # Keep top half, double the budget
         results.sort(key=lambda x: x[1], reverse=True)
-        active_configs = [config for config, _ in results[:len(results)//2]]
+        active_configs = [config for config, _ in results[: len(results) // 2]]
         budget_per_config *= 2
-    
+
     return active_configs[0]  # Best configuration
 ```
 
@@ -348,11 +350,11 @@ Automated discovery of neural network architectures using:
    ```python
    # Start with known good defaults
    config = {
-       'learning_rate': 3e-4,
-       'batch_size': 32,
-       'weight_decay': 1e-4,
-       'dropout': 0.1,
-       'warmup_steps': 1000,
+       "learning_rate": 3e-4,
+       "batch_size": 32,
+       "weight_decay": 1e-4,
+       "dropout": 0.1,
+       "warmup_steps": 1000,
    }
    ```
 
@@ -390,33 +392,33 @@ Automated discovery of neural network architectures using:
 **Computer Vision:**
 ```python
 vision_defaults = {
-    'learning_rate': 1e-3,        # Higher for CNNs
-    'weight_decay': 1e-4,         # Important for generalization
-    'batch_size': 64,             # Balance memory/gradient quality
-    'augmentation_strength': 0.2, # Data augmentation intensity
-    'mixup_alpha': 0.2,           # Modern regularization
+    "learning_rate": 1e-3,  # Higher for CNNs
+    "weight_decay": 1e-4,  # Important for generalization
+    "batch_size": 64,  # Balance memory/gradient quality
+    "augmentation_strength": 0.2,  # Data augmentation intensity
+    "mixup_alpha": 0.2,  # Modern regularization
 }
 ```
 
 **Natural Language Processing:**
 ```python
 nlp_defaults = {
-    'learning_rate': 5e-5,        # Lower for pre-trained models
-    'warmup_ratio': 0.1,          # Warmup proportion
-    'max_grad_norm': 1.0,         # Gradient clipping
-    'label_smoothing': 0.1,       # For classification
-    'attention_dropout': 0.1,     # Separate attention dropout
+    "learning_rate": 5e-5,  # Lower for pre-trained models
+    "warmup_ratio": 0.1,  # Warmup proportion
+    "max_grad_norm": 1.0,  # Gradient clipping
+    "label_smoothing": 0.1,  # For classification
+    "attention_dropout": 0.1,  # Separate attention dropout
 }
 ```
 
 **Large Language Models:**
 ```python
 llm_defaults = {
-    'learning_rate': 1e-4,        # Very careful tuning needed
-    'batch_size': 2048,           # Large batch training
-    'gradient_accumulation': 8,   # Simulate larger batches
-    'beta2': 0.95,                # Lower beta2 often better
-    'weight_decay': 0.1,          # Higher for large models
+    "learning_rate": 1e-4,  # Very careful tuning needed
+    "batch_size": 2048,  # Large batch training
+    "gradient_accumulation": 8,  # Simulate larger batches
+    "beta2": 0.95,  # Lower beta2 often better
+    "weight_decay": 0.1,  # Higher for large models
 }
 ```
 
@@ -439,14 +441,16 @@ llm_defaults = {
 # Run multiple seeds and test significance
 import scipy.stats as stats
 
+
 def compare_configurations(config_a_scores, config_b_scores):
     """Compare two configurations with statistical testing."""
     statistic, p_value = stats.ttest_ind(config_a_scores, config_b_scores)
-    
+
     if p_value < 0.05:
         return "Statistically significant difference"
     else:
         return "No significant difference"
+
 
 # Example usage
 config_a_scores = [0.92, 0.91, 0.93, 0.90, 0.92]  # 5 different seeds
@@ -535,6 +539,7 @@ $$f(\theta) = f_0 + \sum_i f_i(\theta_i) + \sum_{i<j} f_{ij}(\theta_i, \theta_j)
 from sklearn.ensemble import RandomForestRegressor
 import numpy as np
 
+
 def analyze_hyperparameter_importance(X_params, y_scores):
     """
     Analyze which hyperparameters are most important.
@@ -543,17 +548,17 @@ def analyze_hyperparameter_importance(X_params, y_scores):
     """
     rf = RandomForestRegressor(n_estimators=100, random_state=42)
     rf.fit(X_params, y_scores)
-    
+
     importances = rf.feature_importances_
-    param_names = ['learning_rate', 'batch_size', 'hidden_units', ...]
-    
+    param_names = ["learning_rate", "batch_size", "hidden_units", ...]
+
     # Sort by importance
     sorted_idx = np.argsort(importances)[::-1]
-    
+
     print("Hyperparameter Importance Ranking:")
     for i, idx in enumerate(sorted_idx):
-        print(f"{i+1}. {param_names[idx]}: {importances[idx]:.3f}")
-    
+        print(f"{i + 1}. {param_names[idx]}: {importances[idx]:.3f}")
+
     return importances
 ```
 

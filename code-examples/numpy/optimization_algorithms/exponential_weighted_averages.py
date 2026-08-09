@@ -20,12 +20,25 @@ Deep Learning Reference Hub
 License
 -------
 MIT
+
+Notes
+-----
+Bias correction divides the accumulator by the total weight it has applied to its
+samples. Textbooks write that weight as ``1 - beta**t``, which is its closed form
+when beta is the same at every step.
+
+This implementation tracks the weight directly, through
+``weight = beta_t * weight + (1 - beta_t)``. The two agree exactly for a constant
+beta. They diverge once beta varies with t, which is what ``warmup_steps`` and the
+``EXPONENTIAL_DECAY`` strategy both do: there the closed form understates the
+applied weight and the correction inflates the result.
 """
 
-import numpy as np
-from typing import Dict, Union, Tuple, Any
-from enum import Enum
 import warnings
+from enum import Enum
+from typing import Any
+
+import numpy as np
 
 
 class AveragingStrategy(Enum):
@@ -103,10 +116,16 @@ class ExponentialWeightedAverage:
         self.t = 0
         self.history = []
 
+        # Cumulative weight the accumulator has actually applied to its samples.
+        # The textbook correction factor 1 - beta**t is this quantity's closed form
+        # for a *constant* beta. Warm-up varies beta with t, which invalidates that
+        # closed form, so the weight is tracked directly instead. See Notes.
+        self.weight = 0.0
+
         self.squared_avg = None
         self.variance_history = []
 
-    def update(self, value: Union[float, np.ndarray]) -> Union[float, np.ndarray]:
+    def update(self, value: float | np.ndarray) -> float | np.ndarray:
         """
         Update the exponential weighted average with a new value.
 
@@ -146,6 +165,13 @@ class ExponentialWeightedAverage:
         else:
             effective_beta = self.beta
 
+        if self.strategy == AveragingStrategy.EXPONENTIAL_DECAY:
+            effective_beta = effective_beta ** (self.t / 1000)  # Decay over time
+
+        # Track the weight with whichever coefficient this step actually applied,
+        # so the two stay consistent for every strategy.
+        self.weight = effective_beta * self.weight + (1 - effective_beta)
+
         if self.strategy == AveragingStrategy.SIMPLE:
             self.v = effective_beta * self.v + (1 - effective_beta) * value
             result = self.v
@@ -153,8 +179,7 @@ class ExponentialWeightedAverage:
         elif self.strategy == AveragingStrategy.BIAS_CORRECTED:
             self.v = effective_beta * self.v + (1 - effective_beta) * value
             if self.bias_correction:
-                bias_correction_factor = 1 - effective_beta**self.t
-                result = self.v / (bias_correction_factor + self.epsilon)
+                result = self.v / (self.weight + self.epsilon)
             else:
                 result = self.v
 
@@ -165,11 +190,8 @@ class ExponentialWeightedAverage:
             ) * (value**2)
 
             if self.bias_correction:
-                bias_correction_factor = 1 - effective_beta**self.t
-                mean_corrected = self.v / (bias_correction_factor + self.epsilon)
-                variance_corrected = self.squared_avg / (
-                    bias_correction_factor + self.epsilon
-                )
+                mean_corrected = self.v / (self.weight + self.epsilon)
+                variance_corrected = self.squared_avg / (self.weight + self.epsilon)
 
                 variance = variance_corrected - mean_corrected**2
                 self.variance_history.append(variance)
@@ -178,8 +200,7 @@ class ExponentialWeightedAverage:
                 result = self.v
 
         elif self.strategy == AveragingStrategy.EXPONENTIAL_DECAY:
-            decay_rate = effective_beta ** (self.t / 1000)  # Decay over time
-            self.v = decay_rate * self.v + (1 - decay_rate) * value
+            self.v = effective_beta * self.v + (1 - effective_beta) * value
             result = self.v
 
         else:
@@ -188,7 +209,7 @@ class ExponentialWeightedAverage:
         self.history.append(result.copy() if isinstance(result, np.ndarray) else result)
         return result
 
-    def get_current_average(self) -> Union[float, np.ndarray, None]:
+    def get_current_average(self) -> float | np.ndarray | None:
         """
         Get the current average value.
 
@@ -201,12 +222,11 @@ class ExponentialWeightedAverage:
             return None
 
         if self.strategy == AveragingStrategy.BIAS_CORRECTED and self.bias_correction:
-            bias_correction_factor = 1 - self.beta**self.t
-            return self.v / (bias_correction_factor + self.epsilon)
+            return self.v / (self.weight + self.epsilon)
         else:
             return self.v
 
-    def get_variance(self) -> Union[float, np.ndarray, None]:
+    def get_variance(self) -> float | np.ndarray | None:
         """
         Get the current variance estimate (only available with VARIANCE_CORRECTED strategy).
 
@@ -222,11 +242,8 @@ class ExponentialWeightedAverage:
             return None
 
         if self.bias_correction:
-            bias_correction_factor = 1 - self.beta**self.t
-            mean_corrected = self.v / (bias_correction_factor + self.epsilon)
-            variance_corrected = self.squared_avg / (
-                bias_correction_factor + self.epsilon
-            )
+            mean_corrected = self.v / (self.weight + self.epsilon)
+            variance_corrected = self.squared_avg / (self.weight + self.epsilon)
             return variance_corrected - mean_corrected**2
         else:
             return self.squared_avg - self.v**2
@@ -236,6 +253,7 @@ class ExponentialWeightedAverage:
         self.v = None
         self.squared_avg = None
         self.t = 0
+        self.weight = 0.0
         self.history.clear()
         self.variance_history.clear()
 
@@ -252,7 +270,7 @@ class ExponentialWeightedAverage:
         """
         return 1.0 / (1.0 - self.beta)
 
-    def get_config(self) -> Dict[str, Any]:
+    def get_config(self) -> dict[str, Any]:
         """
         Get configuration dictionary.
 
@@ -270,7 +288,7 @@ class ExponentialWeightedAverage:
             "time_step": self.t,
         }
 
-    def get_state(self) -> Dict[str, Any]:
+    def get_state(self) -> dict[str, Any]:
         """
         Get complete state dictionary.
 
@@ -282,12 +300,13 @@ class ExponentialWeightedAverage:
         return {
             "config": self.get_config(),
             "v": self.v,
+            "weight": self.weight,
             "squared_avg": self.squared_avg,
             "history": self.history.copy(),
             "variance_history": self.variance_history.copy(),
         }
 
-    def load_state(self, state: Dict[str, Any]) -> None:
+    def load_state(self, state: dict[str, Any]) -> None:
         """
         Load state from dictionary.
 
@@ -305,6 +324,9 @@ class ExponentialWeightedAverage:
         self.t = config["time_step"]
 
         self.v = state["v"]
+        # Older states predate the tracked weight. Fall back to the constant-beta
+        # closed form, which is exact whenever warmup_steps is 0.
+        self.weight = state.get("weight", 1 - self.beta**self.t if self.t else 0.0)
         self.squared_avg = state["squared_avg"]
         self.history = state["history"].copy()
         self.variance_history = state["variance_history"].copy()
@@ -341,11 +363,11 @@ class MultiVariateEWA:
         self.strategy = strategy
         self.kwargs = kwargs
 
-        self.averages: Dict[str, ExponentialWeightedAverage] = {}
+        self.averages: dict[str, ExponentialWeightedAverage] = {}
 
     def update(
-        self, values: Dict[str, Union[float, np.ndarray]]
-    ) -> Dict[str, Union[float, np.ndarray]]:
+        self, values: dict[str, float | np.ndarray]
+    ) -> dict[str, float | np.ndarray]:
         """
         Update all averages with new values.
 
@@ -374,7 +396,7 @@ class MultiVariateEWA:
 
         return results
 
-    def get_averages(self) -> Dict[str, Union[float, np.ndarray]]:
+    def get_averages(self) -> dict[str, float | np.ndarray]:
         """Get current averages for all variables."""
         return {name: ewa.get_current_average() for name, ewa in self.averages.items()}
 
@@ -383,7 +405,7 @@ class MultiVariateEWA:
         for ewa in self.averages.values():
             ewa.reset()
 
-    def get_state(self) -> Dict[str, Any]:
+    def get_state(self) -> dict[str, Any]:
         """Get complete state for all averages."""
         return {
             "config": {
@@ -412,7 +434,7 @@ def create_rmsprop_ewa(beta: float = 0.999) -> ExponentialWeightedAverage:
 
 def create_adam_ewa_pair(
     beta1: float = 0.9, beta2: float = 0.999
-) -> Tuple[ExponentialWeightedAverage, ExponentialWeightedAverage]:
+) -> tuple[ExponentialWeightedAverage, ExponentialWeightedAverage]:
     """Create EWA pair for Adam optimizer (first and second moments)."""
     first_moment = ExponentialWeightedAverage(
         beta=beta1, bias_correction=True, strategy=AveragingStrategy.BIAS_CORRECTED

@@ -209,6 +209,7 @@ def dropout_forward(X, keep_prob, training=True):
     else:
         return X, None
 
+
 def dropout_backward(dout, mask):
     return dout * mask
 ```
@@ -357,7 +358,7 @@ $$ \text{Difference} = \frac{||\text{Grad} - \text{Grad}_{approx}||_2} {||\text{
 import torch.nn as nn
 
 # He initialization
-nn.init.kaiming_normal_(layer.weight, mode='fan_out', nonlinearity='relu')
+nn.init.kaiming_normal_(layer.weight, mode="fan_out", nonlinearity="relu")
 
 # Xavier initialization
 nn.init.xavier_uniform_(layer.weight)
@@ -368,7 +369,7 @@ model = nn.Sequential(
     nn.BatchNorm1d(256),
     nn.ReLU(),
     nn.Dropout(0.5),
-    nn.Linear(256, 10)
+    nn.Linear(256, 10),
 )
 ```
 
@@ -376,14 +377,21 @@ model = nn.Sequential(
 ```python
 from tensorflow.keras import layers, initializers
 
-model = tf.keras.Sequential([
-    layers.Dense(256, activation='relu', kernel_initializer='he_normal',
-                kernel_regularizer=tf.keras.regularizers.l2(0.01), use_bias=False),
-    layers.BatchNormalization(),
-    layers.Activation('relu'),
-    layers.Dropout(0.5),
-    layers.Dense(10, activation='softmax')
-])
+model = tf.keras.Sequential(
+    [
+        layers.Dense(
+            256,
+            activation="relu",
+            kernel_initializer="he_normal",
+            kernel_regularizer=tf.keras.regularizers.l2(0.01),
+            use_bias=False,
+        ),
+        layers.BatchNormalization(),
+        layers.Activation("relu"),
+        layers.Dropout(0.5),
+        layers.Dense(10, activation="softmax"),
+    ]
+)
 ```
 
 ---
