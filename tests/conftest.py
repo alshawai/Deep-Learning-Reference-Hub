@@ -4,11 +4,14 @@ Test Harness
 
 Shared fixtures and the module loader every test file uses.
 
-The hub's modules are teaching artifacts published under `code-examples/`, not an
-installed package. Two facts about that tree decide how they get imported here:
-`code-examples` is not a valid identifier, and `code-examples/numpy/` would shadow
-the real NumPy if its parent ever landed on `sys.path`. So modules are loaded from
-their file paths, and the package directory is never added to the path.
+The hub's modules are moving from standalone files under `code-examples/` into
+the installed `dlhub` package. While that is underway, `load` resolves a module
+from the package when it has moved and from its file when it has not, so the
+suite passes at every point in the migration rather than only at the end.
+
+This loader is temporary. It is deleted once the last module has moved, along
+with the file-path machinery that only ever existed because `code-examples` is
+not a valid identifier and a directory named `numpy` would shadow the real one.
 
 Author
 ------
@@ -19,6 +22,7 @@ License
 MIT
 """
 
+import importlib
 import importlib.util
 import sys
 from pathlib import Path
@@ -29,18 +33,99 @@ import pytest
 REPO_ROOT = Path(__file__).resolve().parent.parent
 NUMPY_EXAMPLES = REPO_ROOT / "code-examples" / "numpy"
 
+# Where each module lands in the package. This table is the migration plan
+# written down: a module that has moved resolves through its dotted name, and one
+# that has not falls back to its file. Both work, which is what lets the modules
+# move one commit at a time instead of in one unreviewable change.
+#
+# An entry here is a claim about the future, not the present. Nothing breaks
+# while the target does not exist yet.
+PACKAGE_MODULE = {
+    "optimization_algorithms/adam_optimizer.py": "dlhub.optimizers.adam",
+    "optimization_algorithms/momentum_optimizer.py": "dlhub.optimizers.momentum",
+    "optimization_algorithms/rmsprop_optimizer.py": "dlhub.optimizers.rmsprop",
+    "optimization_algorithms/mini_batch_gradient_descent.py": "dlhub.optimizers.mini_batch",
+    "optimization_algorithms/exponential_weighted_averages.py": "dlhub.optimizers.exponential_weighted_averages",
+    "optimization_algorithms/optimization_comparison.py": "dlhub.optimizers.comparison",
+    "learning_rate_schedulers.py": "dlhub.optimizers.schedules",
+    "hyperparameter_tuning/random_search.py": "dlhub.tuning.random_search",
+    "hyperparameter_tuning/bayesian_optimization.py": "dlhub.tuning.bayesian",
+    "hyperparameter_tuning/multifidelity_optimization.py": "dlhub.tuning.multifidelity",
+    "hyperparameter_tuning/population_based_training.py": "dlhub.tuning.population_based",
+    "hyperparameter_tuning/complete_tuning_framework.py": "dlhub.tuning.framework",
+    "learning_rate_finder.py": "dlhub.tuning.learning_rate_finder",
+    "fully_connected_nn_with_regularization.py": "dlhub.nn.fully_connected",
+    "gradient_checking.py": "dlhub.training.gradient_checking",
+    "early_stopping.py": "dlhub.training.early_stopping",
+}
+
 _CACHE: dict[str, object] = {}
+
+
+def _load_from_package(relative_path: str):
+    """
+    Import a module from the `dlhub` package, if it has moved there already.
+
+    Parameters
+    ----------
+    relative_path : str
+        Key into `PACKAGE_MODULE`.
+
+    Returns
+    -------
+    module or None
+        The imported module, or None if it has no package home yet or has not
+        moved into the one it is assigned.
+    """
+    dotted = PACKAGE_MODULE.get(relative_path)
+    if dotted is None:
+        return None
+    try:
+        return importlib.import_module(dotted)
+    except ModuleNotFoundError:
+        return None
+
+
+def _load_from_file(relative_path: str):
+    """
+    Execute a module from its path under `code-examples/numpy/`.
+
+    The package directory is never added to `sys.path`, because
+    `code-examples/numpy/` would shadow the real NumPy from there.
+
+    Parameters
+    ----------
+    relative_path : str
+        Path relative to `code-examples/numpy`.
+
+    Returns
+    -------
+    module or None
+        The executed module, or None if no file exists at that path.
+    """
+    path = NUMPY_EXAMPLES / relative_path
+    if not path.is_file():
+        return None
+
+    name = f"hub_{relative_path.replace('/', '_').removesuffix('.py')}"
+    spec = importlib.util.spec_from_file_location(name, path)
+    module = importlib.util.module_from_spec(spec)
+    sys.modules[name] = module
+    spec.loader.exec_module(module)
+    return module
 
 
 def load(relative_path: str):
     """
-    Load a hub module from its path under `code-examples/numpy/`.
+    Load a hub module, from the package if it has moved and from its file if not.
 
     Parameters
     ----------
     relative_path : str
         Path relative to `code-examples/numpy`, e.g.
-        `"optimization_algorithms/adam_optimizer.py"`
+        `"optimization_algorithms/adam_optimizer.py"`. This stays the address
+        even after the module moves, so a test file is rewritten to a direct
+        import when its module moves rather than being edited twice.
 
     Returns
     -------
@@ -50,21 +135,22 @@ def load(relative_path: str):
     Raises
     ------
     FileNotFoundError
-        If no file exists at that path, so a renamed module fails loudly here
-        rather than as a confusing collection error.
+        If the module resolves neither way, so a renamed module fails loudly
+        here rather than as a confusing collection error.
     """
     if relative_path in _CACHE:
         return _CACHE[relative_path]
 
-    path = NUMPY_EXAMPLES / relative_path
-    if not path.is_file():
-        raise FileNotFoundError(f"No hub module at {path}")
+    module = _load_from_package(relative_path)
+    if module is None:
+        module = _load_from_file(relative_path)
+    if module is None:
+        raise FileNotFoundError(
+            f"No hub module for {relative_path!r}: not importable as "
+            f"{PACKAGE_MODULE.get(relative_path, '(no package home assigned)')} "
+            f"and no file at {NUMPY_EXAMPLES / relative_path}"
+        )
 
-    name = f"hub_{relative_path.replace('/', '_').removesuffix('.py')}"
-    spec = importlib.util.spec_from_file_location(name, path)
-    module = importlib.util.module_from_spec(spec)
-    sys.modules[name] = module
-    spec.loader.exec_module(module)
     _CACHE[relative_path] = module
     return module
 
