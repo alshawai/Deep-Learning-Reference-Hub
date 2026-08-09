@@ -31,15 +31,17 @@ This framework is designed to be:
 4. Production-ready - includes error handling and checkpointing
 """
 
-import numpy as np
-from typing import Dict, List, Tuple, Callable, Optional, Any, Union
-from dataclasses import dataclass, field
-from abc import ABC, abstractmethod
-import time
 import json
-from pathlib import Path
+import time
 import warnings
+from abc import ABC, abstractmethod
+from collections.abc import Callable
+from dataclasses import dataclass, field
 from enum import Enum
+from pathlib import Path
+from typing import Any
+
+import numpy as np
 
 
 class OptimizationMethod(Enum):
@@ -73,7 +75,7 @@ class HyperparameterConfig:
 
     name: str
     type: str
-    range: Union[Tuple, List]
+    range: tuple | list
     scale: str = "linear"
     default: Any = None
 
@@ -107,13 +109,13 @@ class ExperimentConfig:
 
     experiment_name: str
     optimization_method: OptimizationMethod
-    hyperparameters: List[HyperparameterConfig]
+    hyperparameters: list[HyperparameterConfig]
     objective_metric: str
     maximize: bool = True
     n_trials: int = 100
-    random_seed: Optional[int] = None
-    save_dir: Optional[str] = None
-    additional_config: Dict[str, Any] = field(default_factory=dict)
+    random_seed: int | None = None
+    save_dir: str | None = None
+    additional_config: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass
@@ -138,11 +140,11 @@ class TrialResult:
     """
 
     trial_id: int
-    hyperparams: Dict[str, Any]
-    metrics: Dict[str, float]
+    hyperparams: dict[str, Any]
+    metrics: dict[str, float]
     training_time: float
     status: str = "success"
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    metadata: dict[str, Any] = field(default_factory=dict)
 
 
 @dataclass
@@ -166,9 +168,9 @@ class OptimizationResult:
 
     experiment_config: ExperimentConfig
     best_trial: TrialResult
-    all_trials: List[TrialResult]
+    all_trials: list[TrialResult]
     total_time: float
-    summary_statistics: Dict[str, Any] = field(default_factory=dict)
+    summary_statistics: dict[str, Any] = field(default_factory=dict)
 
 
 class ObjectiveFunction(ABC):
@@ -179,7 +181,7 @@ class ObjectiveFunction(ABC):
     """
 
     @abstractmethod
-    def evaluate(self, hyperparams: Dict[str, Any]) -> Dict[str, float]:
+    def evaluate(self, hyperparams: dict[str, Any]) -> dict[str, float]:
         """
         Evaluate hyperparameters and return metrics.
 
@@ -196,7 +198,7 @@ class ObjectiveFunction(ABC):
         pass
 
     @abstractmethod
-    def get_metric_names(self) -> List[str]:
+    def get_metric_names(self) -> list[str]:
         """
         Get names of all metrics returned by evaluate.
 
@@ -221,16 +223,16 @@ class FunctionObjective(ObjectiveFunction):
     """
 
     def __init__(
-        self, eval_function: Callable[[Dict], Dict[str, float]], metric_names: List[str]
+        self, eval_function: Callable[[dict], dict[str, float]], metric_names: list[str]
     ):
         self.eval_function = eval_function
         self.metric_names = metric_names
 
-    def evaluate(self, hyperparams: Dict[str, Any]) -> Dict[str, float]:
+    def evaluate(self, hyperparams: dict[str, Any]) -> dict[str, float]:
         """Evaluate using wrapped function."""
         return self.eval_function(hyperparams)
 
-    def get_metric_names(self) -> List[str]:
+    def get_metric_names(self) -> list[str]:
         """Get metric names."""
         return self.metric_names
 
@@ -249,14 +251,14 @@ class HyperparameterSampler:
 
     def __init__(
         self,
-        hyperparameter_configs: List[HyperparameterConfig],
-        random_state: Optional[int] = None,
+        hyperparameter_configs: list[HyperparameterConfig],
+        random_state: int | None = None,
     ):
         self.configs = hyperparameter_configs
         if random_state is not None:
             np.random.seed(random_state)
 
-    def sample(self) -> Dict[str, Any]:
+    def sample(self) -> dict[str, Any]:
         """
         Sample a hyperparameter configuration.
 
@@ -302,7 +304,7 @@ class HyperparameterSampler:
         """Sample categorical parameter."""
         return np.random.choice(config.range)
 
-    def validate(self, hyperparams: Dict[str, Any]) -> bool:
+    def validate(self, hyperparams: dict[str, Any]) -> bool:
         """
         Validate a hyperparameter configuration.
 
@@ -345,7 +347,7 @@ class ExperimentLogger:
         Name of the experiment
     """
 
-    def __init__(self, save_dir: Optional[str], experiment_name: str):
+    def __init__(self, save_dir: str | None, experiment_name: str):
         self.experiment_name = experiment_name
         self.save_dir = Path(save_dir) if save_dir else None
 
@@ -410,7 +412,7 @@ class ExperimentLogger:
         with open(summary_file, "w") as f:
             json.dump(summary, f, indent=2)
 
-    def load_results(self) -> Optional[List[TrialResult]]:
+    def load_results(self) -> list[TrialResult] | None:
         """
         Load trial results from log file.
 
@@ -423,7 +425,7 @@ class ExperimentLogger:
             return None
 
         trials = []
-        with open(self.log_file, "r") as f:
+        with open(self.log_file) as f:
             for line in f:
                 trial_dict = json.loads(line)
                 trial = TrialResult(
@@ -466,7 +468,7 @@ class HyperparameterOptimizer:
         self.best_trial = None
         self.trial_counter = 0
 
-    def _evaluate_trial(self, hyperparams: Dict[str, Any]) -> TrialResult:
+    def _evaluate_trial(self, hyperparams: dict[str, Any]) -> TrialResult:
         """
         Evaluate a single trial.
 
@@ -640,7 +642,7 @@ class HyperparameterOptimizer:
                     f"{trial.metrics.get(self.config.objective_metric, 'N/A')}"
                 )
 
-    def _generate_grid(self) -> List[Dict[str, Any]]:
+    def _generate_grid(self) -> list[dict[str, Any]]:
         """Generate grid of hyperparameter configurations."""
         from itertools import product
 
@@ -672,7 +674,7 @@ class HyperparameterOptimizer:
 
         return grid_configs
 
-    def _compute_summary_statistics(self) -> Dict[str, Any]:
+    def _compute_summary_statistics(self) -> dict[str, Any]:
         """Compute summary statistics from all trials."""
         successful_trials = [t for t in self.all_trials if t.status == "success"]
 
@@ -707,30 +709,41 @@ class HyperparameterOptimizer:
                 "min": float(np.min(training_times)),
                 "max": float(np.max(training_times)),
             },
-            "improvement_over_random": (
-                (
-                    self.best_trial.metrics[self.config.objective_metric]  # type: ignore
-                    - np.mean(objective_scores[: min(10, len(objective_scores))])
-                )
-                / abs(np.mean(objective_scores[: min(10, len(objective_scores))]))
-                if len(objective_scores) >= 10
-                else 0.0
-            ),
+            "improvement_over_random": self._improvement_over_random(objective_scores),
         }
 
         return statistics
 
+    def _improvement_over_random(self, objective_scores: list[float]) -> float:
+        """
+        Relative gain of the best trial over the first ten, which for random and
+        grid search are as good a stand-in for chance as the run provides.
+
+        Reported as 0.0 below ten trials, and when the baseline mean is zero:
+        the relative gain over nothing is not a number, and a metric centred on
+        zero is a legitimate thing to optimize.
+        """
+        if len(objective_scores) < 10:
+            return 0.0
+
+        baseline = float(np.mean(objective_scores[:10]))
+        if baseline == 0.0:
+            return 0.0
+
+        best_score = self.best_trial.metrics[self.config.objective_metric]  # type: ignore
+        return float((best_score - baseline) / abs(baseline))
+
 
 def optimize_hyperparameters(
-    objective_function: Callable[[Dict], Dict[str, float]],
-    hyperparameters: List[Dict[str, Any]],
+    objective_function: Callable[[dict], dict[str, float]],
+    hyperparameters: list[dict[str, Any]],
     objective_metric: str,
     experiment_name: str = "hyperparameter_optimization",
     optimization_method: str = "random_search",
     n_trials: int = 100,
     maximize: bool = True,
-    random_seed: Optional[int] = None,
-    save_dir: Optional[str] = None,
+    random_seed: int | None = None,
+    save_dir: str | None = None,
     verbose: bool = True,
 ) -> OptimizationResult:
     """
@@ -825,7 +838,7 @@ if __name__ == "__main__":
     print("Modern Hyperparameter Tuning Framework Example")
     print("=" * 60)
 
-    def nn_objective(hyperparams: Dict[str, Any]) -> Dict[str, float]:
+    def nn_objective(hyperparams: dict[str, Any]) -> dict[str, float]:
         """
         Simulate neural network training objective.
 

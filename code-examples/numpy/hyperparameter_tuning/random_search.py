@@ -28,14 +28,16 @@ for the final performance. It explores the hyperparameter space more efficiently
 than grid search by sampling more unique values per dimension.
 """
 
-import numpy as np
-from scipy.stats import uniform, loguniform, randint
-from typing import Dict, List, Tuple, Callable, Optional, Any, Union
-from concurrent.futures import ProcessPoolExecutor, as_completed
 import multiprocessing as mp
-from dataclasses import dataclass, field
 import time
 import warnings
+from collections.abc import Callable
+from concurrent.futures import ProcessPoolExecutor, as_completed
+from dataclasses import dataclass, field
+from typing import Any
+
+import numpy as np
+from scipy.stats import loguniform, randint, uniform
 
 
 @dataclass
@@ -59,12 +61,12 @@ class RandomSearchResult:
         Search statistics and analysis
     """
 
-    best_params: Dict[str, Any]
+    best_params: dict[str, Any]
     best_score: float
-    all_params: List[Dict[str, Any]]
-    all_scores: List[float]
+    all_params: list[dict[str, Any]]
+    all_scores: list[float]
     search_time: float
-    statistics: Dict[str, Any] = field(default_factory=dict)
+    statistics: dict[str, Any] = field(default_factory=dict)
 
 
 class ParameterDistribution:
@@ -174,7 +176,7 @@ class ChoiceDistribution(ParameterDistribution):
         Probability weights for each choice (uniform if None)
     """
 
-    def __init__(self, choices: List[Any], probabilities: Optional[List[float]] = None):
+    def __init__(self, choices: list[Any], probabilities: list[float] | None = None):
         self.choices = choices
         if probabilities is None:
             self.probabilities = [1.0 / len(choices)] * len(choices)
@@ -206,7 +208,8 @@ class PowerDistribution(ParameterDistribution):
     high : float
         Upper bound
     power : float, default=2.0
-        Power parameter (higher values favor smaller numbers)
+        Power parameter. Above 1 the mass concentrates near `low`, at 1 the
+        distribution is uniform, and below 1 it concentrates near `high`.
     """
 
     def __init__(self, low: float, high: float, power: float = 2.0):
@@ -216,8 +219,13 @@ class PowerDistribution(ParameterDistribution):
 
     def sample(self) -> float:
         """Sample from power distribution."""
+        # u ** power, not u ** (1 / power). The latter is the standard
+        # power-function distribution, whose mass moves toward `high` as the
+        # exponent grows: the default power=2 would draw a mean of 2/3 of the
+        # range, which is the opposite of what this class is documented to do
+        # and useless for the weight-decay sweeps it exists for.
         u = np.random.random()
-        return self.low + (self.high - self.low) * (u ** (1.0 / self.power))
+        return self.low + (self.high - self.low) * (u**self.power)
 
     def __repr__(self) -> str:
         return (
@@ -252,10 +260,10 @@ class RandomSearchOptimizer:
 
     def __init__(
         self,
-        objective_function: Callable[[Dict], float],
-        search_space: Dict[str, ParameterDistribution],
+        objective_function: Callable[[dict], float],
+        search_space: dict[str, ParameterDistribution],
         n_iter: int = 100,
-        random_state: Optional[int] = None,
+        random_state: int | None = None,
         n_jobs: int = 1,
         early_stopping: bool = False,
         patience: int = 10,
@@ -277,7 +285,7 @@ class RandomSearchOptimizer:
         self.best_params = None
         self.iterations_without_improvement = 0
 
-    def sample_parameters(self) -> Dict[str, Any]:
+    def sample_parameters(self) -> dict[str, Any]:
         """
         Sample a single parameter configuration from the search space.
 
@@ -291,7 +299,7 @@ class RandomSearchOptimizer:
             params[param_name] = distribution.sample()
         return params
 
-    def sample_multiple_parameters(self, n_samples: int) -> List[Dict[str, Any]]:
+    def sample_multiple_parameters(self, n_samples: int) -> list[dict[str, Any]]:
         """
         Sample multiple parameter configurations.
 
@@ -307,7 +315,7 @@ class RandomSearchOptimizer:
         """
         return [self.sample_parameters() for _ in range(n_samples)]
 
-    def _evaluate_single(self, params: Dict[str, Any]) -> Tuple[Dict[str, Any], float]:
+    def _evaluate_single(self, params: dict[str, Any]) -> tuple[dict[str, Any], float]:
         """
         Evaluate objective function for a single parameter configuration.
 
@@ -331,8 +339,8 @@ class RandomSearchOptimizer:
             return params, -np.inf
 
     def _evaluate_batch_sequential(
-        self, param_list: List[Dict[str, Any]]
-    ) -> List[Tuple[Dict[str, Any], float]]:
+        self, param_list: list[dict[str, Any]]
+    ) -> list[tuple[dict[str, Any], float]]:
         """Evaluate parameters sequentially."""
         results = []
         for params in param_list:
@@ -341,8 +349,8 @@ class RandomSearchOptimizer:
         return results
 
     def _evaluate_batch_parallel(
-        self, param_list: List[Dict[str, Any]]
-    ) -> List[Tuple[Dict[str, Any], float]]:
+        self, param_list: list[dict[str, Any]]
+    ) -> list[tuple[dict[str, Any], float]]:
         """Evaluate parameters in parallel."""
         results = []
         with ProcessPoolExecutor(max_workers=self.n_jobs) as executor:
@@ -493,10 +501,10 @@ class RandomSearchOptimizer:
 
 
 def random_search(
-    objective_function: Callable[[Dict], float],
-    search_space: Dict[str, Union[ParameterDistribution, Tuple, List]],
+    objective_function: Callable[[dict], float],
+    search_space: dict[str, ParameterDistribution | tuple | list],
     n_iter: int = 100,
-    random_state: Optional[int] = None,
+    random_state: int | None = None,
     n_jobs: int = 1,
     early_stopping: bool = False,
     patience: int = 10,
@@ -512,8 +520,10 @@ def random_search(
     search_space : dict
         Search space definition. Can contain:
         - ParameterDistribution objects
-        - Tuples (min, max) for uniform distributions
-        - Lists for categorical choices
+        - Tuples ``(low, high)`` for numeric ranges. Two integer bounds give an
+          inclusive integer range, and a ratio above 100 switches to
+          log-uniform so that wide ranges are sampled by order of magnitude.
+        - Lists for categorical choices, whatever their length
     n_iter : int, default=100
         Number of parameter configurations to evaluate
     random_state : int (optional)
@@ -558,7 +568,12 @@ def random_search(
     for param_name, param_spec in search_space.items():
         if isinstance(param_spec, ParameterDistribution):
             processed_space[param_name] = param_spec
-        elif isinstance(param_spec, (tuple, list)) and len(param_spec) == 2:
+        elif isinstance(param_spec, list):
+            # A list is always categorical. Checking the length first would
+            # capture any two-option list — ["relu", "tanh"] — and try to read
+            # it as a numeric range.
+            processed_space[param_name] = ChoiceDistribution(param_spec)
+        elif isinstance(param_spec, tuple) and len(param_spec) == 2:
             low, high = param_spec
             if isinstance(low, (int, float)) and isinstance(high, (int, float)):
                 if low > 0 and high / low > 100:  # Use log-uniform for wide ranges
@@ -569,9 +584,6 @@ def random_search(
                     processed_space[param_name] = UniformDistribution(low, high)
             else:
                 raise ValueError(f"Invalid tuple format for {param_name}: {param_spec}")
-        elif isinstance(param_spec, list):
-            # List format - categorical choice
-            processed_space[param_name] = ChoiceDistribution(param_spec)
         else:
             raise ValueError(
                 f"Unsupported search space format for {param_name}: {param_spec}"
@@ -592,7 +604,7 @@ def random_search(
 
 def analyze_parameter_importance(
     result: RandomSearchResult, top_n: int = 10
-) -> Dict[str, float]:
+) -> dict[str, float]:
     """
     Analyze parameter importance using correlation with objective values.
 
