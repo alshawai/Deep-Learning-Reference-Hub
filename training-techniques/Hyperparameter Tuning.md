@@ -571,7 +571,7 @@ def analyze_hyperparameter_importance(X_params, y_scores):
 >
 > #### **[Bayesian Optimization](../code-examples/numpy/hyperparameter_tuning/bayesian_optimization.py)** - Implementation using Gaussian Process surrogate models with Expected Improvement acquisition function for efficient hyperparameter search.
 > 
-> #### **[Random Search](../code-examples/numpy/hyperparameter_tuning/random_search.py)** - Comprehensive random search implementation with proper probability distributions and parallel evaluation support.
+> #### **[Random Search](../src/dlhub/tuning/random_search.py)** - Comprehensive random search implementation with proper probability distributions and parallel evaluation support.
 > 
 > #### **[Learning Rate Finder](../code-examples/numpy/learning_rate_finder.py)** - Automated learning rate range testing to find optimal learning rate ranges before full training.
 
