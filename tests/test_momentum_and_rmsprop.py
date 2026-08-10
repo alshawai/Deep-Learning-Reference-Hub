@@ -18,9 +18,9 @@ MIT
 import numpy as np
 from conftest import load
 
-momentum = load("optimization_algorithms/momentum_optimizer.py")
+from dlhub.optimizers.momentum import MomentumOptimizer
+
 rmsprop = load("optimization_algorithms/rmsprop_optimizer.py")
-MomentumOptimizer = momentum.MomentumOptimizer
 RMSpropOptimizer = rmsprop.RMSpropOptimizer
 
 
