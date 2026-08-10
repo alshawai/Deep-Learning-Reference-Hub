@@ -13,3 +13,10 @@ License
 -------
 MIT
 """
+
+from dlhub.nn.fully_connected import DeepNeuralNetwork, create_sample_data
+
+__all__ = [
+    "DeepNeuralNetwork",
+    "create_sample_data",
+]

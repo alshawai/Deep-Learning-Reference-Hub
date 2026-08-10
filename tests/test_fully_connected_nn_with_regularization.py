@@ -10,9 +10,8 @@ analytic gradient against a numerical one can.
 
 import numpy as np
 import pytest
-from conftest import load
 
-DeepNeuralNetwork = load("fully_connected_nn_with_regularization.py").DeepNeuralNetwork
+from dlhub.nn.fully_connected import DeepNeuralNetwork
 
 
 def tiny_problem(n_features=4, m=12, seed=0):
