@@ -25,16 +25,16 @@ from collections import Counter
 
 import numpy as np
 import pytest
-from conftest import load
 
-mf = load("hyperparameter_tuning/multifidelity_optimization.py")
-ASHAOptimizer = mf.ASHAOptimizer
-FidelityEvaluator = mf.FidelityEvaluator
-FunctionEvaluator = mf.FunctionEvaluator
-CandidateResult = mf.CandidateResult
-MultiFidelityResult = mf.MultiFidelityResult
-asha_optimize = mf.asha_optimize
-analyze_fidelity_correlation = mf.analyze_fidelity_correlation
+from dlhub.tuning.multifidelity import (
+    ASHAOptimizer,
+    CandidateResult,
+    FidelityEvaluator,
+    FunctionEvaluator,
+    MultiFidelityResult,
+    analyze_fidelity_correlation,
+    asha_optimize,
+)
 
 
 def ranked_eval(hyperparams, fidelity):

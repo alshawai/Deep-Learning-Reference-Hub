@@ -567,21 +567,21 @@ def analyze_hyperparameter_importance(X_params, y_scores):
 ## Implementation Examples
 
 ### Individual Techniques:
-> #### **[Learning Rate Scheduler](../code-examples/numpy/learning_rate_schedulers.py)** - Collection of learning rate scheduling strategies including step decay, exponential decay, and cosine annealing.
+> #### **[Learning Rate Scheduler](../src/dlhub/optimizers/schedules.py)** - Collection of learning rate scheduling strategies including step decay, exponential decay, and cosine annealing.
 >
-> #### **[Bayesian Optimization](../code-examples/numpy/hyperparameter_tuning/bayesian_optimization.py)** - Implementation using Gaussian Process surrogate models with Expected Improvement acquisition function for efficient hyperparameter search.
+> #### **[Bayesian Optimization](../src/dlhub/tuning/bayesian.py)** - Implementation using Gaussian Process surrogate models with Expected Improvement acquisition function for efficient hyperparameter search.
 > 
-> #### **[Random Search](../code-examples/numpy/hyperparameter_tuning/random_search.py)** - Comprehensive random search implementation with proper probability distributions and parallel evaluation support.
+> #### **[Random Search](../src/dlhub/tuning/random_search.py)** - Comprehensive random search implementation with proper probability distributions and parallel evaluation support.
 > 
-> #### **[Learning Rate Finder](../code-examples/numpy/learning_rate_finder.py)** - Automated learning rate range testing to find optimal learning rate ranges before full training.
+> #### **[Learning Rate Finder](../src/dlhub/tuning/learning_rate_finder.py)** - Automated learning rate range testing to find optimal learning rate ranges before full training.
 
 ### Advanced Implementations:
-> #### **[Multi-Fidelity Optimization](../code-examples/numpy/hyperparameter_tuning/multifidelity_optimization.py)** - ASHA (Asynchronous Successive Halving) implementation for efficient resource allocation across hyperparameter candidates.
+> #### **[Multi-Fidelity Optimization](../src/dlhub/tuning/multifidelity.py)** - ASHA (Asynchronous Successive Halving) implementation for efficient resource allocation across hyperparameter candidates.
 > 
-> #### **[Population-Based Training](../code-examples/numpy/hyperparameter_tuning/population_based_training.py)** - Complete PBT implementation with online hyperparameter adaptation during training.
+> #### **[Population-Based Training](../src/dlhub/tuning/population_based.py)** - Complete PBT implementation with online hyperparameter adaptation during training.
 
 ### Complete Frameworks:
-> #### **[Modern Hyperparameter Tuning Framework](../code-examples/numpy/hyperparameter_tuning/complete_tuning_framework.py)** - Production-ready framework integrating multiple optimization strategies with experiment tracking and statistical analysis.
+> #### **[Modern Hyperparameter Tuning Framework](../src/dlhub/tuning/framework.py)** - Production-ready framework integrating multiple optimization strategies with experiment tracking and statistical analysis.
 
 ---
 

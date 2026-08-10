@@ -16,12 +16,10 @@ MIT
 """
 
 import numpy as np
-from conftest import load
 
-momentum = load("optimization_algorithms/momentum_optimizer.py")
-rmsprop = load("optimization_algorithms/rmsprop_optimizer.py")
-MomentumOptimizer = momentum.MomentumOptimizer
-RMSpropOptimizer = rmsprop.RMSpropOptimizer
+from dlhub.optimizers.adam import AdamOptimizer
+from dlhub.optimizers.momentum import MomentumOptimizer
+from dlhub.optimizers.rmsprop import RMSpropOptimizer
 
 
 class TestMomentum:
@@ -180,11 +178,8 @@ def test_the_three_optimizers_agree_on_direction():
     p = {"W": np.array([1.0, -1.0])}
     g = {"W": np.array([0.5, -0.5])}
 
-    adam = load("optimization_algorithms/adam_optimizer.py").AdamOptimizer(
-        learning_rate=0.01
-    )
     results = [
-        adam.update(p, g)["W"],
+        AdamOptimizer(learning_rate=0.01).update(p, g)["W"],
         MomentumOptimizer(learning_rate=0.01).update_parameters(p, g)["W"],
         RMSpropOptimizer(learning_rate=0.01).update_parameters(p, g)["W"],
     ]

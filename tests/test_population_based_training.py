@@ -22,20 +22,19 @@ MIT
 
 import numpy as np
 import pytest
-from conftest import load
 
-pbt = load("hyperparameter_tuning/population_based_training.py")
-WorkerState = pbt.WorkerState
-PBTResult = pbt.PBTResult
-HyperparameterDistribution = pbt.HyperparameterDistribution
-LogUniformPerturbation = pbt.LogUniformPerturbation
-UniformPerturbation = pbt.UniformPerturbation
-ChoicePerturbation = pbt.ChoicePerturbation
-WorkerInterface = pbt.WorkerInterface
-FunctionWorker = pbt.FunctionWorker
-PopulationBasedTrainer = pbt.PopulationBasedTrainer
-pbt_optimize = pbt.pbt_optimize
-
+from dlhub.tuning.population_based import (
+    ChoicePerturbation,
+    FunctionWorker,
+    HyperparameterDistribution,
+    LogUniformPerturbation,
+    PBTResult,
+    PopulationBasedTrainer,
+    UniformPerturbation,
+    WorkerInterface,
+    WorkerState,
+    pbt_optimize,
+)
 
 BEST_LR = 0.01
 

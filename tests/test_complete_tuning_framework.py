@@ -24,21 +24,20 @@ import json
 
 import numpy as np
 import pytest
-from conftest import load
 
-ctf = load("hyperparameter_tuning/complete_tuning_framework.py")
-OptimizationMethod = ctf.OptimizationMethod
-HyperparameterConfig = ctf.HyperparameterConfig
-ExperimentConfig = ctf.ExperimentConfig
-TrialResult = ctf.TrialResult
-OptimizationResult = ctf.OptimizationResult
-ObjectiveFunction = ctf.ObjectiveFunction
-FunctionObjective = ctf.FunctionObjective
-HyperparameterSampler = ctf.HyperparameterSampler
-ExperimentLogger = ctf.ExperimentLogger
-HyperparameterOptimizer = ctf.HyperparameterOptimizer
-optimize_hyperparameters = ctf.optimize_hyperparameters
-
+from dlhub.tuning.framework import (
+    ExperimentConfig,
+    ExperimentLogger,
+    FunctionObjective,
+    HyperparameterConfig,
+    HyperparameterOptimizer,
+    HyperparameterSampler,
+    ObjectiveFunction,
+    OptimizationMethod,
+    OptimizationResult,
+    TrialResult,
+    optimize_hyperparameters,
+)
 
 BEST_LR = 0.01
 

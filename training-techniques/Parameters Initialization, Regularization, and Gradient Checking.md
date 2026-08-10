@@ -398,10 +398,10 @@ model = tf.keras.Sequential(
 
 ## Implementation Examples
 ### Individual Techniques:
-> #### **[Early Stopping](../code-examples/numpy/early_stopping.py)** - Implements a validation-based early stopping strategy, halting training when the validation loss stops improving. Includes configurable patience and verbose logging.  
-> #### **[Gradient Checking](../code-examples/numpy/gradient_checking.py)** - Compares analytical and numerical gradients using a two-sided difference method to ensure backpropagation correctness. Prints the relative difference for debugging.  
+> #### **[Early Stopping](../src/dlhub/training/early_stopping.py)** - Implements a validation-based early stopping strategy, halting training when the validation loss stops improving. Includes configurable patience and verbose logging.  
+> #### **[Gradient Checking](../src/dlhub/training/gradient_checking.py)** - Compares analytical and numerical gradients using a two-sided difference method to ensure backpropagation correctness. Prints the relative difference for debugging.  
 ### Complete Implementations:  
-> #### **[Complete Example: Deep Neural Network with All Techniques](../code-examples/numpy/fully_connected_nn_with_regularization.py)** - An end-to-end neural network implementation integrating He initialization, dropout, batch normalization, L2 regularization, and early stopping.  
+> #### **[Complete Example: Deep Neural Network with All Techniques](../src/dlhub/nn/fully_connected.py)** - An end-to-end neural network implementation integrating He initialization, dropout, batch normalization, L2 regularization, and early stopping.  
 
 ---
 

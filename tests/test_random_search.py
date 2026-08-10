@@ -23,19 +23,18 @@ MIT
 
 import numpy as np
 import pytest
-from conftest import load
 
-rs = load("hyperparameter_tuning/random_search.py")
-ParameterDistribution = rs.ParameterDistribution
-UniformDistribution = rs.UniformDistribution
-LogUniformDistribution = rs.LogUniformDistribution
-IntegerDistribution = rs.IntegerDistribution
-ChoiceDistribution = rs.ChoiceDistribution
-PowerDistribution = rs.PowerDistribution
-RandomSearchOptimizer = rs.RandomSearchOptimizer
-RandomSearchResult = rs.RandomSearchResult
-random_search = rs.random_search
-analyze_parameter_importance = rs.analyze_parameter_importance
+from dlhub.tuning.random_search import (
+    ChoiceDistribution,
+    IntegerDistribution,
+    LogUniformDistribution,
+    ParameterDistribution,
+    PowerDistribution,
+    RandomSearchOptimizer,
+    UniformDistribution,
+    analyze_parameter_importance,
+    random_search,
+)
 
 SAMPLES = 4000
 

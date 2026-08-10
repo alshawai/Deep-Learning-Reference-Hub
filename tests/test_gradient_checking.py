@@ -21,12 +21,12 @@ MIT
 
 import numpy as np
 import pytest
-from conftest import load
 
-gc = load("gradient_checking.py")
-gradient_check = gc.gradient_check
-dictionary_to_vector = gc.dictionary_to_vector
-vector_to_dictionary = gc.vector_to_dictionary
+from dlhub.training.gradient_checking import (
+    dictionary_to_vector,
+    gradient_check,
+    vector_to_dictionary,
+)
 
 
 def quadratic(X, Y, parameters):
