@@ -567,7 +567,7 @@ def analyze_hyperparameter_importance(X_params, y_scores):
 ## Implementation Examples
 
 ### Individual Techniques:
-> #### **[Learning Rate Scheduler](../code-examples/numpy/learning_rate_schedulers.py)** - Collection of learning rate scheduling strategies including step decay, exponential decay, and cosine annealing.
+> #### **[Learning Rate Scheduler](../src/dlhub/optimizers/schedules.py)** - Collection of learning rate scheduling strategies including step decay, exponential decay, and cosine annealing.
 >
 > #### **[Bayesian Optimization](../code-examples/numpy/hyperparameter_tuning/bayesian_optimization.py)** - Implementation using Gaussian Process surrogate models with Expected Improvement acquisition function for efficient hyperparameter search.
 > 

@@ -22,11 +22,8 @@ MIT
 import math
 
 import pytest
-from conftest import load
 
-lrs = load("learning_rate_schedulers.py")
-LearningRateScheduler = lrs.LearningRateScheduler
-SchedulerType = lrs.SchedulerType
+from dlhub.optimizers.schedules import LearningRateScheduler, SchedulerType
 
 
 def test_constant_never_moves():
