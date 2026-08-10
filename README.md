@@ -18,6 +18,7 @@ _A comprehensive collection of deep learning concepts, techniques, and best prac
   - [Quick Start](#-quick-start)
     - [For Mathematical Understanding](#for-mathematical-understanding)
     - [For practical Implementation](#for-practical-implementation)
+    - [To Run the Code](#to-run-the-code)
   - [Code Examples](#️-code-examples)
   - [Learning Path Recommendations](#-learning-path-recommendations)
     - [Path 1: Academic/Research Focus](#path-1-academicresearch-focus)
@@ -81,6 +82,30 @@ Start with **[L-Layer Neural Network](theory/L-Layer%20Neural%20Network.md)** to
 ### For Practical Implementation
 Read **[Parameters Initialization, Regularization, and Gradient Checking](training-techniques/Parameters%20Initialization,%20Regularization,%20and%20Gradient%20Checking.md)** to learn essential training techniques with modern best practices and working code examples.  
 Next, explore **[Optimization Algorithms](training-techniques/Optimization%20Algorithms.md)** to understand how different optimizers, learning rate schedules, and gradient-based methods impact training efficiency and convergence, accompanied by practical implementations.
+
+### To Run the Code
+
+The implementations install as a package, which puts every dependency they need on your machine in one step:
+
+```bash
+git clone https://github.com/eima40x4c/Deep-Learning-Reference-Hub.git
+cd Deep-Learning-Reference-Hub
+pip install -e .
+```
+
+That covers NumPy, SciPy, and Matplotlib, which is everything the from-scratch implementations use. Some documents also show the same idea in TensorFlow or PyTorch; to run those snippets, install the frameworks as well:
+
+```bash
+pip install -e ".[frameworks]"
+```
+
+Installing into a virtual environment is worth the extra command, since it keeps these versions from colliding with the rest of your machine:
+
+```bash
+python -m venv .venv && source .venv/bin/activate
+```
+
+Contributors need the test and lint tools too — see [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ---
 
