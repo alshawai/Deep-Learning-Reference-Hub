@@ -18,6 +18,21 @@ MIT
 """
 
 from dlhub.optimizers.adam import AdamOptimizer, create_adam_optimizer
+
+# The comparison harness carries its own Momentum, RMSprop, and Adam, written to
+# a different interface than the canonical ones above and colliding with them by
+# name. Only the harness itself is re-exported here; its optimizers stay reachable
+# through `dlhub.optimizers.comparison` until that duplication is resolved.
+from dlhub.optimizers.comparison import (
+    BealeFunction,
+    OptimizationAnalytics,
+    OptimizationComparison,
+    OptimizationProblem,
+    OptimizationResult,
+    OptimizerType,
+    QuadraticBowl,
+    RosenbrockFunction,
+)
 from dlhub.optimizers.exponential_weighted_averages import (
     AveragingStrategy,
     ExponentialWeightedAverage,
@@ -41,12 +56,20 @@ from dlhub.optimizers.schedules import (
 __all__ = [
     "AdamOptimizer",
     "AveragingStrategy",
+    "BealeFunction",
     "ExponentialWeightedAverage",
     "LearningRateScheduler",
     "MiniBatchGradientDescent",
     "MomentumOptimizer",
     "MultiVariateEWA",
+    "OptimizationAnalytics",
+    "OptimizationComparison",
+    "OptimizationProblem",
+    "OptimizationResult",
+    "OptimizerType",
+    "QuadraticBowl",
     "RMSpropOptimizer",
+    "RosenbrockFunction",
     "SchedulerType",
     "create_adam_ewa_pair",
     "create_adam_optimizer",

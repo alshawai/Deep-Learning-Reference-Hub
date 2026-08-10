@@ -502,7 +502,7 @@ optimizer = tf.keras.optimizers.SGD(learning_rate=0.01, momentum=0.9)
 > #### **[Learning Rate Schedulers](../src/dlhub/optimizers/schedules.py)** - Collection of learning rate scheduling strategies including step decay, exponential decay, and cosine annealing.
 
 ### Complete Training Examples:
-> #### **[Optimization Comparison](../code-examples/numpy/optimization_algorithms/optimization_comparison.py)** - Side-by-side comparison of different optimizers on the same problem, visualizing convergence behavior and final performance.
+> #### **[Optimization Comparison](../src/dlhub/optimizers/comparison.py)** - Side-by-side comparison of different optimizers on the same problem, visualizing convergence behavior and final performance.
 
 ---
 

@@ -22,17 +22,17 @@ MIT
 
 import numpy as np
 import pytest
-from conftest import load
 
-oc = load("optimization_algorithms/optimization_comparison.py")
-OptimizerType = oc.OptimizerType
-OptimizationComparison = oc.OptimizationComparison
-OptimizationProblem = oc.OptimizationProblem
-OptimizationResult = oc.OptimizationResult
-OptimizationAnalytics = oc.OptimizationAnalytics
-QuadraticBowl = oc.QuadraticBowl
-RosenbrockFunction = oc.RosenbrockFunction
-BealeFunction = oc.BealeFunction
+from dlhub.optimizers.comparison import (
+    BealeFunction,
+    OptimizationAnalytics,
+    OptimizationComparison,
+    OptimizationProblem,
+    OptimizationResult,
+    OptimizerType,
+    QuadraticBowl,
+    RosenbrockFunction,
+)
 
 PROBLEMS = [
     QuadraticBowl(),
