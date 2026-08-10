@@ -16,9 +16,7 @@ License
 MIT
 """
 
-from conftest import load
-
-early_stopping = load("early_stopping.py").early_stopping
+from dlhub.training.early_stopping import early_stopping
 
 
 def test_fewer_than_two_epochs_never_stops():

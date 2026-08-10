@@ -20,6 +20,11 @@ from dlhub.training.gradient_checking import (
     vector_to_dictionary,
 )
 
+# `early_stopping` names both a module here and the one function inside it.
+# Re-exporting the function would rebind the attribute and hide the module, so
+# callers reach it through the module path instead — same rule as
+# `dlhub.tuning.random_search`.
+
 __all__ = [
     "dictionary_to_vector",
     "gradient_check",
