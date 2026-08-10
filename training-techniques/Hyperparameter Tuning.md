@@ -576,7 +576,7 @@ def analyze_hyperparameter_importance(X_params, y_scores):
 > #### **[Learning Rate Finder](../code-examples/numpy/learning_rate_finder.py)** - Automated learning rate range testing to find optimal learning rate ranges before full training.
 
 ### Advanced Implementations:
-> #### **[Multi-Fidelity Optimization](../code-examples/numpy/hyperparameter_tuning/multifidelity_optimization.py)** - ASHA (Asynchronous Successive Halving) implementation for efficient resource allocation across hyperparameter candidates.
+> #### **[Multi-Fidelity Optimization](../src/dlhub/tuning/multifidelity.py)** - ASHA (Asynchronous Successive Halving) implementation for efficient resource allocation across hyperparameter candidates.
 > 
 > #### **[Population-Based Training](../code-examples/numpy/hyperparameter_tuning/population_based_training.py)** - Complete PBT implementation with online hyperparameter adaptation during training.
 

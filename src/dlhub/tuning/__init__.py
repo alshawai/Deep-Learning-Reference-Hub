@@ -21,6 +21,16 @@ from dlhub.tuning.bayesian import (
     GaussianProcess,
     optimize_hyperparameters,
 )
+from dlhub.tuning.multifidelity import (
+    ASHAOptimizer,
+    CandidateResult,
+    FidelityConfig,
+    FidelityEvaluator,
+    FunctionEvaluator,
+    MultiFidelityResult,
+    analyze_fidelity_correlation,
+    asha_optimize,
+)
 
 # `random_search` names both a module here and a function inside it. Re-exporting
 # the function would rebind the attribute and make `dlhub.tuning.random_search`
@@ -38,17 +48,25 @@ from dlhub.tuning.random_search import (
 )
 
 __all__ = [
+    "ASHAOptimizer",
     "BayesianOptimizationResult",
     "BayesianOptimizer",
+    "CandidateResult",
     "ChoiceDistribution",
+    "FidelityConfig",
+    "FidelityEvaluator",
+    "FunctionEvaluator",
     "GaussianProcess",
     "IntegerDistribution",
     "LogUniformDistribution",
+    "MultiFidelityResult",
     "ParameterDistribution",
     "PowerDistribution",
     "RandomSearchOptimizer",
     "RandomSearchResult",
     "UniformDistribution",
+    "analyze_fidelity_correlation",
     "analyze_parameter_importance",
+    "asha_optimize",
     "optimize_hyperparameters",
 ]
