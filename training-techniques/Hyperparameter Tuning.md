@@ -581,7 +581,7 @@ def analyze_hyperparameter_importance(X_params, y_scores):
 > #### **[Population-Based Training](../src/dlhub/tuning/population_based.py)** - Complete PBT implementation with online hyperparameter adaptation during training.
 
 ### Complete Frameworks:
-> #### **[Modern Hyperparameter Tuning Framework](../code-examples/numpy/hyperparameter_tuning/complete_tuning_framework.py)** - Production-ready framework integrating multiple optimization strategies with experiment tracking and statistical analysis.
+> #### **[Modern Hyperparameter Tuning Framework](../src/dlhub/tuning/framework.py)** - Production-ready framework integrating multiple optimization strategies with experiment tracking and statistical analysis.
 
 ---
 

@@ -21,6 +21,24 @@ from dlhub.tuning.bayesian import (
     GaussianProcess,
     optimize_hyperparameters,
 )
+
+# `framework.optimize_hyperparameters` is a second function of that name: it drives
+# whichever strategy its `optimization_method` argument selects, over a different
+# search-space format, and returns a different result type. Only the Bayesian one
+# is re-exported here; this one is reached through its module path until Phase 2
+# settles which of the two is canonical.
+from dlhub.tuning.framework import (
+    ExperimentConfig,
+    ExperimentLogger,
+    FunctionObjective,
+    HyperparameterConfig,
+    HyperparameterOptimizer,
+    HyperparameterSampler,
+    ObjectiveFunction,
+    OptimizationMethod,
+    OptimizationResult,
+    TrialResult,
+)
 from dlhub.tuning.learning_rate_finder import (
     BaseTrainer,
     FunctionTrainer,
@@ -75,25 +93,35 @@ __all__ = [
     "CandidateResult",
     "ChoiceDistribution",
     "ChoicePerturbation",
+    "ExperimentConfig",
+    "ExperimentLogger",
     "FidelityConfig",
     "FidelityEvaluator",
     "FunctionEvaluator",
+    "FunctionObjective",
     "FunctionTrainer",
     "FunctionWorker",
     "GaussianProcess",
+    "HyperparameterConfig",
     "HyperparameterDistribution",
+    "HyperparameterOptimizer",
+    "HyperparameterSampler",
     "IntegerDistribution",
     "LearningRateFinder",
     "LearningRateFinderResult",
     "LogUniformDistribution",
     "LogUniformPerturbation",
     "MultiFidelityResult",
+    "ObjectiveFunction",
+    "OptimizationMethod",
+    "OptimizationResult",
     "PBTResult",
     "ParameterDistribution",
     "PopulationBasedTrainer",
     "PowerDistribution",
     "RandomSearchOptimizer",
     "RandomSearchResult",
+    "TrialResult",
     "UniformDistribution",
     "UniformPerturbation",
     "WorkerInterface",
