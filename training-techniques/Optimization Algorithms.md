@@ -494,7 +494,7 @@ optimizer = tf.keras.optimizers.SGD(learning_rate=0.01, momentum=0.9)
 ### Complete Implementations:
 > #### **[Mini-batch Gradient Descent](../src/dlhub/optimizers/mini_batch.py)** - Implements efficient mini-batch processing with proper shuffling and batch creation for neural network training.
 > #### **[Momentum Optimizer](../src/dlhub/optimizers/momentum.py)** - Complete implementation of gradient descent with momentum, including exponential weighted averages and bias correction.
-> #### **[RMSprop Optimizer](../code-examples/numpy/optimization_algorithms/rmsprop_optimizer.py)** - Adaptive learning rate optimization with squared gradient accumulation and parameter-wise learning rate adjustment.
+> #### **[RMSprop Optimizer](../src/dlhub/optimizers/rmsprop.py)** - Adaptive learning rate optimization with squared gradient accumulation and parameter-wise learning rate adjustment.
 > #### **[Adam Optimizer](../code-examples/numpy/optimization_algorithms/adam_optimizer.py)** - Full implementation of the Adam algorithm combining momentum and RMSprop with bias correction.
 
 ### Utility Functions:

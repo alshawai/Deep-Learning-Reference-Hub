@@ -19,9 +19,7 @@ import numpy as np
 from conftest import load
 
 from dlhub.optimizers.momentum import MomentumOptimizer
-
-rmsprop = load("optimization_algorithms/rmsprop_optimizer.py")
-RMSpropOptimizer = rmsprop.RMSpropOptimizer
+from dlhub.optimizers.rmsprop import RMSpropOptimizer
 
 
 class TestMomentum:

@@ -19,5 +19,6 @@ MIT
 
 from dlhub.optimizers.mini_batch import MiniBatchGradientDescent
 from dlhub.optimizers.momentum import MomentumOptimizer
+from dlhub.optimizers.rmsprop import RMSpropOptimizer
 
-__all__ = ["MiniBatchGradientDescent", "MomentumOptimizer"]
+__all__ = ["MiniBatchGradientDescent", "MomentumOptimizer", "RMSpropOptimizer"]
