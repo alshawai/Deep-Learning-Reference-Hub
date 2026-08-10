@@ -18,6 +18,7 @@ MIT
 """
 
 from dlhub.optimizers.adam import AdamOptimizer, create_adam_optimizer
+from dlhub.optimizers.base import BaseOptimizer
 
 # The comparison harness carries its own Momentum, RMSprop, and Adam, written to
 # a different interface than the canonical ones above and colliding with them by
@@ -56,6 +57,7 @@ from dlhub.optimizers.schedules import (
 __all__ = [
     "AdamOptimizer",
     "AveragingStrategy",
+    "BaseOptimizer",
     "BealeFunction",
     "ExponentialWeightedAverage",
     "LearningRateScheduler",

@@ -43,6 +43,8 @@ from enum import Enum
 import matplotlib.pyplot as plt
 import numpy as np
 
+from dlhub.optimizers.base import BaseOptimizer
+
 warnings.filterwarnings("ignore", category=RuntimeWarning)
 
 
@@ -82,45 +84,6 @@ class OptimizationResult:
     convergence_time: float
     final_loss: float
     iterations_to_converge: int
-
-
-class BaseOptimizer:
-    """
-    Base class for all optimizers with common functionality.
-
-    Parameters
-    ----------
-    learning_rate : float, default=0.01
-        Learning rate for parameter updates.
-    """
-
-    def __init__(self, learning_rate: float = 0.01):
-        self.learning_rate = learning_rate
-        self.name = "BaseOptimizer"
-
-    def update_parameters(self, params: dict, grads: dict, t: int) -> dict:
-        """
-        Update parameters using optimization algorithm.
-
-        Parameters
-        ----------
-        params : dict
-            Current parameter values.
-        grads : dict
-            Gradients for each parameter.
-        t : int
-            Current iteration/timestep.
-
-        Returns
-        -------
-        dict
-            Updated parameters.
-        """
-        raise NotImplementedError("Subclasses must implement update_parameters")
-
-    def reset(self):
-        """Reset optimizer state for new optimization run."""
-        pass
 
 
 class SGDOptimizer(BaseOptimizer):
@@ -362,7 +325,7 @@ class AdamOptimizer(BaseOptimizer):
         """Reset first and second moment estimates for new optimization run."""
         self.m = {}
         self.v = {}
-        self.t
+        self.t = 0
 
 
 class OptimizationProblem:
