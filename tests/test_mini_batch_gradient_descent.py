@@ -18,11 +18,8 @@ MIT
 
 import numpy as np
 import pytest
-from conftest import load
 
-mbgd = load("optimization_algorithms/mini_batch_gradient_descent.py")
-MiniBatchGradientDescent = mbgd.MiniBatchGradientDescent
-initialize_parameters = mbgd.initialize_parameters
+from dlhub.optimizers.mini_batch import MiniBatchGradientDescent, initialize_parameters
 
 
 @pytest.fixture

@@ -16,3 +16,7 @@ License
 -------
 MIT
 """
+
+from dlhub.optimizers.mini_batch import MiniBatchGradientDescent
+
+__all__ = ["MiniBatchGradientDescent"]
