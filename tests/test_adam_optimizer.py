@@ -17,10 +17,8 @@ MIT
 
 import numpy as np
 import pytest
-from conftest import load
 
-adam = load("optimization_algorithms/adam_optimizer.py")
-AdamOptimizer = adam.AdamOptimizer
+from dlhub.optimizers.adam import AdamOptimizer, create_adam_optimizer
 
 
 def test_first_step_size_equals_the_learning_rate():
@@ -195,7 +193,7 @@ def test_rejects_hyperparameters_outside_their_valid_range(kwargs):
 
 
 def test_factory_passes_arguments_through():
-    opt = adam.create_adam_optimizer(learning_rate=0.5, beta1=0.5, amsgrad=True)
+    opt = create_adam_optimizer(learning_rate=0.5, beta1=0.5, amsgrad=True)
     assert opt.learning_rate == 0.5
     assert opt.beta1 == 0.5
     assert opt.amsgrad is True
