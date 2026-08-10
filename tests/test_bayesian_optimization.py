@@ -23,14 +23,13 @@ MIT
 
 import numpy as np
 import pytest
-from conftest import load
 from scipy.stats import norm
 
-bo = load("hyperparameter_tuning/bayesian_optimization.py")
-GaussianProcess = bo.GaussianProcess
-BayesianOptimizer = bo.BayesianOptimizer
-BayesianOptimizationResult = bo.BayesianOptimizationResult
-optimize_hyperparameters = bo.optimize_hyperparameters
+from dlhub.tuning.bayesian import (
+    BayesianOptimizer,
+    GaussianProcess,
+    optimize_hyperparameters,
+)
 
 
 def quadratic(params):

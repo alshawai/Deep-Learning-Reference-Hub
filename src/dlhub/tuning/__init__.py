@@ -15,6 +15,13 @@ License
 MIT
 """
 
+from dlhub.tuning.bayesian import (
+    BayesianOptimizationResult,
+    BayesianOptimizer,
+    GaussianProcess,
+    optimize_hyperparameters,
+)
+
 # `random_search` names both a module here and a function inside it. Re-exporting
 # the function would rebind the attribute and make `dlhub.tuning.random_search`
 # resolve to it, so callers reach that one through the module path instead.
@@ -31,7 +38,10 @@ from dlhub.tuning.random_search import (
 )
 
 __all__ = [
+    "BayesianOptimizationResult",
+    "BayesianOptimizer",
     "ChoiceDistribution",
+    "GaussianProcess",
     "IntegerDistribution",
     "LogUniformDistribution",
     "ParameterDistribution",
@@ -40,4 +50,5 @@ __all__ = [
     "RandomSearchResult",
     "UniformDistribution",
     "analyze_parameter_importance",
+    "optimize_hyperparameters",
 ]
