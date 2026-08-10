@@ -21,6 +21,14 @@ from dlhub.tuning.bayesian import (
     GaussianProcess,
     optimize_hyperparameters,
 )
+from dlhub.tuning.learning_rate_finder import (
+    BaseTrainer,
+    FunctionTrainer,
+    LearningRateFinder,
+    LearningRateFinderResult,
+    find_learning_rate,
+    suggest_learning_rate_schedule,
+)
 from dlhub.tuning.multifidelity import (
     ASHAOptimizer,
     CandidateResult,
@@ -61,6 +69,7 @@ from dlhub.tuning.random_search import (
 
 __all__ = [
     "ASHAOptimizer",
+    "BaseTrainer",
     "BayesianOptimizationResult",
     "BayesianOptimizer",
     "CandidateResult",
@@ -69,10 +78,13 @@ __all__ = [
     "FidelityConfig",
     "FidelityEvaluator",
     "FunctionEvaluator",
+    "FunctionTrainer",
     "FunctionWorker",
     "GaussianProcess",
     "HyperparameterDistribution",
     "IntegerDistribution",
+    "LearningRateFinder",
+    "LearningRateFinderResult",
     "LogUniformDistribution",
     "LogUniformPerturbation",
     "MultiFidelityResult",
@@ -89,6 +101,8 @@ __all__ = [
     "analyze_fidelity_correlation",
     "analyze_parameter_importance",
     "asha_optimize",
+    "find_learning_rate",
     "optimize_hyperparameters",
     "pbt_optimize",
+    "suggest_learning_rate_schedule",
 ]

@@ -573,7 +573,7 @@ def analyze_hyperparameter_importance(X_params, y_scores):
 > 
 > #### **[Random Search](../src/dlhub/tuning/random_search.py)** - Comprehensive random search implementation with proper probability distributions and parallel evaluation support.
 > 
-> #### **[Learning Rate Finder](../code-examples/numpy/learning_rate_finder.py)** - Automated learning rate range testing to find optimal learning rate ranges before full training.
+> #### **[Learning Rate Finder](../src/dlhub/tuning/learning_rate_finder.py)** - Automated learning rate range testing to find optimal learning rate ranges before full training.
 
 ### Advanced Implementations:
 > #### **[Multi-Fidelity Optimization](../src/dlhub/tuning/multifidelity.py)** - ASHA (Asynchronous Successive Halving) implementation for efficient resource allocation across hyperparameter candidates.

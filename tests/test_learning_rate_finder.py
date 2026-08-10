@@ -22,13 +22,13 @@ MIT
 
 import numpy as np
 import pytest
-from conftest import load
 
-lrf = load("learning_rate_finder.py")
-LearningRateFinder = lrf.LearningRateFinder
-FunctionTrainer = lrf.FunctionTrainer
-BaseTrainer = lrf.BaseTrainer
-suggest_learning_rate_schedule = lrf.suggest_learning_rate_schedule
+from dlhub.tuning.learning_rate_finder import (
+    BaseTrainer,
+    FunctionTrainer,
+    LearningRateFinder,
+    suggest_learning_rate_schedule,
+)
 
 
 class CurveTrainer(BaseTrainer):
