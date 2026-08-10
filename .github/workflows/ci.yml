@@ -45,10 +45,14 @@ jobs:
       - name: Lint
         run: ruff check .
 
+      # Walks both trees while the migration is underway: modules leave
+      # `code-examples` for `src` one commit at a time, and `code-examples`
+      # stops existing entirely once the last one moves. Neither tree is
+      # required to be present, so this step needs no edit as they trade places.
       - name: Imports resolve
         run: |
-          find code-examples -name '*.py' -not -path '*__pycache__*' -print0 \
-            | xargs -0 -I{} python -c "import importlib.util,sys;s=importlib.util.spec_from_file_location('m','{}');m=importlib.util.module_from_spec(s);s.loader.exec_module(m)"
+          find src code-examples -name '*.py' -not -path '*__pycache__*' -print0 2>/dev/null \
+            | xargs -0 -r -I{} python -c "import importlib.util,sys;s=importlib.util.spec_from_file_location('m','{}');m=importlib.util.module_from_spec(s);s.loader.exec_module(m)"
 
       - name: Tests
         run: |
