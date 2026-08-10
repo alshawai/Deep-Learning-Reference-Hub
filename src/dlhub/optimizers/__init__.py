@@ -18,14 +18,28 @@ MIT
 """
 
 from dlhub.optimizers.adam import AdamOptimizer, create_adam_optimizer
+from dlhub.optimizers.exponential_weighted_averages import (
+    AveragingStrategy,
+    ExponentialWeightedAverage,
+    MultiVariateEWA,
+    create_adam_ewa_pair,
+    create_momentum_ewa,
+    create_rmsprop_ewa,
+)
 from dlhub.optimizers.mini_batch import MiniBatchGradientDescent
 from dlhub.optimizers.momentum import MomentumOptimizer
 from dlhub.optimizers.rmsprop import RMSpropOptimizer
 
 __all__ = [
     "AdamOptimizer",
+    "AveragingStrategy",
+    "ExponentialWeightedAverage",
     "MiniBatchGradientDescent",
     "MomentumOptimizer",
+    "MultiVariateEWA",
     "RMSpropOptimizer",
+    "create_adam_ewa_pair",
     "create_adam_optimizer",
+    "create_momentum_ewa",
+    "create_rmsprop_ewa",
 ]

@@ -498,7 +498,7 @@ optimizer = tf.keras.optimizers.SGD(learning_rate=0.01, momentum=0.9)
 > #### **[Adam Optimizer](../src/dlhub/optimizers/adam.py)** - Full implementation of the Adam algorithm combining momentum and RMSprop with bias correction.
 
 ### Utility Functions:
-> #### **[Exponential Weighted Averages](../code-examples/numpy/optimization_algorithms/exponential_weighted_averages.py)** - Standalone implementation of EWA with bias correction for understanding the mathematical foundation.
+> #### **[Exponential Weighted Averages](../src/dlhub/optimizers/exponential_weighted_averages.py)** - Standalone implementation of EWA with bias correction for understanding the mathematical foundation.
 > #### **[Learning Rate Schedulers](../code-examples/numpy/learning_rate_schedulers.py)** - Collection of learning rate scheduling strategies including step decay, exponential decay, and cosine annealing.
 
 ### Complete Training Examples:

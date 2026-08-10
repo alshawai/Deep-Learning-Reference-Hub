@@ -17,11 +17,11 @@ MIT
 
 import numpy as np
 import pytest
-from conftest import load
 
-ewa = load("optimization_algorithms/exponential_weighted_averages.py")
-ExponentialWeightedAverage = ewa.ExponentialWeightedAverage
-AveragingStrategy = ewa.AveragingStrategy
+from dlhub.optimizers.exponential_weighted_averages import (
+    AveragingStrategy,
+    ExponentialWeightedAverage,
+)
 
 
 def test_first_bias_corrected_average_is_approximately_the_first_sample():
