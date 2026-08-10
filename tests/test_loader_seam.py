@@ -25,13 +25,40 @@ import pytest
 from conftest import NUMPY_EXAMPLES, PACKAGE_MODULE, load
 
 
-def test_a_module_that_has_not_moved_loads_from_its_file():
+def _files_left_in_the_old_tree():
     """
-    The fallback path. Asserted against a module's real content rather than its
-    mere existence, so an empty or half-executed module fails here.
+    Paths, relative to the old tree, of the modules that have not moved yet.
+
+    Shrinks by one with each Phase 1 commit and is empty when the phase is done.
     """
-    adam = load("optimization_algorithms/adam_optimizer.py")
-    assert hasattr(adam, "AdamOptimizer")
+    return {
+        str(path.relative_to(NUMPY_EXAMPLES))
+        for path in NUMPY_EXAMPLES.rglob("*.py")
+        if not path.name.startswith("__")
+    }
+
+
+def test_every_module_still_in_the_old_tree_loads_from_its_file():
+    """
+    The fallback path, stated as an invariant over whatever has not moved yet
+    rather than pinned to one module. Pinning it to a named module would make
+    this pass for the wrong reason the moment that module moved: the assertion
+    would still hold, but against the package copy, while claiming to cover the
+    fallback.
+
+    A module that resolves to the package while its old file is still present
+    fails here, which is a move that copied instead of moving.
+
+    Vacuous once the old tree is empty. That is the correct reading -- at that
+    point there is nothing left to fall back to, and the seam is ready to be
+    deleted. The package path stays covered by the test below either way.
+    """
+    for relative_path in sorted(_files_left_in_the_old_tree()):
+        module = load(relative_path)
+        assert module.__file__ == str(NUMPY_EXAMPLES / relative_path), (
+            f"{relative_path} still has a file in the old tree but resolved to "
+            f"{module.__name__}; it exists in both places"
+        )
 
 
 def test_a_module_that_has_moved_loads_from_the_package():
@@ -80,9 +107,5 @@ def test_every_unmoved_module_has_a_package_home_assigned():
     new module added to the old tree during the migration fails here until its
     destination is decided, which is the moment to decide it.
     """
-    stranded = {
-        str(path.relative_to(NUMPY_EXAMPLES))
-        for path in NUMPY_EXAMPLES.rglob("*.py")
-        if not path.name.startswith("__")
-    } - set(PACKAGE_MODULE)
+    stranded = _files_left_in_the_old_tree() - set(PACKAGE_MODULE)
     assert not stranded, f"no package home assigned for: {sorted(stranded)}"
