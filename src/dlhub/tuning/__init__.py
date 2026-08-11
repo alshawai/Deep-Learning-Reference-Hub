@@ -19,14 +19,14 @@ from dlhub.tuning.bayesian import (
     BayesianOptimizationResult,
     BayesianOptimizer,
     GaussianProcess,
-    optimize_hyperparameters,
+    bayesian_optimize,
 )
 
-# `framework.optimize_hyperparameters` is a second function of that name: it drives
-# whichever strategy its `optimization_method` argument selects, over a different
-# search-space format, and returns a different result type. Only the Bayesian one
-# is re-exported here; this one is reached through its module path until Phase 2
-# settles which of the two is canonical.
+# One entry point per method -- `bayesian_optimize`, `random_search`,
+# `asha_optimize`, `pbt_optimize` -- plus `optimize_hyperparameters`, which takes
+# a method name and dispatches to one of them. The per-method functions take that
+# method's own search-space format and return its own result type; the dispatcher
+# takes the framework's and returns an `ExperimentResult`.
 from dlhub.tuning.framework import (
     ExperimentConfig,
     ExperimentLogger,
@@ -38,6 +38,7 @@ from dlhub.tuning.framework import (
     ObjectiveFunction,
     OptimizationMethod,
     TrialResult,
+    optimize_hyperparameters,
 )
 from dlhub.tuning.learning_rate_finder import (
     BaseTrainer,
@@ -129,6 +130,7 @@ __all__ = [
     "analyze_fidelity_correlation",
     "analyze_parameter_importance",
     "asha_optimize",
+    "bayesian_optimize",
     "find_learning_rate",
     "optimize_hyperparameters",
     "pbt_optimize",

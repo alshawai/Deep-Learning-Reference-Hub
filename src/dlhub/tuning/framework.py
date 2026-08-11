@@ -750,7 +750,14 @@ def optimize_hyperparameters(
     verbose: bool = True,
 ) -> ExperimentResult:
     """
-    Convenience function for hyperparameter optimization.
+    Run a hyperparameter search by method name, returning an ``ExperimentResult``.
+
+    The general dispatcher: ``optimization_method`` selects the strategy. It takes
+    the framework's search-space format, which carries a type per hyperparameter
+    and so covers categorical and integer dimensions as well as continuous ones.
+    The method-specific entry points -- :func:`~dlhub.tuning.bayesian_optimize`,
+    :func:`~dlhub.tuning.random_search` -- take their own formats and return their
+    own result types.
 
     Parameters
     ----------
