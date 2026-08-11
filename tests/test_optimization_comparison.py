@@ -28,7 +28,7 @@ from dlhub.optimizers.comparison import (
     OptimizationAnalytics,
     OptimizationComparison,
     OptimizationProblem,
-    OptimizationResult,
+    OptimizationRun,
     OptimizerType,
     QuadraticBowl,
     RosenbrockFunction,
@@ -257,13 +257,13 @@ def test_comparing_optimizers_returns_one_result_per_configuration():
     )
     assert len(results) == 2
     for result in results.values():
-        assert isinstance(result, OptimizationResult)
+        assert isinstance(result, OptimizationRun)
         assert result.losses
 
 
 class TestAnalytics:
     def make_result(self, losses):
-        return OptimizationResult(
+        return OptimizationRun(
             optimizer_name="probe",
             losses=list(losses),
             parameters=[{} for _ in losses],

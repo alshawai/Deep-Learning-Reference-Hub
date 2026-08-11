@@ -84,9 +84,12 @@ class OptimizerType(Enum):
 
 
 @dataclass
-class OptimizationResult:
+class OptimizationRun:
     """
-    Container for optimization results and metrics.
+    The trace of one optimizer descending one problem, and its summary.
+
+    Not to be confused with :class:`dlhub.tuning.ExperimentResult`, which records
+    the outcome of a hyperparameter search rather than a single descent.
 
     Attributes
     ----------
@@ -582,7 +585,7 @@ class OptimizationComparison:
 
     def run_optimization(
         self, problem: OptimizationProblem, optimizer: BaseOptimizer
-    ) -> OptimizationResult:
+    ) -> OptimizationRun:
         """
         Run single optimization experiment.
 
@@ -595,7 +598,7 @@ class OptimizationComparison:
 
         Returns
         -------
-        OptimizationResult
+        OptimizationRun
             Results of optimization including metrics and trajectory.
         """
         optimizer.reset()
@@ -642,7 +645,7 @@ class OptimizationComparison:
 
         end_time = time.time()
 
-        result = OptimizationResult(
+        result = OptimizationRun(
             optimizer_name=optimizer.name,
             losses=losses,
             parameters=parameter_history,
@@ -662,7 +665,7 @@ class OptimizationComparison:
 
     def compare_optimizers(
         self, problem: OptimizationProblem, optimizer_configs: dict[OptimizerType, dict]
-    ) -> dict[str, OptimizationResult]:
+    ) -> dict[str, OptimizationRun]:
         """
         Compare multiple optimizers on a single problem.
 
@@ -691,7 +694,7 @@ class OptimizationComparison:
 
         return results
 
-    def run_comprehensive_comparison(self) -> dict[str, dict[str, OptimizationResult]]:
+    def run_comprehensive_comparison(self) -> dict[str, dict[str, OptimizationRun]]:
         """
         Run comprehensive comparison across multiple problems and optimizers.
 
@@ -725,7 +728,7 @@ class OptimizationComparison:
 
     def plot_convergence_comparison(
         self,
-        results: dict[str, OptimizationResult],
+        results: dict[str, OptimizationRun],
         problem_name: str,
         log_scale: bool = True,
     ):
@@ -776,7 +779,7 @@ class OptimizationComparison:
 
     def plot_optimization_paths(
         self,
-        results: dict[str, OptimizationResult],
+        results: dict[str, OptimizationRun],
         problem: OptimizationProblem,
         contour_levels: int = 20,
     ):
@@ -858,7 +861,7 @@ class OptimizationComparison:
         plt.show()
 
     def generate_summary_table(
-        self, all_results: dict[str, dict[str, OptimizationResult]]
+        self, all_results: dict[str, dict[str, OptimizationRun]]
     ) -> None:
         """
         Generate formatted summary table of optimization results.
@@ -953,13 +956,13 @@ class OptimizationAnalytics:
     """
 
     @staticmethod
-    def compute_convergence_metrics(result: OptimizationResult) -> dict[str, float]:
+    def compute_convergence_metrics(result: OptimizationRun) -> dict[str, float]:
         """
         Compute detailed convergence metrics for a single optimization run.
 
         Parameters
         ----------
-        result : OptimizationResult
+        result : OptimizationRun
             Single optimization result to analyze.
 
         Returns
@@ -997,7 +1000,7 @@ class OptimizationAnalytics:
 
     @staticmethod
     def rank_optimizers(
-        all_results: dict[str, dict[str, OptimizationResult]],
+        all_results: dict[str, dict[str, OptimizationRun]],
     ) -> dict[str, dict[str, int]]:
         """
         Rank optimizers across different problems and metrics.
@@ -1049,7 +1052,7 @@ class OptimizationAnalytics:
 
     @staticmethod
     def generate_performance_heatmap(
-        all_results: dict[str, dict[str, OptimizationResult]],
+        all_results: dict[str, dict[str, OptimizationRun]],
     ):
         """
         Generate performance heatmap comparing optimizers across problems.

@@ -148,9 +148,12 @@ class TrialResult:
 
 
 @dataclass
-class OptimizationResult:
+class ExperimentResult:
     """
-    Complete results from hyperparameter optimization.
+    The outcome of one hyperparameter search: every trial, and the best of them.
+
+    Named for the :class:`ExperimentConfig` it answers. Not to be confused with
+    :class:`dlhub.optimizers.OptimizationRun`, which traces a single descent.
 
     Attributes
     ----------
@@ -383,13 +386,13 @@ class ExperimentLogger:
         with open(self.log_file, "a") as f:
             f.write(json.dumps(trial_dict) + "\n")
 
-    def save_results(self, result: OptimizationResult) -> None:
+    def save_results(self, result: ExperimentResult) -> None:
         """
         Save complete optimization results.
 
         Parameters
         ----------
-        result : OptimizationResult
+        result : ExperimentResult
             Optimization results to save
         """
         if self.save_dir is None:
@@ -551,7 +554,7 @@ class HyperparameterOptimizer:
                 if current_score < best_score:
                     self.best_trial = trial
 
-    def optimize(self, verbose: bool = True) -> OptimizationResult:
+    def optimize(self, verbose: bool = True) -> ExperimentResult:
         """
         Run hyperparameter optimization.
 
@@ -562,7 +565,7 @@ class HyperparameterOptimizer:
 
         Returns
         -------
-        OptimizationResult
+        ExperimentResult
             Optimization results
         """
         if verbose:
@@ -592,7 +595,7 @@ class HyperparameterOptimizer:
 
         summary_stats = self._compute_summary_statistics()
 
-        result = OptimizationResult(
+        result = ExperimentResult(
             experiment_config=self.config,
             best_trial=self.best_trial,  # type: ignore
             all_trials=self.all_trials,
@@ -745,7 +748,7 @@ def optimize_hyperparameters(
     random_seed: int | None = None,
     save_dir: str | None = None,
     verbose: bool = True,
-) -> OptimizationResult:
+) -> ExperimentResult:
     """
     Convenience function for hyperparameter optimization.
 
@@ -774,7 +777,7 @@ def optimize_hyperparameters(
 
     Returns
     -------
-    OptimizationResult
+    ExperimentResult
         Optimization results
 
     Examples

@@ -30,13 +30,13 @@ from dlhub.tuning.bayesian import (
 from dlhub.tuning.framework import (
     ExperimentConfig,
     ExperimentLogger,
+    ExperimentResult,
     FunctionObjective,
     HyperparameterConfig,
     HyperparameterOptimizer,
     HyperparameterSampler,
     ObjectiveFunction,
     OptimizationMethod,
-    OptimizationResult,
     TrialResult,
 )
 from dlhub.tuning.learning_rate_finder import (
@@ -95,6 +95,7 @@ __all__ = [
     "ChoicePerturbation",
     "ExperimentConfig",
     "ExperimentLogger",
+    "ExperimentResult",
     "FidelityConfig",
     "FidelityEvaluator",
     "FunctionEvaluator",
@@ -114,7 +115,6 @@ __all__ = [
     "MultiFidelityResult",
     "ObjectiveFunction",
     "OptimizationMethod",
-    "OptimizationResult",
     "PBTResult",
     "ParameterDistribution",
     "PopulationBasedTrainer",

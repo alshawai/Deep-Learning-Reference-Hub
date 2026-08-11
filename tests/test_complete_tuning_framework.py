@@ -28,13 +28,13 @@ import pytest
 from dlhub.tuning.framework import (
     ExperimentConfig,
     ExperimentLogger,
+    ExperimentResult,
     FunctionObjective,
     HyperparameterConfig,
     HyperparameterOptimizer,
     HyperparameterSampler,
     ObjectiveFunction,
     OptimizationMethod,
-    OptimizationResult,
     TrialResult,
     optimize_hyperparameters,
 )
@@ -426,7 +426,7 @@ class TestOptimize:
         result = optimize_hyperparameters(
             accuracy, SPACE, "accuracy", n_trials=10, random_seed=0, verbose=False
         )
-        assert isinstance(result, OptimizationResult)
+        assert isinstance(result, ExperimentResult)
         assert isinstance(result.best_trial, TrialResult)
         assert result.experiment_config.objective_metric == "accuracy"
         assert result.total_time > 0
