@@ -485,7 +485,7 @@ class BayesianOptimizer:
         )
 
 
-def optimize_hyperparameters(
+def bayesian_optimize(
     objective_function: Callable[[dict], float],
     search_space: dict[str, tuple[float, float]],
     n_iterations: int = 20,
@@ -495,7 +495,15 @@ def optimize_hyperparameters(
     verbose: int = 1,
 ) -> BayesianOptimizationResult:
     """
-    Convenience function for Bayesian hyperparameter optimization.
+    Run a Bayesian search over continuous bounds, returning its own result type.
+
+    The method-specific entry point, alongside :func:`~dlhub.tuning.random_search`
+    and :func:`~dlhub.tuning.asha_optimize`. To choose a method by name instead,
+    call :func:`~dlhub.tuning.optimize_hyperparameters`, which takes the
+    framework's richer search-space format and returns an ``ExperimentResult``.
+
+    Takes a scalar objective and a ``{name: (low, high)}`` search space; every
+    dimension is continuous, since the Gaussian process interpolates over them.
 
     Parameters
     ----------
@@ -529,7 +537,7 @@ def optimize_hyperparameters(
     >>>
     >>> search_space = {"learning_rate": (1e-5, 1e-1), "weight_decay": (1e-6, 1e-2)}
     >>>
-    >>> result = optimize_hyperparameters(
+    >>> result = bayesian_optimize(
     ...     objective, search_space, n_iterations=30, random_state=42
     ... )
     >>> print(f"Best parameters: {result.best_params}")
@@ -558,7 +566,7 @@ if __name__ == "__main__":
     print("Example: Optimizing quadratic function")
     print("True optimum: x=2, y=-1, value=-5")
 
-    result = optimize_hyperparameters(
+    result = bayesian_optimize(
         objective_function=quadratic_objective,
         search_space=search_space,
         n_iterations=25,
@@ -600,7 +608,7 @@ if __name__ == "__main__":
     print("\n" + "=" * 60)
     print("Example: Neural Network Hyperparameter Optimization")
 
-    nn_result = optimize_hyperparameters(
+    nn_result = bayesian_optimize(
         objective_function=nn_objective,
         search_space=nn_search_space,
         n_iterations=30,

@@ -28,7 +28,7 @@ from scipy.stats import norm
 from dlhub.tuning.bayesian import (
     BayesianOptimizer,
     GaussianProcess,
-    optimize_hyperparameters,
+    bayesian_optimize,
 )
 
 
@@ -237,7 +237,7 @@ class TestParameterMapping:
 
 class TestOptimize:
     def test_the_reported_best_is_the_best_of_the_history(self):
-        result = optimize_hyperparameters(
+        result = bayesian_optimize(
             quadratic,
             {"x": (-5.0, 5.0), "y": (-5.0, 5.0)},
             n_iterations=10,
@@ -249,7 +249,7 @@ class TestOptimize:
         assert (result.best_params, result.best_score) in result.history
 
     def test_the_search_spends_its_whole_budget(self):
-        result = optimize_hyperparameters(
+        result = bayesian_optimize(
             quadratic,
             {"x": (-5.0, 5.0), "y": (-5.0, 5.0)},
             n_iterations=8,
@@ -266,7 +266,7 @@ class TestOptimize:
         The acquisition is maximized in normalized coordinates, so a mapping
         error shows up as configurations outside the bounds the caller set.
         """
-        result = optimize_hyperparameters(
+        result = bayesian_optimize(
             quadratic,
             {"x": (-2.0, 3.0), "y": (10.0, 20.0)},
             n_iterations=10,
@@ -289,7 +289,7 @@ class TestOptimize:
         n_initial, n_iterations = 5, 10
         guided, blind = [], []
         for seed in range(3):
-            result = optimize_hyperparameters(
+            result = bayesian_optimize(
                 quadratic,
                 bounds,
                 n_iterations=n_iterations,
@@ -305,7 +305,7 @@ class TestOptimize:
         assert np.mean(guided) > np.mean(blind)
 
     def test_the_improvement_is_measured_against_the_initial_random_design(self):
-        result = optimize_hyperparameters(
+        result = bayesian_optimize(
             quadratic,
             {"x": (-5.0, 5.0), "y": (-5.0, 5.0)},
             n_iterations=10,
@@ -331,7 +331,7 @@ class TestOptimize:
             return -(params["x"] ** 2)
 
         with pytest.warns(UserWarning):
-            result = optimize_hyperparameters(
+            result = bayesian_optimize(
                 unstable,
                 {"x": (-5.0, 5.0)},
                 n_iterations=10,
@@ -344,7 +344,7 @@ class TestOptimize:
         assert len(result.history) + result.convergence_data["n_failed"] == 16
 
     def test_a_non_finite_score_is_treated_as_a_failure(self):
-        result = optimize_hyperparameters(
+        result = bayesian_optimize(
             lambda p: np.inf if p["x"] > 0 else p["x"],
             {"x": (-5.0, 5.0)},
             n_iterations=6,
@@ -364,7 +364,7 @@ class TestOptimize:
             raise RuntimeError("nothing works")
 
         with pytest.warns(UserWarning), pytest.raises(RuntimeError):
-            optimize_hyperparameters(
+            bayesian_optimize(
                 always_fails,
                 {"x": (0.0, 1.0)},
                 n_iterations=3,
@@ -375,7 +375,7 @@ class TestOptimize:
 
     def test_the_random_state_makes_a_run_reproducible(self):
         def run():
-            return optimize_hyperparameters(
+            return bayesian_optimize(
                 quadratic,
                 {"x": (-5.0, 5.0), "y": (-5.0, 5.0)},
                 n_iterations=8,
@@ -389,7 +389,7 @@ class TestOptimize:
         assert first.convergence_data["scores"] == second.convergence_data["scores"]
 
     def test_verbose_zero_prints_nothing(self, capsys):
-        optimize_hyperparameters(
+        bayesian_optimize(
             quadratic,
             {"x": (-5.0, 5.0), "y": (-5.0, 5.0)},
             n_iterations=3,
@@ -402,7 +402,7 @@ class TestOptimize:
     def test_higher_verbosity_reports_more(self, capsys):
         printed = {}
         for level in (1, 2):
-            optimize_hyperparameters(
+            bayesian_optimize(
                 quadratic,
                 {"x": (-5.0, 5.0), "y": (-5.0, 5.0)},
                 n_iterations=5,

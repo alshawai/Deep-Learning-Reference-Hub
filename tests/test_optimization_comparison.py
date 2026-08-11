@@ -28,7 +28,7 @@ from dlhub.optimizers.comparison import (
     OptimizationAnalytics,
     OptimizationComparison,
     OptimizationProblem,
-    OptimizationResult,
+    OptimizationRun,
     OptimizerType,
     QuadraticBowl,
     RosenbrockFunction,
@@ -137,6 +137,23 @@ class TestOptimizerFactory:
 
 
 class TestRunOptimization:
+    def test_scalar_starting_points_reach_the_optimizer_as_arrays(self):
+        """
+        The problems state their starting points as plain floats, which reads
+        naturally for a point on a two-dimensional surface. Optimizers are
+        written against arrays, and the adaptive ones ask a parameter for its
+        shape when they size their moment estimates, so a float reaching one
+        raises rather than converging. Adam is the strictest of the four; if the
+        conversion at the boundary is dropped, this is where it shows.
+        """
+        harness = OptimizationComparison(max_iterations=5, verbose=False)
+        result = harness.run_optimization(
+            QuadraticBowl(),
+            harness.create_optimizer(OptimizerType.ADAM, learning_rate=0.1),
+        )
+        for name, value in result.parameters[0].items():
+            assert isinstance(value, np.ndarray), f"{name} reached the optimizer raw"
+
     def test_the_loss_history_starts_at_the_initial_point(self):
         harness = OptimizationComparison(max_iterations=50, verbose=False)
         problem = QuadraticBowl()
@@ -240,13 +257,13 @@ def test_comparing_optimizers_returns_one_result_per_configuration():
     )
     assert len(results) == 2
     for result in results.values():
-        assert isinstance(result, OptimizationResult)
+        assert isinstance(result, OptimizationRun)
         assert result.losses
 
 
 class TestAnalytics:
     def make_result(self, losses):
-        return OptimizationResult(
+        return OptimizationRun(
             optimizer_name="probe",
             losses=list(losses),
             parameters=[{} for _ in losses],
