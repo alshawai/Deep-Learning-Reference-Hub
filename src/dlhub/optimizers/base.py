@@ -27,10 +27,11 @@ to be.
 The step index is passed in. Optimizers whose update depends on how many steps
 have been taken -- anything applying bias correction -- read it from the argument
 rather than counting internally, so that a driver resetting an optimizer between
-runs does not have to trust it to reset its own counter. Note that the canonical
-optimizer modules in this subpackage predate this contract and each maintain their
-own counter instead; reconciling the two is the subject of the commit that rewires
-the harness onto them.
+runs does not have to trust it to reset its own counter. The canonical optimizer
+modules in this subpackage predate this contract and count internally instead; the
+adapters in ``comparison`` bridge the two by clearing that counter in ``reset``,
+which is the property the contract actually cares about and the one its tests
+check.
 
 Author
 ------

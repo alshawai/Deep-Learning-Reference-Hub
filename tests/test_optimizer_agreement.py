@@ -2,33 +2,23 @@
 Optimizer Agreement Tests
 =========================
 
-Two implementations of RMSprop ship in this subpackage: the canonical one in
-``dlhub.optimizers.rmsprop``, written to be read alongside the derivation, and
+Two implementations of RMSprop used to ship in this subpackage: the canonical one
+in ``dlhub.optimizers.rmsprop``, written to be read alongside the derivation, and
 the comparison harness's own, written to the uniform driver contract. Two of
 Momentum, likewise. They are the same method, so on the same configuration and
-the same gradients they must produce the same parameters.
+the same gradients they must produce the same parameters. They did not.
 
-They do not, and the reason is not a coefficient. Bias correction is a
-constructor flag on the canonical optimizers -- default off for RMSprop, default
-on for Momentum -- and the harness copies hardwire it on with no way to ask for
-anything else. So a race run through the harness silently compares
-bias-corrected RMSprop against whatever the rest of the hub means by RMSprop,
-and the module docstring's claim that "all optimizers include proper bias
-correction" is true only of the copies.
+The cause was narrower than a wrong coefficient. Bias correction is a constructor
+flag on the canonical optimizers -- default off for RMSprop, default on for
+Momentum -- and the harness copies hardwired it on with no way to ask for
+anything else, so a race silently compared bias-corrected RMSprop against what
+the rest of the hub calls RMSprop.
 
-The tests below are written against the configuration, not the defaults: each
-one names the bias-correction setting it wants and requires both
-implementations to honour it. That is the property that has to survive the fix,
-whichever default the harness ends up choosing.
-
-This file ships ahead of the commit that rewires the harness onto the canonical
-optimizers, so the two agreement tests ship failing, deliberately. The failure
-is the divergence itself, demonstrated rather than asserted in a plan. It is
-recorded as a strict ``xfail`` on the exact exception the missing flag raises,
-which means the suite stays honest in both directions: red is expected now, and
-the moment the rewiring makes either test pass, the strict marker turns that
-unexpected pass into a failure until the marker is removed. The next commit
-removes them.
+The harness now constructs the canonical optimizers and passes the flag through,
+so there is one implementation of each method again. These tests are what holds
+that true: they are written against a named configuration rather than against
+defaults, so they keep their meaning whichever default the race settles on, and
+they would fail again the moment either implementation is re-forked.
 
 Author
 ------
@@ -84,18 +74,12 @@ def harness_trajectory(optimizer, steps=STEPS):
 
 @pytest.mark.parametrize("canonical_class, harness_name", METHODS)
 class TestTheHarnessAgreesWithTheCanonicalImplementation:
-    @pytest.mark.xfail(
-        strict=True,
-        raises=TypeError,
-        reason="the harness carries its own copies, which hardwire bias correction "
-        "on and take no flag; rewiring it onto the canonical optimizers is what "
-        "makes this expressible",
-    )
     def test_bias_correction_can_be_turned_off(self, canonical_class, harness_name):
         """
-        The configuration the harness cannot currently express. Its copies apply
-        bias correction unconditionally, so this is the assertion that fails
-        until the harness runs the canonical optimizer.
+        The configuration the harness could not express while it carried its own
+        copies, which applied bias correction unconditionally. It is expressible
+        now because the harness constructs the canonical optimizer and passes the
+        flag straight through.
         """
         harness_class = getattr(comparison, harness_name)
         harness = harness_class(
@@ -106,17 +90,11 @@ class TestTheHarnessAgreesWithTheCanonicalImplementation:
         )
         assert np.allclose(harness_trajectory(harness), canonical_trajectory(canonical))
 
-    @pytest.mark.xfail(
-        strict=True,
-        raises=TypeError,
-        reason="same missing flag: the harness reaches this configuration only by "
-        "having no alternative, so it cannot be asked for it",
-    )
     def test_bias_correction_can_be_turned_on(self, canonical_class, harness_name):
         """
-        The configuration the harness already runs, stated explicitly rather
-        than left to a default. Both implementations must reach it by being
-        asked, so that the race documents what it raced.
+        The configuration the race runs by default, stated explicitly rather
+        than left to a default. Both implementations reach it by being asked, so
+        that the race documents what it raced.
         """
         harness_class = getattr(comparison, harness_name)
         harness = harness_class(
@@ -146,13 +124,20 @@ class TestTheHarnessAgreesWithTheCanonicalImplementation:
         assert not np.allclose(off, on)
 
 
-def test_the_harness_rmsprop_is_reachable_under_the_canonical_default():
+def test_the_race_default_differs_from_the_canonical_rmsprop_default():
     """
-    The divergence stated as the number it is worth. Canonical RMSprop defaults
-    to no bias correction; the harness copy has no such setting, and the gap
-    between the two trajectories is far larger than a floating-point tolerance,
-    so a reader comparing the harness's curve against the canonical module's
-    output sees two different optimizers under one name.
+    What is left of the divergence once the fork is gone, and why it is now a
+    property rather than a defect. The race asks for bias correction everywhere
+    it is available; canonical RMSprop, constructed on its own, defaults to
+    none. Those are different runs, by a margin far larger than a floating-point
+    tolerance.
+
+    The difference is the same size as before. What changed is that it is now a
+    stated configuration rather than a hardwired one -- ``RACE_BIAS_CORRECTION``
+    names it, and the tests above show either setting can be asked for and is
+    honoured by both implementations. This test pins that the race's choice is a
+    real choice: if the constant flipped to False, the race would silently
+    become an uncorrected run and this assertion would catch it.
     """
     canonical = canonical_trajectory(
         CanonicalRMSprop(learning_rate=LEARNING_RATE, beta=BETA, epsilon=EPSILON)
@@ -163,5 +148,6 @@ def test_the_harness_rmsprop_is_reachable_under_the_canonical_default():
         )
     )
     assert not np.allclose(harness, canonical), (
-        "the defaults agree; this test and the divergence it records are stale"
+        "the race and the canonical default now agree; RACE_BIAS_CORRECTION has "
+        "been flipped off, or one of the two defaults moved"
     )

@@ -31,7 +31,10 @@ MIT License
 Notes
 -----
 This implementation focuses on numerical stability and educational clarity.
-All optimizers include proper bias correction and handle edge cases gracefully.
+The optimizers raced here are the canonical implementations from this
+subpackage, presented through a uniform driver interface rather than
+reimplemented; see :data:`RACE_BIAS_CORRECTION` for the one configuration
+decision the race makes on their behalf.
 Visualization utilities require matplotlib and are designed for Jupyter notebooks.
 """
 
@@ -43,9 +46,32 @@ from enum import Enum
 import matplotlib.pyplot as plt
 import numpy as np
 
+from dlhub.optimizers.adam import AdamOptimizer as CanonicalAdam
 from dlhub.optimizers.base import BaseOptimizer
+from dlhub.optimizers.mini_batch import MiniBatchGradientDescent
+from dlhub.optimizers.momentum import MomentumOptimizer as CanonicalMomentum
+from dlhub.optimizers.rmsprop import RMSpropOptimizer as CanonicalRMSprop
 
 warnings.filterwarnings("ignore", category=RuntimeWarning)
+
+#: Whether the race asks for bias correction wherever an optimizer supports it.
+#:
+#: The question is unavoidable and was previously answered by accident. Adam
+#: bias-corrects unconditionally, by construction; on Momentum and RMSprop it is
+#: a choice, and the canonical modules make it a constructor flag with different
+#: defaults -- on for Momentum, off for RMSprop, each matching how that method is
+#: usually written.
+#:
+#: Racing them at their own defaults would put a bias-corrected Momentum against
+#: an uncorrected RMSprop against a corrected Adam, so part of any gap between
+#: the curves would be the correction rather than the method. The race therefore
+#: asks for it everywhere it is available, which is also what the harness did
+#: before it delegated: its own copies applied the correction unconditionally.
+#:
+#: This governs the race only. Each adapter takes ``bias_correction`` and passes
+#: it through, so a caller comparing against a canonical module's own output can
+#: ask for that module's default instead.
+RACE_BIAS_CORRECTION = True
 
 
 class OptimizerType(Enum):
@@ -93,6 +119,10 @@ class SGDOptimizer(BaseOptimizer):
     Basic gradient descent with fixed learning rate. Simple but often effective
     baseline for comparison with more sophisticated optimizers.
 
+    The update rule itself lives in :mod:`dlhub.optimizers.mini_batch`, which is
+    where the hub teaches plain gradient descent; this class exists to present it
+    through the driver contract so the race can hold it alongside the others.
+
     Parameters
     ----------
     learning_rate : float, default=0.01
@@ -102,6 +132,7 @@ class SGDOptimizer(BaseOptimizer):
     def __init__(self, learning_rate: float = 0.01):
         super().__init__(learning_rate)
         self.name = "SGD"
+        self._optimizer = MiniBatchGradientDescent(learning_rate=learning_rate)
 
     def update_parameters(self, params: dict, grads: dict, t: int) -> dict:
         """
@@ -114,17 +145,15 @@ class SGDOptimizer(BaseOptimizer):
         grads : dict
             Gradients for each parameter.
         t : int
-            Current iteration (unused in SGD).
+            Current iteration. Unused: the step is the same at every iteration,
+            since plain gradient descent carries no state to correct for.
 
         Returns
         -------
         dict
             Updated parameters after SGD step.
         """
-        updated_params = {}
-        for key in params:
-            updated_params[key] = params[key] - self.learning_rate * grads[key]
-        return updated_params
+        return self._optimizer.update_parameters(params, grads)
 
 
 class MomentumOptimizer(BaseOptimizer):
@@ -134,19 +163,34 @@ class MomentumOptimizer(BaseOptimizer):
     Accelerates gradient descent by accumulating momentum in consistent directions
     and dampening oscillations. Particularly effective in ravines and saddle points.
 
+    Wraps :class:`dlhub.optimizers.momentum.MomentumOptimizer`, which is where the
+    update rule is derived and written out.
+
     Parameters
     ----------
     learning_rate : float, default=0.01
         Step size for parameter updates.
     beta : float, default=0.9
         Momentum coefficient for exponential moving average.
+    bias_correction : bool, default=``RACE_BIAS_CORRECTION``
+        Whether to divide out the bias of the zero-initialised velocity. See
+        :data:`RACE_BIAS_CORRECTION` for why the race sets it rather than
+        inheriting the canonical module's own default.
     """
 
-    def __init__(self, learning_rate: float = 0.01, beta: float = 0.9):
+    def __init__(
+        self,
+        learning_rate: float = 0.01,
+        beta: float = 0.9,
+        bias_correction: bool = RACE_BIAS_CORRECTION,
+    ):
         super().__init__(learning_rate)
         self.beta = beta
+        self.bias_correction = bias_correction
         self.name = "Momentum"
-        self.v = {}
+        self._optimizer = CanonicalMomentum(
+            learning_rate=learning_rate, beta=beta, bias_correction=bias_correction
+        )
 
     def update_parameters(self, params: dict, grads: dict, t: int) -> dict:
         """
@@ -159,59 +203,69 @@ class MomentumOptimizer(BaseOptimizer):
         grads : dict
             Gradients for each parameter.
         t : int
-            Current iteration (used for bias correction).
+            Current iteration. Unused: the canonical optimizer counts its own
+            steps, and :meth:`reset` clears that count, so the two agree for any
+            driver that counts from one and resets between runs.
 
         Returns
         -------
         dict
             Updated parameters after momentum step.
         """
-        if not self.v:
-            for key in params:
-                self.v[key] = np.zeros_like(params[key])
+        return self._optimizer.update_parameters(params, grads)
 
-        updated_params = {}
-        for key in params:
-            self.v[key] = self.beta * self.v[key] + (1 - self.beta) * grads[key]
-            v_corrected = self.v[key] / (1 - self.beta**t) if t > 0 else self.v[key]
-            updated_params[key] = params[key] - self.learning_rate * v_corrected
-
-        return updated_params
-
-    def reset(self):
+    def reset(self) -> None:
         """Reset momentum terms for new optimization run."""
-        self.v = {}
+        self._optimizer.reset_optimizer_state()
 
 
 class RMSpropOptimizer(BaseOptimizer):
     """
     RMSprop (Root Mean Square Propagation) optimizer.
 
-    Adapts learning rates for each parameter based on recent gradient magnitudes.
-    Effective for non-stationary objectives and helps with different parameter scales.
+    Adapts the learning rate per parameter using a running average of squared
+    gradients, so that parameters with consistently large gradients take smaller
+    steps.
+
+    Wraps :class:`dlhub.optimizers.rmsprop.RMSpropOptimizer`, which is where the
+    update rule is derived and written out.
 
     Parameters
     ----------
     learning_rate : float, default=0.001
-        Base learning rate.
+        Step size for parameter updates.
     beta : float, default=0.9
-        Decay rate for squared gradient moving average.
+        Decay rate for the running average of squared gradients.
     epsilon : float, default=1e-8
         Small constant to prevent division by zero.
+    bias_correction : bool, default=``RACE_BIAS_CORRECTION``
+        Whether to divide out the bias of the zero-initialised second moment.
+        The canonical module defaults this off, which is how RMSprop is usually
+        written; see :data:`RACE_BIAS_CORRECTION` for why the race overrides it.
     """
 
     def __init__(
-        self, learning_rate: float = 0.001, beta: float = 0.9, epsilon: float = 1e-8
+        self,
+        learning_rate: float = 0.001,
+        beta: float = 0.9,
+        epsilon: float = 1e-8,
+        bias_correction: bool = RACE_BIAS_CORRECTION,
     ):
         super().__init__(learning_rate)
         self.beta = beta
         self.epsilon = epsilon
+        self.bias_correction = bias_correction
         self.name = "RMSprop"
-        self.s = {}
+        self._optimizer = CanonicalRMSprop(
+            learning_rate=learning_rate,
+            beta=beta,
+            epsilon=epsilon,
+            bias_correction=bias_correction,
+        )
 
     def update_parameters(self, params: dict, grads: dict, t: int) -> dict:
         """
-        Update parameters using RMSprop adaptive learning rates.
+        Update parameters using RMSprop optimization.
 
         Parameters
         ----------
@@ -220,30 +274,19 @@ class RMSpropOptimizer(BaseOptimizer):
         grads : dict
             Gradients for each parameter.
         t : int
-            Current iteration (used for bias correction).
+            Current iteration. Unused, for the reason given on
+            :meth:`MomentumOptimizer.update_parameters`.
 
         Returns
         -------
         dict
             Updated parameters after RMSprop step.
         """
-        if not self.s:
-            for key in params:
-                self.s[key] = np.zeros_like(params[key])
+        return self._optimizer.update_parameters(params, grads)
 
-        updated_params = {}
-        for key in params:
-            self.s[key] = self.beta * self.s[key] + (1 - self.beta) * (grads[key] ** 2)
-            s_corrected = self.s[key] / (1 - self.beta**t) if t > 0 else self.s[key]
-            updated_params[key] = params[key] - self.learning_rate * grads[key] / (
-                np.sqrt(s_corrected) + self.epsilon
-            )
-
-        return updated_params
-
-    def reset(self):
-        """Reset squared gradient averages for new optimization run."""
-        self.s = {}
+    def reset(self) -> None:
+        """Reset second moment estimates for new optimization run."""
+        self._optimizer.reset_optimizer_state()
 
 
 class AdamOptimizer(BaseOptimizer):
@@ -252,6 +295,11 @@ class AdamOptimizer(BaseOptimizer):
 
     Combines benefits of Momentum and RMSprop by maintaining both first and second
     moment estimates of gradients. Generally robust and effective across many problems.
+
+    Wraps :class:`dlhub.optimizers.adam.AdamOptimizer`, which is where the update
+    rule is derived and written out. Adam bias-corrects both moments by
+    construction, so it takes no flag: the correction is part of the method
+    rather than an option on it.
 
     Parameters
     ----------
@@ -277,9 +325,9 @@ class AdamOptimizer(BaseOptimizer):
         self.beta2 = beta2
         self.epsilon = epsilon
         self.name = "Adam"
-        self.m = {}
-        self.v = {}
-        self.t = 0
+        self._optimizer = CanonicalAdam(
+            learning_rate=learning_rate, beta1=beta1, beta2=beta2, epsilon=epsilon
+        )
 
     def update_parameters(self, params: dict, grads: dict, t: int) -> dict:
         """
@@ -292,40 +340,19 @@ class AdamOptimizer(BaseOptimizer):
         grads : dict
             Gradients for each parameter.
         t : int
-            Current iteration/timestep for bias correction.
+            Current iteration. Unused, for the reason given on
+            :meth:`MomentumOptimizer.update_parameters`.
 
         Returns
         -------
         dict
             Updated parameters after Adam step.
         """
-        self.t += 1
-        if not self.m:
-            for key in params:
-                self.m[key] = np.zeros_like(params[key])
-                self.v[key] = np.zeros_like(params[key])
+        return self._optimizer.update(params, grads)
 
-        updated_params = {}
-        for key in params:
-            self.m[key] = self.beta1 * self.m[key] + (1 - self.beta1) * grads[key]
-            self.v[key] = self.beta2 * self.v[key] + (1 - self.beta2) * (
-                grads[key] ** 2
-            )
-
-            m_corrected = self.m[key] / (1 - self.beta1**self.t)
-            v_corrected = self.v[key] / (1 - self.beta2**self.t)
-
-            updated_params[key] = params[key] - self.learning_rate * m_corrected / (
-                np.sqrt(v_corrected) + self.epsilon
-            )
-
-        return updated_params
-
-    def reset(self):
+    def reset(self) -> None:
         """Reset first and second moment estimates for new optimization run."""
-        self.m = {}
-        self.v = {}
-        self.t = 0
+        self._optimizer.reset_state()
 
 
 class OptimizationProblem:
@@ -573,7 +600,17 @@ class OptimizationComparison:
         """
         optimizer.reset()
 
-        params = problem.initial_parameters()
+        # The benchmark problems below are two-dimensional surfaces, so they state
+        # their starting points as plain floats, which reads naturally for a point
+        # on a contour plot. Optimizers are written against arrays -- the contract
+        # says so, and a neural network's parameters are never scalars -- so the
+        # conversion happens once, here, where the problem's world meets the
+        # optimizer's. Doing it at the boundary means every optimizer receives what
+        # the contract promises, rather than each one having to tolerate floats.
+        params = {
+            name: np.asarray(value, dtype=float)
+            for name, value in problem.initial_parameters().items()
+        }
         losses = []
         parameter_history = []
 
