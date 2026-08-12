@@ -14,6 +14,7 @@ Please follow these guidelines to keep the repository consistent and high-qualit
   - [Code of Conduct](#-code-of-conduct)
   - [Getting Started](#️-getting-started)
   - [Coding Standards](#-coding-standards)
+    - [Where Code Lives](#where-code-lives)
     - [Running the Gate](#running-the-gate)
     - [Tests](#tests)
   - [Documentation Standards](#-documentation-standards)
@@ -51,6 +52,12 @@ git checkout -b feature/my-new-feature
 - Follow PEP 8 for Python code style.
 - `pyproject.toml` holds the real configuration — line length, lint rules, docstring convention. It is the authority. Where this page and `pyproject.toml` disagree, `pyproject.toml` is right.
 - Ruff does both the formatting and the linting. There is no separate formatter or docstring checker to run.
+
+### Where Code Lives
+
+An implementation goes inside the `dlhub` package, under `src/`, in the subpackage for its subject. A reader installs the hub and imports it — `from dlhub.optimizers.adam import AdamOptimizer` — so a module that sits outside the package is one a reader cannot reach.
+
+A new subpackage needs an `__init__.py` exporting the names it means to publish. That file is also how `hubcheck` recognises an implementation, so a module in a directory without one is invisible to the README's count.
 
 ### Running the Gate
 
