@@ -72,3 +72,8 @@ temp.*
 notes/
 drafts/
 .claude
+
+# `mkdocs build` output. Ignored rather than committed because the published
+# site is built from source by CI, and because an untracked `site/` would
+# otherwise be scanned as published material by tools/hubcheck.py.
+site/

@@ -105,6 +105,17 @@ REPO_META = {
     "security.md",
 }
 
+# A page named `index.md` routes a reader to documents rather than being one:
+# a site landing page, or a section home whose whole subject is what belongs in
+# that section. Counting them would have the hub advertise one more document for
+# every signpost it puts up, and a section home that exists to record that its
+# section is empty would count as a document about nothing.
+#
+# Named rather than pattern-matched because `index` is the one filename every
+# static site generator reserves for precisely this purpose, so the rule holds
+# wherever the documentation tree is later moved to.
+SIGNPOSTS = {"index.md"}
+
 PLACEHOLDERS = (
     "yourusername",
     "your-username",
@@ -204,9 +215,14 @@ def published_docs() -> List[Path]:
     Returns
     -------
     list of Path
-        Every published Markdown file except README, LICENSE, and their kin.
+        Every published Markdown file except README, LICENSE, and their kin,
+        and except the section signposts named in :data:`SIGNPOSTS`.
     """
-    return [p for p in md_files() if p.name.lower() not in REPO_META]
+    return [
+        p
+        for p in md_files()
+        if p.name.lower() not in REPO_META and p.name.lower() not in SIGNPOSTS
+    ]
 
 
 def code_modules() -> List[Path]:

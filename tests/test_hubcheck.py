@@ -119,6 +119,35 @@ class TestCodeModules:
         assert not [p for p in hubcheck.code_modules() if p.name.startswith("__")]
 
 
+class TestPublishedDocs:
+    """The set the README's document count is verified against."""
+
+    def test_the_scan_finds_documents_at_all(self, hubcheck):
+        """
+        Guards the exclusion below. A scan returning nothing would satisfy any
+        "is not counted" claim trivially, and would make the README's document
+        count pass by comparing against an empty set.
+        """
+        assert len(hubcheck.published_docs()) > 1
+
+    def test_signpost_pages_are_not_counted_as_documents(self, hubcheck):
+        """
+        The site landing page and each section home are named `index.md`. They
+        route a reader to documents rather than being documents, so counting
+        them would inflate the README's claim once per signpost -- and the
+        tutorial home, whose subject is that its section is empty, would be
+        counted as a document about nothing.
+
+        The first assertion is what keeps the second honest: it fails if the
+        documentation tree stops containing signposts, which is the only way
+        the second could pass without the exclusion doing any work.
+        """
+        assert [p for p in hubcheck.md_files() if p.name.lower() in hubcheck.SIGNPOSTS]
+        assert not [
+            p for p in hubcheck.published_docs() if p.name.lower() in hubcheck.SIGNPOSTS
+        ]
+
+
 class TestReadmeCheck:
     """The check that keeps the README's self-description true."""
 

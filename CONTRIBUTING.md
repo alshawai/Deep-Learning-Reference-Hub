@@ -37,9 +37,9 @@ Be respectful and constructive. Discussions should stay technical and educationa
 1. Fork the repository and clone it locally.
 2. Install the hub and its development tools:
 ```bash
-pip install -e ".[dev]"
+pip install -e ".[dev,docs]"
 ```
-This installs `dlhub` in editable mode, so an edit to a module is live in the next test run with no reinstall. Add the frameworks with `pip install -e ".[dev,frameworks]"` if you are working on a port.
+This installs `dlhub` in editable mode, so an edit to a module is live in the next test run with no reinstall. Add the frameworks with `pip install -e ".[dev,docs,frameworks]"` if you are working on a port.
 3. Create a new branch for your changes:
 ```bash
 git checkout -b feature/my-new-feature
@@ -61,10 +61,11 @@ A new subpackage needs an `__init__.py` exporting the names it means to publish.
 
 ### Running the Gate
 
-Run these four commands before you open a pull request. [`.github/workflows/ci.yml`](.github/workflows/ci.yml) runs the same checks, so a clean run here means a green CI.
+Run these five commands before you open a pull request. [`.github/workflows/ci.yml`](.github/workflows/ci.yml) runs the same checks, so a clean run here means a green CI.
 
 ```bash
 python tools/hubcheck.py all   # links, anchors, prose Python, README claims
+mkdocs build --strict          # the documentation site
 ruff format .                  # apply formatting
 ruff check .                   # lint, including the NumPy docstring rules
 python -m pytest -q            # tests
@@ -74,10 +75,12 @@ python -m pytest -q            # tests
 
 `hubcheck` checks what a linter cannot: that every relative link resolves, that every anchor points at a heading that exists, that the Python inside fenced code blocks compiles, and that the counts `README.md` advertises match the files actually in the tree. Run one check on its own by passing `links`, `anchors`, `fences`, or `readme` instead of `all`.
 
+`mkdocs build --strict` builds the documentation site under `docs/`, and fails on a broken internal link, a link to a heading that does not exist, or a page missing from the nav in `mkdocs.yml`. Adding a page to `docs/` therefore means adding its nav entry in the same commit. Preview the site with `mkdocs serve`.
+
 If a command is missing, install the development tools:
 
 ```bash
-pip install -e ".[dev]"
+pip install -e ".[dev,docs]"
 ```
 
 ### Tests
@@ -212,6 +215,7 @@ Only add well-established, high-quality resources.
 1. Ensure the gate passes locally — see [Running the Gate](#running-the-gate):
 ```bash
 python tools/hubcheck.py all
+mkdocs build --strict
 ruff format .
 ruff check .
 python -m pytest -q

@@ -1,0 +1,65 @@
+site_name: Deep Learning Reference Hub
+site_description: From-scratch implementations of core deep learning methods, written to be read
+repo_url: https://github.com/eima40x4c/Deep-Learning-Reference-Hub
+repo_name: Deep-Learning-Reference-Hub
+edit_uri: edit/main/docs/
+
+# No `site_url` yet. It would name a page nobody can open, and this hub holds
+# its documents to the rule that a stated fact is a checked one. It arrives with
+# the deployment that makes it true.
+
+theme:
+  name: material
+  features:
+    # The four quadrants are peers, not a hierarchy, and tabs are the one
+    # navigation style that shows them that way.
+    - navigation.tabs
+    - navigation.top
+    - toc.follow
+    - content.code.copy
+    - search.highlight
+    - search.suggest
+  palette:
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      toggle:
+        icon: material/weather-night
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to light mode
+
+markdown_extensions:
+  # Math, extracted before any other processing so that Markdown never sees a
+  # subscript underscore as emphasis. `generic: true` hands off to MathJax
+  # rather than pre-rendering, which is what lets `\begin{align}` work.
+  - pymdownx.arithmatex:
+      generic: true
+  - admonition
+  - pymdownx.details
+  - pymdownx.superfences
+  - attr_list
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+
+extra_javascript:
+  - javascripts/mathjax.js
+  - https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js
+
+# This block is why the build is a link checker. Every one of these is a warning
+# by default, and `--strict` promotes warnings to errors -- so the settings here
+# plus that flag are what turn a broken cross-reference into a failed build.
+# `anchors` is the one worth naming: without it a link to a heading that no
+# longer exists resolves to the page and passes silently.
+validation:
+  omitted_files: warn
+  absolute_links: warn
+  unrecognized_links: warn
+  anchors: warn
+
+nav:
+  - Home: index.md
