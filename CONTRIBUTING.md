@@ -64,8 +64,8 @@ A new subpackage needs an `__init__.py` exporting the names it means to publish.
 Run these five commands before you open a pull request. [`.github/workflows/ci.yml`](.github/workflows/ci.yml) runs the same checks, so a clean run here means a green CI.
 
 ```bash
-python tools/hubcheck.py all   # links, anchors, prose Python, README claims
-mkdocs build --strict          # the documentation site
+python tools/hubcheck.py all   # links and anchors outside docs/, prose Python, README claims
+mkdocs build --strict          # the documentation site, and every link inside it
 ruff format .                  # apply formatting
 ruff check .                   # lint, including the NumPy docstring rules
 python -m pytest -q            # tests
@@ -76,6 +76,8 @@ python -m pytest -q            # tests
 `hubcheck` checks what a linter cannot: that every relative link resolves, that every anchor points at a heading that exists, that the Python inside fenced code blocks compiles, and that the counts `README.md` advertises match the files actually in the tree. Run one check on its own by passing `links`, `anchors`, `fences`, or `readme` instead of `all`.
 
 `mkdocs build --strict` builds the documentation site under `docs/`, and fails on a broken internal link, a link to a heading that does not exist, or a page missing from the nav in `mkdocs.yml`. Adding a page to `docs/` therefore means adding its nav entry in the same commit. Preview the site with `mkdocs serve`.
+
+The two tools split the tree between them rather than overlapping. `mkdocs build --strict` resolves the links and anchors inside `docs/`; `hubcheck`'s `links` and `anchors` checks cover everything outside it, which today is `README.md`, `CONTRIBUTING.md`, and the documents not yet filed into the site. That boundary is read from `docs_dir` in `mkdocs.yml`, so it follows the tree if the tree moves, and the second half shrinks as documents are filed in. Pointing `hubcheck links --file` at a page inside `docs/` reports that the site build owns it rather than passing on an empty scan. The `fences` and `readme` checks are not split — no site build compiles the Python in a fence or counts what the README claims.
 
 If a command is missing, install the development tools:
 
