@@ -46,4 +46,12 @@ Drawn from the lookup material currently embedded in the source documents:
 - **Initialisation schemes** — the variance each scheme uses and when it applies.
 - **Hyperparameter search methods** — the method comparison table and the
   documented defaults.
-- **API reference** — generated from the package docstrings.
+
+## API reference
+
+Generated from the package docstrings, one page per subpackage:
+
+- [Optimizers](api/optimizers.md) — gradient descent and the adaptive methods.
+- [Tuning](api/tuning.md) — hyperparameter search strategies.
+- [Neural networks](api/nn.md) — network construction and the training loop.
+- [Training techniques](api/training.md) — early stopping and gradient checking.

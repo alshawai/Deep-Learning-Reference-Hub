@@ -50,6 +50,26 @@ extra_javascript:
   - javascripts/mathjax.js
   - https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js
 
+plugins:
+  # `search` is on by default, but naming any plugin replaces that default
+  # rather than adding to it, so it has to be listed again here.
+  - search
+  # The API reference is generated from the docstrings the house style already
+  # requires, which is what keeps that section true without anyone maintaining
+  # it. A hand-written signature is the first documentation to go stale.
+  - mkdocstrings:
+      handlers:
+        python:
+          paths: [src]
+          options:
+            docstring_style: numpy
+            show_source: true
+            show_root_heading: true
+            heading_level: 2
+            members_order: source
+            separate_signature: true
+            show_signature_annotations: true
+
 # This block is why the build is a link checker. Every one of these is a warning
 # by default, and `--strict` promotes warnings to errors -- so the settings here
 # plus that flag are what turn a broken cross-reference into a failed build.
@@ -65,5 +85,11 @@ nav:
   - Home: index.md
   - Tutorials: tutorials/index.md
   - How-to guides: how-to/index.md
-  - Reference: reference/index.md
+  - Reference:
+      - reference/index.md
+      - API:
+          - Optimizers: reference/api/optimizers.md
+          - Tuning: reference/api/tuning.md
+          - Neural networks: reference/api/nn.md
+          - Training techniques: reference/api/training.md
   - Explanation: explanation/index.md

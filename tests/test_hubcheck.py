@@ -147,6 +147,27 @@ class TestPublishedDocs:
             p for p in hubcheck.published_docs() if p.name.lower() in hubcheck.SIGNPOSTS
         ]
 
+    def test_generated_pages_are_not_counted_as_documents(self, hubcheck):
+        """
+        An API page's body is a docstring-extraction directive, so every word a
+        reader sees on it comes from a module the implementation count already
+        counts. Counting it as a document too would report one piece of work
+        twice, and would make the README's document count grow whenever a
+        subpackage was added.
+
+        The first assertion keeps the second honest: it fails if no generated
+        page is in the tree, which is the only way the second could pass with
+        the exclusion doing nothing.
+        """
+        generated = [
+            p
+            for p in hubcheck.md_files()
+            if (hubcheck.read_text(p) or "")
+            and hubcheck.GENERATED_RE.search(hubcheck.read_text(p) or "")
+        ]
+        assert generated
+        assert not set(generated) & set(hubcheck.published_docs())
+
 
 class TestReadmeCheck:
     """The check that keeps the README's self-description true."""

@@ -116,6 +116,15 @@ REPO_META = {
 # wherever the documentation tree is later moved to.
 SIGNPOSTS = {"index.md"}
 
+# A page whose body is a docstring-extraction directive publishes code that is
+# counted already, as an implementation. It holds no prose of its own: the words
+# a reader sees come from the module. Counting it would report the same work
+# twice, once as a module and once as a document about that module.
+#
+# Matched by the directive rather than by location, so the rule follows the
+# generated pages wherever in the documentation tree they are filed.
+GENERATED_RE = re.compile(r"^:::\s+\S", re.MULTILINE)
+
 PLACEHOLDERS = (
     "yourusername",
     "your-username",
@@ -212,17 +221,24 @@ def md_files() -> List[Path]:
 def published_docs() -> List[Path]:
     """Return Markdown files that count as documents rather than repo meta.
 
+    Excludes README, LICENSE, and their kin; the section signposts named in
+    :data:`SIGNPOSTS`; and generated pages, which restate code the
+    implementation count already covers rather than holding prose of their own.
+
     Returns
     -------
     list of Path
-        Every published Markdown file except README, LICENSE, and their kin,
-        and except the section signposts named in :data:`SIGNPOSTS`.
+        Sorted absolute paths.
     """
-    return [
-        p
-        for p in md_files()
-        if p.name.lower() not in REPO_META and p.name.lower() not in SIGNPOSTS
-    ]
+    out = []
+    for path in md_files():
+        if path.name.lower() in REPO_META or path.name.lower() in SIGNPOSTS:
+            continue
+        text = read_text(path)
+        if text is not None and GENERATED_RE.search(text):
+            continue
+        out.append(path)
+    return out
 
 
 def code_modules() -> List[Path]:
