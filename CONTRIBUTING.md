@@ -202,7 +202,7 @@ def update_parameters(params: Dict, grads: Dict, t: int) -> Dict:
 
 ## 🔗 Adding New Resources
 To add books, papers, or courses:
-1. Open `Resources.md`.
+1. Open `docs/reference/resources.md`.
 2. Add the resource under the appropriate section.
 3. Use this format:
 ```markdown
@@ -227,7 +227,7 @@ python -m pytest -q
 4. PRs will be reviewed for:
     - Correctness
     - Code clarity
-    - Proper documentation (docstrings, updated `Resources.md` if needed)
+    - Proper documentation (docstrings, updated resource reference if needed)
     - Tests covering any new implementation
 
 ### Commit Message Guidelines

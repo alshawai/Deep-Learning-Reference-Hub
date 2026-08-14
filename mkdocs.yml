@@ -103,6 +103,7 @@ nav:
       - Regularization: reference/regularization.md
       - Gradient checking: reference/gradient-checking.md
       - Hyperparameter search methods: reference/hyperparameter-search-methods.md
+      - Deep learning resources: reference/resources.md
       - API:
           - Optimizers: reference/api/optimizers.md
           - Tuning: reference/api/tuning.md

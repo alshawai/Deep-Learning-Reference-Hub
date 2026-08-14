@@ -52,6 +52,8 @@ Drawn from the lookup material currently embedded in the source documents:
   the generated implementation reference.
 - **[Hyperparameter search methods](hyperparameter-search-methods.md)** — the method comparison table and the
   documented defaults.
+- **[Deep learning resources](resources.md)** — curated books, papers, courses,
+  frameworks, and supplementary reading.
 
 ## API reference
 
