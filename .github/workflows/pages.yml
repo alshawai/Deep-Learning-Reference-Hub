@@ -1,0 +1,62 @@
+name: Pages
+
+on:
+  workflow_run:
+    workflows: [CI]
+    branches: [main]
+    types: [completed]
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    name: Build and deploy documentation
+    if: >-
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.event == 'push'
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.workflow_run.head_sha }}
+
+      - name: Confirm this is the current main revision
+        env:
+          TRIGGER_SHA: ${{ github.event.workflow_run.head_sha }}
+        run: test "$(git ls-remote origin refs/heads/main | cut -f1)" = "$TRIGGER_SHA"
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install documentation dependencies
+        run: pip install -e ".[docs]"
+
+      - name: Build documentation
+        run: mkdocs build --strict
+
+      - uses: actions/configure-pages@v5
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+      - name: Verify published internal links
+        env:
+          SITE_URL: ${{ steps.deployment.outputs.page_url }}
+        run: wget --spider --recursive --no-parent "$SITE_URL"

@@ -1,12 +1,9 @@
 site_name: Deep Learning Reference Hub
 site_description: From-scratch implementations of core deep learning methods, written to be read
-repo_url: https://github.com/eima40x4c/Deep-Learning-Reference-Hub
+site_url: https://alshawai.github.io/Deep-Learning-Reference-Hub/
+repo_url: https://github.com/alshawai/Deep-Learning-Reference-Hub
 repo_name: Deep-Learning-Reference-Hub
 edit_uri: edit/main/docs/
-
-# No `site_url` yet. It would name a page nobody can open, and this hub holds
-# its documents to the rule that a stated fact is a checked one. It arrives with
-# the deployment that makes it true.
 
 theme:
   name: material
