@@ -86,12 +86,19 @@ validation:
 nav:
   - Home: index.md
   - Tutorials: tutorials/index.md
-  - How-to guides: how-to/index.md
+  - How-to guides:
+      - how-to/index.md
   - Reference:
       - reference/index.md
+      - Network shapes and dimensions: reference/network-shapes-and-dimensions.md
+      - Activation functions: reference/activation-functions.md
+      - Parameter update rule: reference/parameter-update-rule.md
       - API:
           - Optimizers: reference/api/optimizers.md
           - Tuning: reference/api/tuning.md
           - Neural networks: reference/api/nn.md
           - Training techniques: reference/api/training.md
-  - Explanation: explanation/index.md
+  - Explanation:
+      - explanation/index.md
+      - Forward and backward propagation: explanation/forward-and-backward-propagation.md
+      - Matrix calculus for neural networks: explanation/matrix-calculus-for-neural-networks.md

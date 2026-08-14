@@ -15,8 +15,9 @@ what they are building.
 **The first tutorial should be the construction of an L-layer network from
 scratch**: initialise the parameters, implement one forward pass, derive and
 implement one backward pass, verify the gradients numerically, then train it on
-a small problem the reader can watch converge. The derivation it draws on is
-already written; what is missing is the guided path through it.
+a small problem the reader can watch converge. The
+[forward- and backward-propagation derivation](../explanation/forward-and-backward-propagation.md)
+it draws on is already written; what is missing is the guided path through it.
 
 Writing that tutorial is a content project rather than a documentation move, so
 it is deliberately out of scope for the restructuring that created this section.

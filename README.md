@@ -54,7 +54,7 @@ This repository serves as a living reference guide for deep learning concepts, d
 ## 📚 Current Content
 
 ### 🧮 Mathematical Foundations
-- **[L-Layer Neural Network](theory/L-Layer%20Neural%20Network.md)**
+- **[L-Layer Neural Network](docs/explanation/forward-and-backward-propagation.md)**
   - Complete mathematical derivation for L-layered neural networks
   - Step-by-step forward and backward propagation equations
   - Chain rule applications and dimensional analysis
@@ -77,7 +77,7 @@ This repository serves as a living reference guide for deep learning concepts, d
 ## 🚀 Quick Start
 
 ### For Mathematical Understanding
-Start with **[L-Layer Neural Network](theory/L-Layer%20Neural%20Network.md)** to understand the fundamental mathematics behind deep learning, including complete derivations and the chain rule applications.
+Start with **[L-Layer Neural Network](docs/explanation/forward-and-backward-propagation.md)** to understand the fundamental mathematics behind deep learning, including complete derivations and the chain rule applications.
 
 ### For Practical Implementation
 Read **[Parameters Initialization, Regularization, and Gradient Checking](training-techniques/Parameters%20Initialization,%20Regularization,%20and%20Gradient%20Checking.md)** to learn essential training techniques with modern best practices and working code examples.  
@@ -227,7 +227,7 @@ We welcome contributions from the community! Please see our [Contributing Guidel
 
 ## 📊 Repository Statistics
 
-- **Total Documents**: 5
+- **Total Documents**: 9
 - **Code Examples**: 17 implementations
 - **Frameworks Covered**: NumPy
 
