@@ -86,12 +86,34 @@ validation:
 nav:
   - Home: index.md
   - Tutorials: tutorials/index.md
-  - How-to guides: how-to/index.md
+  - How-to guides:
+      - how-to/index.md
+      - Choose an optimizer: how-to/choose-an-optimizer.md
+      - Run a gradient check: how-to/run-a-gradient-check.md
+      - Tune a learning rate: how-to/tune-learning-rate.md
+      - Run a hyperparameter search: how-to/run-hyperparameter-search.md
   - Reference:
       - reference/index.md
+      - Network shapes and dimensions: reference/network-shapes-and-dimensions.md
+      - Activation functions: reference/activation-functions.md
+      - Parameter update rule: reference/parameter-update-rule.md
+      - Optimizer update rules: reference/optimizer-update-rules.md
+      - Learning-rate schedules: reference/learning-rate-schedules.md
+      - Parameter initialization: reference/parameter-initialization.md
+      - Regularization: reference/regularization.md
+      - Gradient checking: reference/gradient-checking.md
+      - Hyperparameter search methods: reference/hyperparameter-search-methods.md
       - API:
           - Optimizers: reference/api/optimizers.md
           - Tuning: reference/api/tuning.md
           - Neural networks: reference/api/nn.md
           - Training techniques: reference/api/training.md
-  - Explanation: explanation/index.md
+  - Explanation:
+      - explanation/index.md
+      - Forward and backward propagation: explanation/forward-and-backward-propagation.md
+      - Matrix calculus for neural networks: explanation/matrix-calculus-for-neural-networks.md
+      - Optimization algorithms: explanation/optimization-algorithms.md
+      - Parameter initialization: explanation/parameter-initialization.md
+      - Regularization: explanation/regularization.md
+      - Gradient checking: explanation/gradient-checking.md
+      - Hyperparameter tuning landscape: explanation/hyperparameter-tuning-landscape.md

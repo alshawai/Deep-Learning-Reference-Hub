@@ -36,11 +36,11 @@ reader would arrive already wanting the outcome.
 Drawn from procedural material currently embedded in the source documents, which
 the document decomposition files here:
 
-- **How to choose an optimizer** — from the practical guidelines and optimizer
+- **[How to choose an optimizer](choose-an-optimizer.md)** — from the practical guidelines and optimizer
   selection sections of the optimization algorithms document.
-- **How to run a gradient check** — from the gradient checking procedure,
+- **[How to run a gradient check](run-a-gradient-check.md)** — from the gradient checking procedure,
   including how to read the resulting relative error.
-- **How to tune a learning rate** — from the learning rate finder material and
+- **[How to tune a learning rate](tune-learning-rate.md)** — from the learning rate finder material and
   the tuning starting strategy.
-- **How to run a hyperparameter search** — from the search strategy guidance,
+- **[How to run a hyperparameter search](run-hyperparameter-search.md)** — from the search strategy guidance,
   covering search space design and the pitfalls documented alongside it.

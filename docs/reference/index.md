@@ -37,14 +37,20 @@ reader should do.
 
 Drawn from the lookup material currently embedded in the source documents:
 
-- **Network shapes and dimensions** — the forward and backward dimension tables
+- **[Network shapes and dimensions](network-shapes-and-dimensions.md)** — the forward and backward dimension tables
   from the L-layer derivation, and its dimensional-analysis verifications.
-- **Activation functions** — each function with its derivative, as a table.
-- **Optimizer update rules** — the update equation and default hyperparameters
+- **[Activation functions](activation-functions.md)** — each function with its derivative.
+- **[Parameter update rule](parameter-update-rule.md)** — the gradient-descent
+  update equations for an L-layer network.
+- **[Optimizer update rules](optimizer-update-rules.md)** — the update equation and default hyperparameters
   for each method, plus the comparison table.
-- **Learning rate schedules** — each schedule's formula and parameters.
-- **Initialisation schemes** — the variance each scheme uses and when it applies.
-- **Hyperparameter search methods** — the method comparison table and the
+- **[Learning rate schedules](learning-rate-schedules.md)** — each schedule's formula and parameters.
+- **[Initialisation schemes](parameter-initialization.md)** — the variance each scheme uses and when it applies.
+- **[Regularisation methods](regularization.md)** — equations, implementations,
+  and framework examples for regularisation techniques.
+- **[Gradient checking](gradient-checking.md)** — result tolerances and links to
+  the generated implementation reference.
+- **[Hyperparameter search methods](hyperparameter-search-methods.md)** — the method comparison table and the
   documented defaults.
 
 ## API reference
