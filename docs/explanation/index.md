@@ -52,3 +52,5 @@ Drawn from the conceptual material currently embedded in the source documents:
   dropout, and batch normalisation each act on it.
 - **[How gradient checking works](gradient-checking.md)** — the finite-difference approximation and why
   it is a debugging tool rather than a training one.
+- **[The hyperparameter tuning landscape](hyperparameter-tuning-landscape.md)** — why some hyperparameters matter far
+  more than others, and why random search beats grid search.

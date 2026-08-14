@@ -40,7 +40,7 @@ the document decomposition files here:
   selection sections of the optimization algorithms document.
 - **[How to run a gradient check](run-a-gradient-check.md)** — from the gradient checking procedure,
   including how to read the resulting relative error.
-- **How to tune a learning rate** — from the learning rate finder material and
+- **[How to tune a learning rate](tune-learning-rate.md)** — from the learning rate finder material and
   the tuning starting strategy.
-- **How to run a hyperparameter search** — from the search strategy guidance,
+- **[How to run a hyperparameter search](run-hyperparameter-search.md)** — from the search strategy guidance,
   covering search space design and the pitfalls documented alongside it.

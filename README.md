@@ -227,7 +227,7 @@ We welcome contributions from the community! Please see our [Contributing Guidel
 
 ## 📊 Repository Statistics
 
-- **Total Documents**: 18
+- **Total Documents**: 21
 - **Code Examples**: 17 implementations
 - **Frameworks Covered**: NumPy
 

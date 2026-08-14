@@ -50,6 +50,8 @@ Drawn from the lookup material currently embedded in the source documents:
   and framework examples for regularisation techniques.
 - **[Gradient checking](gradient-checking.md)** — result tolerances and links to
   the generated implementation reference.
+- **[Hyperparameter search methods](hyperparameter-search-methods.md)** — the method comparison table and the
+  documented defaults.
 
 ## API reference
 
