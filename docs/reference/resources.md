@@ -1,10 +1,11 @@
-# Deep Learning Resources
+# Deep learning resources
 
-A curated list of high-quality resources to complement the implementations in this repository.
+A curated list of high-quality resources that complement the implementations
+and documentation in this hub.
 
 ---
 
-## 📖 Core Deep Learning Texts
+## Core deep learning texts
 
 - **Deep Learning (Goodfellow, Bengio, Courville)**  
   [https://www.deeplearningbook.org/](https://www.deeplearningbook.org/) – The definitive textbook.
@@ -17,7 +18,7 @@ A curated list of high-quality resources to complement the implementations in th
 
 ---
 
-## 📝 Research Papers
+## Research papers
 
 - **Backpropagation**: Rumelhart, Hinton & Williams (1986).  
 - **Adam Optimizer**: Kingma & Ba (2014) – [https://arxiv.org/abs/1412.6980](https://arxiv.org/abs/1412.6980)
@@ -26,7 +27,7 @@ A curated list of high-quality resources to complement the implementations in th
 
 ---
 
-## 🎓 Online Courses
+## Online courses
 
 - **Deep Learning Specialization (Andrew Ng, Coursera)**  
   [https://www.coursera.org/specializations/deep-learning](https://www.coursera.org/specializations/deep-learning)
@@ -39,7 +40,7 @@ A curated list of high-quality resources to complement the implementations in th
 
 ---
 
-## 🔧 Tools & Frameworks
+## Tools and frameworks
 
 - **TensorFlow** – [https://www.tensorflow.org/](https://www.tensorflow.org/)  
 - **PyTorch** – [https://pytorch.org/](https://pytorch.org/)  
@@ -47,7 +48,7 @@ A curated list of high-quality resources to complement the implementations in th
 
 ---
 
-## 🗃 Supplementary Resources
+## Supplementary resources
 
 - **Distill.pub (Intuitive Explanations)** – [https://distill.pub/](https://distill.pub/)  
 - **The Illustrated Transformer (Jay Alammar)** – [http://jalammar.github.io/illustrated-transformer/](http://jalammar.github.io/illustrated-transformer/)  
@@ -55,8 +56,10 @@ A curated list of high-quality resources to complement the implementations in th
 
 ---
 
-## 🏗 Contributing Resources
+## Contributing resources
 
-If you have additional high-quality resources to recommend, feel free to contribute by submitting a pull request!
+To recommend an additional high-quality resource, follow the instructions in
+the repository's
+[contributing guide](https://github.com/alshawai/Deep-Learning-Reference-Hub/blob/main/CONTRIBUTING.md#adding-new-resources).
 
 ---
