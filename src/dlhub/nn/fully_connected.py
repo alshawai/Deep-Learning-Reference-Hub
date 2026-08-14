@@ -587,28 +587,28 @@ class DeepNeuralNetwork:
 
         Parameters
         ----------
-            X : np.ndarray
-                Training data of shape (n_features, m_samples)
-            Y : np.ndarray
-                Training labels of shape (1, m_samples)
-            X_val : np.ndarray
-                Validation data
-            Y_val : np.ndarray
-                Validation labels
-            learning_rate : float, default=0.01
-                Initial learning rate
-            num_epochs : int, default=1000
-                Number of training epochs
-            print_cost : bool, default=True
-                Whether to print cost during training
-            learning_rate_decay : float, default=0,95
-                Learning rate decay factor
-            decay_step : int, default=100
-                Steps between learning rate decay
-            early_stopping : bool, default=True
-                Whether to use early stopping
-            patience : int, default=50
-                Early stopping patience
+        X : np.ndarray
+            Training data of shape (n_features, m_samples)
+        Y : np.ndarray
+            Training labels of shape (1, m_samples)
+        X_val : np.ndarray
+            Validation data
+        Y_val : np.ndarray
+            Validation labels
+        learning_rate : float, default=0.01
+            Initial learning rate
+        num_epochs : int, default=1000
+            Number of training epochs
+        print_cost : bool, default=True
+            Whether to print cost during training
+        learning_rate_decay : float, default=0.95
+            Learning rate decay factor
+        decay_step : int, default=100
+            Steps between learning rate decay
+        early_stopping : bool, default=True
+            Whether to use early stopping
+        patience : int, default=50
+            Early stopping patience
 
         Returns
         -------

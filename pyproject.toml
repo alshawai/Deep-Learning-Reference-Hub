@@ -11,17 +11,24 @@ requires-python = ">=3.10"
 license = { file = "LICENSE" }
 dependencies = ["numpy>=1.26.0", "scipy>=1.11.0", "matplotlib>=3.8.0"]
 
-# Split out because most of the hub does not need them. These were once listed
-# unconditionally alongside NumPy, so the docs-and-NumPy CI job installed
-# TensorFlow and PyTorch in order to run tests that import neither.
+# These were once listed unconditionally alongside NumPy, so the
+# docs-and-NumPy CI job installed TensorFlow and PyTorch in order
+# to run tests that import neither.
 #
 # `frameworks` is for a reader who wants everything with one command. CI does not
 # use it: plain `torch` resolves to the CUDA build, which is gigabytes of wheel a
 # CPU runner will never execute, so the parity job installs CPU builds by index
-# instead. Do not "simplify" that job to this extra.
+# instead.
 [project.optional-dependencies]
 frameworks = ["torch>=2.3.0", "tensorflow>=2.17.0"]
 dev = ["ruff>=0.6.0", "pytest>=8.0.0"]
+# Separate from `dev` because the site build is the slowest thing in the gate to
+# install and most contributions never touch a document. The gate needs both.
+docs = [
+    "mkdocs>=1.6.0",
+    "mkdocs-material>=9.5.0",
+    "mkdocstrings[python]>=0.26.0",
+]
 
 # src layout, so the tests exercise the installed package. Without it, a bare
 # `dlhub/` beside the tests is importable straight from the working directory and

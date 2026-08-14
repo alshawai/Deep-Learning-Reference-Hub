@@ -26,6 +26,15 @@ Published material is whatever git would ship: tracked files plus untracked
 files that ``.gitignore`` does not exclude. That definition survives any
 reorganization of the tree, which a hardcoded directory list does not.
 
+The link and anchor checks stop at the documentation site's source directory.
+``mkdocs build --strict`` resolves every cross-reference inside that tree and
+fails on a broken one, so the two together are a partition: the site build owns
+its own tree, this tool owns everything outside it, and no published Markdown
+is checked twice or not at all. The boundary is read from ``mkdocs.yml``, so it
+moves when the tree does, and it shrinks by itself as documents are filed into
+the site. The fence and README checks are not divided -- no site build compiles
+the Python in a fence or counts what the README claims.
+
 Anchor slugs follow GitHub's rules. Retargeting the hub at another renderer
 means revisiting :func:`slugify`.
 
@@ -73,7 +82,9 @@ ROOT = _find_root(TOOLS_DIR)
 FALLBACK_SKIP_DIRS = {".git", ".claude", "__pycache__", ".ruff_cache", ".vscode"}
 
 FENCE_RE = re.compile(r"^(\s*)(`{3,}|~{3,})\s*([A-Za-z0-9_+-]*)\s*$")
-LINK_RE = re.compile(r"(?<!!)\[(?P<text>[^\]\n]*)\]\((?P<href>[^)\s]+)(?:\s+\"[^\"]*\")?\)")
+LINK_RE = re.compile(
+    r"(?<!!)\[(?P<text>[^\]\n]*)\]\((?P<href>[^)\s]+)(?:\s+\"[^\"]*\")?\)"
+)
 HEADING_RE = re.compile(r"^(#{1,6})\s+(.*?)\s*#*\s*$")
 IMPORT_RE = re.compile(r"^\s*(?:import|from)\s+([A-Za-z_][\w.]*)", re.MULTILINE)
 SKIP_MARK = "hubcheck: skip"
@@ -105,6 +116,25 @@ REPO_META = {
     "security.md",
 }
 
+# A page named `index.md` routes a reader to documents rather than being one:
+# a site landing page, or a section home whose whole subject is what belongs in
+# that section. Counting them would have the hub advertise one more document for
+# every signpost it puts up, and a section home that exists to record that its
+# section is empty would count as a document about nothing.
+#
+# Named rather than pattern-matched because `index` is the one filename every
+# static site generator reserves for precisely this purpose, so the rule holds
+# wherever the documentation tree is later moved to.
+SIGNPOSTS = {"index.md"}
+
+# A marked page publishes code that is counted already, as an implementation.
+# Counting it would report the same work twice, once as a module and once as a
+# document about that module.
+#
+# Explicit rather than inferred from a mkdocstrings directive: a hand-written
+# document may embed generated API reference without becoming generated itself.
+GENERATED_MARKER = "<!-- hubcheck: generated -->"
+
 PLACEHOLDERS = (
     "yourusername",
     "your-username",
@@ -132,6 +162,19 @@ FRAMEWORK_ALIASES = {
     "matplotlib": {"matplotlib"},
 }
 
+MKDOCS_CONFIG = ROOT / "mkdocs.yml"
+
+# The site build's own source directory, read from its config rather than
+# assumed, so moving the documentation tree moves the division of labour with
+# it. Anchored at column zero because only a top-level key sets `docs_dir`;
+# the same word indented under a plugin means something else entirely.
+#
+# Scanned line by line instead of parsed. This tool has no third-party
+# dependencies on purpose, and one key off the top level of a YAML file does
+# not justify acquiring one.
+DOCS_DIR_RE = re.compile(r"^docs_dir:\s*(?P<value>\S.*?)\s*$")
+MKDOCS_EXCLUSION_RE = re.compile(r"^(?:exclude_docs|draft_docs):")
+
 _REPO_FILES: Optional[List[Path]] = None
 
 # One line per check describing what it actually inspected. A check that
@@ -158,8 +201,16 @@ def repo_files() -> List[Path]:
     listing = None
     try:
         done = subprocess.run(
-            ["git", "-C", str(ROOT), "ls-files", "--cached", "--others",
-             "--exclude-standard", "-z"],
+            [
+                "git",
+                "-C",
+                str(ROOT),
+                "ls-files",
+                "--cached",
+                "--others",
+                "--exclude-standard",
+                "-z",
+            ],
             capture_output=True,
             text=True,
             timeout=30,
@@ -198,15 +249,108 @@ def md_files() -> List[Path]:
     return [p for p in repo_files() if p.suffix.lower() == ".md"]
 
 
-def published_docs() -> List[Path]:
-    """Return Markdown files that count as documents rather than repo meta.
+def site_source_dir() -> Optional[Path]:
+    """Return the directory the documentation site is built from.
+
+    Returns
+    -------
+    Path or None
+        The configured ``docs_dir``, MkDocs' ``docs`` default when the config
+        names none, or None when there is no site config at all.
+    """
+    text = read_text(MKDOCS_CONFIG)
+    if text is None:
+        return None
+    for line in text.splitlines():
+        match = DOCS_DIR_RE.match(line)
+        if match:
+            return (ROOT / match.group("value").strip("\"'")).resolve()
+    return (ROOT / "docs").resolve()
+
+
+def site_exclusions_configured() -> bool:
+    """Return whether MkDocs is configured to omit source documents.
+
+    Hubcheck deliberately supports only a single contiguous site domain. If
+    MkDocs exclusions are added, treating every file under ``docs_dir`` as
+    built would silently remove the excluded files from link checking.
+
+    Returns
+    -------
+    bool
+        True when a top-level exclusion setting is present.
+    """
+    text = read_text(MKDOCS_CONFIG) or ""
+    return any(MKDOCS_EXCLUSION_RE.match(line) for line in text.splitlines())
+
+
+def built_md_files() -> List[Path]:
+    """Return the Markdown the site build renders, and therefore checks itself.
 
     Returns
     -------
     list of Path
-        Every published Markdown file except README, LICENSE, and their kin.
+        Sorted absolute paths; empty when the repository has no site config.
     """
-    return [p for p in md_files() if p.name.lower() not in REPO_META]
+    site = site_source_dir()
+    if site is None or site_exclusions_configured():
+        return []
+    return [
+        p
+        for p in md_files()
+        if site in p.parents
+        and "templates" not in p.relative_to(site).parts
+        and not any(part.startswith(".") for part in p.relative_to(site).parts)
+    ]
+
+
+def unbuilt_md_files() -> List[Path]:
+    """Return the Markdown the site build never sees.
+
+    The complement of :func:`built_md_files` within :func:`md_files`, and the
+    domain of the link and anchor checks. ``mkdocs build --strict`` resolves
+    every cross-reference inside its own source tree; a repository has plenty
+    of Markdown outside it -- README, CONTRIBUTING, anything not yet filed --
+    and nothing else would look at those.
+
+    With no site config, everything is unbuilt. That is the fail-closed
+    reading: a missing config means no build is checking anything, so this
+    tool takes the whole tree rather than assuming a directory that may not be
+    there.
+
+    Returns
+    -------
+    list of Path
+        Sorted absolute paths.
+    """
+    site = site_source_dir()
+    if site is None or site_exclusions_configured():
+        return md_files()
+    built = set(built_md_files())
+    return [p for p in md_files() if p not in built]
+
+
+def published_docs() -> List[Path]:
+    """Return Markdown files that count as documents rather than repo meta.
+
+    Excludes README, LICENSE, and their kin; the section signposts named in
+    :data:`SIGNPOSTS`; and generated pages, which restate code the
+    implementation count already covers rather than holding prose of their own.
+
+    Returns
+    -------
+    list of Path
+        Sorted absolute paths.
+    """
+    out = []
+    for path in md_files():
+        if path.name.lower() in REPO_META or path.name.lower() in SIGNPOSTS:
+            continue
+        text = read_text(path)
+        if text is not None and GENERATED_MARKER in text:
+            continue
+        out.append(path)
+    return out
 
 
 def code_modules() -> List[Path]:
@@ -397,6 +541,10 @@ def normalize_fragment(fragment: str) -> str:
 def check_links(only: Optional[Path] = None) -> List[str]:
     """Verify every relative Markdown link resolves on disk.
 
+    Runs over :func:`unbuilt_md_files` only. The site build resolves links
+    inside its own tree and fails on a broken one, so checking those here would
+    duplicate it; checking them nowhere would lose them.
+
     Parameters
     ----------
     only : Path, optional
@@ -409,7 +557,14 @@ def check_links(only: Optional[Path] = None) -> List[str]:
     """
     fails = []
     seen = links = 0
-    for path in md_files():
+    domain = unbuilt_md_files()
+    if only and only not in domain:
+        COVERAGE["links"] = "nothing inspected"
+        return [
+            f"{only.relative_to(ROOT)}: the site build owns this page's links; "
+            "check it with `mkdocs build --strict`"
+        ]
+    for path in domain:
         if only and path != only:
             continue
         rel = path.relative_to(ROOT)
@@ -438,7 +593,9 @@ def check_links(only: Optional[Path] = None) -> List[str]:
                     known = {normalize_fragment(a) for a in anchors_of(other)}
                     if normalize_fragment(unquote(frag)) not in known:
                         fails.append(f"{rel}:{line_no}: dead anchor -> {target}#{frag}")
-    COVERAGE["links"] = f"{links} relative link(s) across {seen} document(s)"
+    COVERAGE["links"] = (
+        f"{links} relative link(s) across {seen} document(s) outside the site build"
+    )
     return fails
 
 
@@ -447,6 +604,9 @@ def check_anchors(only: Optional[Path] = None) -> List[str]:
 
     Catches the stale table-of-contents row: a heading renamed or removed
     while its own TOC entry stayed behind.
+
+    Runs over :func:`unbuilt_md_files` only, for the reason given on
+    :func:`check_links`: the site build's ``anchors`` validation covers the rest.
 
     Parameters
     ----------
@@ -460,7 +620,14 @@ def check_anchors(only: Optional[Path] = None) -> List[str]:
     """
     fails = []
     seen = found = 0
-    for path in md_files():
+    domain = unbuilt_md_files()
+    if only and only not in domain:
+        COVERAGE["anchors"] = "nothing inspected"
+        return [
+            f"{only.relative_to(ROOT)}: the site build owns this page's anchors; "
+            "check it with `mkdocs build --strict`"
+        ]
+    for path in domain:
         if only and path != only:
             continue
         rel = path.relative_to(ROOT)
@@ -481,7 +648,9 @@ def check_anchors(only: Optional[Path] = None) -> List[str]:
                 found += 1
                 if anchor not in emitted:
                     fails.append(f"{rel}:{line_no}: anchor has no heading -> #{anchor}")
-    COVERAGE["anchors"] = f"{found} in-document anchor(s) across {seen} document(s)"
+    COVERAGE["anchors"] = (
+        f"{found} in-document anchor(s) across {seen} document(s) outside the site build"
+    )
     return fails
 
 
@@ -582,12 +751,20 @@ def readme_claims(text: str) -> Iterator[Tuple[int, str, str]]:
     for line_no, line in strip_fences(text):
         match = CLAIM_RE.match(line)
         if match:
-            yield line_no, match.group("label").strip().lower(), match.group("value").strip()
+            yield (
+                line_no,
+                match.group("label").strip().lower(),
+                match.group("value").strip(),
+            )
 
 
 COUNTABLE = (
     (("document", "doc", "guide", "article"), "document(s)", published_docs),
-    (("code example", "implementation", "module", "script"), "code example(s)", code_modules),
+    (
+        ("code example", "implementation", "module", "script"),
+        "code example(s)",
+        code_modules,
+    ),
     (("notebook",), "notebook(s)", notebooks),
     (("test",), "test(s)", test_modules),
 )

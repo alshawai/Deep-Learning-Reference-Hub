@@ -2,19 +2,25 @@
 Hub Check Tests
 ============================
 
-Covers how `tools/hubcheck.py` decides what counts as a published
-implementation -- the set the README's "Code Examples: N" claim is checked
-against.
+Covers how `tools/hubcheck.py` decides what it is looking at: which files count
+as published implementations, which count as documents, and which Markdown is
+its own to check rather than the site build's.
 
-That decision used to be made by subtraction: every published `.py` except the
-ones under `tools/` and `tests/`. It now asks whether a file sits in an
-importable package. The count is the same either way today, so a test is the
-only thing that distinguishes the two definitions, and the only thing that will
-notice if a later edit drifts back toward naming directories.
+The implementation count used to be decided by subtraction: every published
+`.py` except the ones under `tools/` and `tests/`. It now asks whether a file
+sits in an importable package. The count is the same either way today, so a test
+is the only thing that distinguishes the two definitions, and the only thing
+that will notice if a later edit drifts back toward naming directories.
 
-The central assertion is agreement with `pkgutil`: whatever the package really
-publishes is what the README is held to. A checker that counts a different set
-than the one a reader can import is wrong even when its number is right.
+The central assertion there is agreement with `pkgutil`: whatever the package
+really publishes is what the README is held to. A checker that counts a
+different set than the one a reader can import is wrong even when its number is
+right.
+
+The domain tests carry the same weight for links and anchors. Those checks were
+scoped to the tree `mkdocs build --strict` does not build, rather than retired
+into it, and scoping is only safe while the two halves genuinely partition the
+published Markdown. Nothing but a test says they still do.
 
 Author
 ------
@@ -117,6 +123,231 @@ class TestCodeModules:
         five of them would overstate the hub by five.
         """
         assert not [p for p in hubcheck.code_modules() if p.name.startswith("__")]
+
+
+class TestPublishedDocs:
+    """The set the README's document count is verified against."""
+
+    def test_the_scan_finds_documents_at_all(self, hubcheck):
+        """
+        Guards the exclusion below. A scan returning nothing would satisfy any
+        "is not counted" claim trivially, and would make the README's document
+        count pass by comparing against an empty set.
+        """
+        assert len(hubcheck.published_docs()) > 1
+
+    def test_signpost_pages_are_not_counted_as_documents(self, hubcheck):
+        """
+        The site landing page and each section home are named `index.md`. They
+        route a reader to documents rather than being documents, so counting
+        them would inflate the README's claim once per signpost -- and the
+        tutorial home, whose subject is that its section is empty, would be
+        counted as a document about nothing.
+
+        The first assertion is what keeps the second honest: it fails if the
+        documentation tree stops containing signposts, which is the only way
+        the second could pass without the exclusion doing any work.
+        """
+        assert [p for p in hubcheck.md_files() if p.name.lower() in hubcheck.SIGNPOSTS]
+        assert not [
+            p for p in hubcheck.published_docs() if p.name.lower() in hubcheck.SIGNPOSTS
+        ]
+
+    def test_generated_pages_are_not_counted_as_documents(self, hubcheck):
+        """
+        An API page's body is a docstring-extraction directive, so every word a
+        reader sees on it comes from a module the implementation count already
+        counts. Counting it as a document too would report one piece of work
+        twice, and would make the README's document count grow whenever a
+        subpackage was added.
+
+        The first assertion keeps the second honest: it fails if no generated
+        page is in the tree, which is the only way the second could pass with
+        the exclusion doing nothing.
+        """
+        generated = [
+            p
+            for p in hubcheck.md_files()
+            if (hubcheck.read_text(p) or "")
+            and hubcheck.GENERATED_MARKER in (hubcheck.read_text(p) or "")
+        ]
+        assert generated
+        assert not set(generated) & set(hubcheck.published_docs())
+
+    def test_a_handwritten_page_that_embeds_api_reference_is_still_counted(
+        self, hubcheck, monkeypatch, tmp_path
+    ):
+        """A directive alone does not make a prose document generated."""
+        page = tmp_path / "guide.md"
+        page.write_text("# Guide\n\nProse.\n\n::: dlhub.optimizers\n", encoding="utf-8")
+        monkeypatch.setattr(hubcheck, "md_files", lambda: [page])
+        assert hubcheck.published_docs() == [page]
+
+
+class TestCheckDomains:
+    """The division of labour between this tool and the site build."""
+
+    def test_the_two_domains_partition_the_published_markdown(self, hubcheck):
+        """
+        The contract that makes reassigning the link checks safe rather than a
+        quiet loss of coverage. `mkdocs build --strict` resolves references
+        inside its own source tree; this tool takes everything else. If the two
+        sets overlapped, work would be done twice; if they did not cover
+        `md_files()` between them, some published page would be checked by
+        nobody -- and a checker going silent after a reorganization is the
+        failure this file exists to prevent.
+        """
+        built = set(hubcheck.built_md_files())
+        unbuilt = set(hubcheck.unbuilt_md_files())
+        assert built | unbuilt == set(hubcheck.md_files())
+        assert not built & unbuilt
+
+    def test_both_sides_of_the_partition_are_populated(self, hubcheck):
+        """
+        Guards the partition above, which an empty set would satisfy for free:
+        with nothing built, the union and disjointness claims still hold while
+        the split does no work at all.
+
+        Both sides being non-empty is also the true state of the repository --
+        there is a site, and there is Markdown outside it -- so this failing
+        means either the site config went missing or the last document outside
+        it was filed away. Both change what the checks cover, and both deserve
+        to be noticed rather than absorbed.
+        """
+        assert hubcheck.built_md_files()
+        assert hubcheck.unbuilt_md_files()
+
+    def test_the_repository_prose_stays_on_this_tool(self, hubcheck):
+        """
+        README and CONTRIBUTING can never be inside the site build -- MkDocs
+        renders `docs_dir` and nothing above it -- so they are the part of the
+        partition that will still be here after every document has moved. They
+        are named explicitly because they are the reason the checks were scoped
+        instead of deleted.
+        """
+        unbuilt = {p.name for p in hubcheck.unbuilt_md_files()}
+        assert "README.md" in unbuilt
+        assert "CONTRIBUTING.md" in unbuilt
+
+    def test_the_configured_docs_dir_is_what_sets_the_boundary(
+        self, hubcheck, monkeypatch, tmp_path
+    ):
+        """
+        The split follows `docs_dir` rather than a hardcoded directory name, so
+        moving the documentation tree moves the boundary with it.
+
+        Pointed at a config of this test's own writing, because the obvious
+        version of this assertion is vacuous: `built_md_files` and
+        `unbuilt_md_files` both call `site_source_dir`, so they agree with each
+        other whatever it returns -- including when it ignores the config and
+        falls back to `docs`. Only an independently written config distinguishes
+        a scanner that reads the key from one that merely guesses correctly.
+        """
+        config = tmp_path / "mkdocs.yml"
+        config.write_text("site_name: Hub\ndocs_dir: elsewhere\n", encoding="utf-8")
+        monkeypatch.setattr(hubcheck, "MKDOCS_CONFIG", config)
+        assert hubcheck.site_source_dir() == (hubcheck.ROOT / "elsewhere").resolve()
+
+    def test_only_a_top_level_key_moves_the_boundary(
+        self, hubcheck, monkeypatch, tmp_path
+    ):
+        """
+        `docs_dir` indented under a plugin is that plugin's own setting and says
+        nothing about where the site is built from. A line scan that matched it
+        anywhere on the line would divide the tree along a directory MkDocs
+        never heard of, and the checks would go quiet over whatever fell outside
+        it.
+        """
+        config = tmp_path / "mkdocs.yml"
+        config.write_text(
+            "site_name: Hub\nplugins:\n  - somewhere:\n      docs_dir: trap\n",
+            encoding="utf-8",
+        )
+        monkeypatch.setattr(hubcheck, "MKDOCS_CONFIG", config)
+        assert hubcheck.site_source_dir() == (hubcheck.ROOT / "docs").resolve()
+
+    def test_no_site_config_leaves_the_whole_tree_to_this_tool(
+        self, hubcheck, monkeypatch, tmp_path
+    ):
+        """
+        The fail-closed reading of a missing `mkdocs.yml`. No config means no
+        build is resolving anything, so the scoped checks must take everything
+        back rather than assume a `docs/` that may not exist -- otherwise
+        deleting the config would silently retire two checks.
+        """
+        monkeypatch.setattr(hubcheck, "MKDOCS_CONFIG", tmp_path / "absent.yml")
+        assert hubcheck.site_source_dir() is None
+        assert hubcheck.built_md_files() == []
+        assert hubcheck.unbuilt_md_files() == hubcheck.md_files()
+
+    def test_site_exclusions_fail_closed(self, hubcheck, monkeypatch, tmp_path):
+        """An unsupported partial site domain leaves every page to hubcheck."""
+        config = tmp_path / "mkdocs.yml"
+        config.write_text(
+            "site_name: Hub\nexclude_docs: private.md\n", encoding="utf-8"
+        )
+        monkeypatch.setattr(hubcheck, "MKDOCS_CONFIG", config)
+        assert hubcheck.site_exclusions_configured()
+        assert hubcheck.built_md_files() == []
+        assert hubcheck.unbuilt_md_files() == hubcheck.md_files()
+
+    def test_mkdocs_implicit_exclusions_stay_on_this_tool(
+        self, hubcheck, monkeypatch, tmp_path
+    ):
+        """Templates and dotfiles under docs_dir are not production site pages."""
+        site = tmp_path / "docs"
+        built = site / "guide.md"
+        template = site / "templates" / "fragment.md"
+        hidden = site / ".notes.md"
+        monkeypatch.setattr(hubcheck, "site_source_dir", lambda: site)
+        monkeypatch.setattr(hubcheck, "site_exclusions_configured", lambda: False)
+        monkeypatch.setattr(hubcheck, "md_files", lambda: [built, hidden, template])
+        assert hubcheck.built_md_files() == [built]
+        assert hubcheck.unbuilt_md_files() == [hidden, template]
+
+    def test_this_repository_is_split_where_its_config_says(self, hubcheck):
+        """
+        The same claim against the real config, read here by a plain string scan
+        so that a rewrite of :func:`site_source_dir` is checked rather than
+        trusted.
+        """
+        lines = hubcheck.MKDOCS_CONFIG.read_text(encoding="utf-8").splitlines()
+        declared = [ln for ln in lines if ln.startswith("docs_dir:")]
+        expected = declared[0].split(":", 1)[1].strip() if declared else "docs"
+        site = (hubcheck.ROOT / expected).resolve()
+        assert hubcheck.site_source_dir() == site
+        assert site.is_dir()
+        assert all(site in p.parents for p in hubcheck.built_md_files())
+        assert not any(site in p.parents for p in hubcheck.unbuilt_md_files())
+
+    def test_a_site_page_is_refused_rather_than_passed(self, hubcheck):
+        """
+        `--file` names one document, and a document inside the site build is
+        outside these checks' domain. Reporting that is what keeps the scoping
+        honest: the alternative is a scan of zero documents printing `ok`, which
+        would tell a contributor their page was checked when nothing looked at
+        it.
+        """
+        page = hubcheck.built_md_files()[0]
+        for check in (hubcheck.check_links, hubcheck.check_anchors):
+            problems = check(page)
+            assert len(problems) == 1
+            assert "mkdocs build --strict" in problems[0]
+
+    def test_the_checks_that_are_not_divided_still_see_everything(self, hubcheck):
+        """
+        No site build compiles the Python in a fence or counts what the README
+        claims, so those two checks keep the whole tree. Scoping them along with
+        the others would drop every fence inside `docs/` -- the exact
+        weakening that scoping rather than deleting was meant to avoid.
+        """
+        hubcheck.check_fences()
+        built = len(hubcheck.built_md_files())
+        assert built > 0
+        assert (
+            f"across {len(hubcheck.md_files())} document(s)"
+            in (hubcheck.COVERAGE["fences"])
+        )
 
 
 class TestReadmeCheck:
