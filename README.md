@@ -62,7 +62,7 @@ This repository serves as a living reference guide for deep learning concepts, d
   - Pure mathematical approach without code examples
 
 ### 🔧 Training Techniques
-- **[Parameters Initialization, Regularization, and Gradient Checking](training-techniques/Parameters%20Initialization,%20Regularization,%20and%20Gradient%20Checking.md)**
+- **[Parameters Initialization, Regularization, and Gradient Checking](docs/explanation/parameter-initialization.md)**
   - Modern parameter initialization techniques (He, Xavier, etc.)
   - Regularization methods (L1, L2, dropout, batch normalization)
   - Gradient checking for debugging neural networks
@@ -80,7 +80,7 @@ This repository serves as a living reference guide for deep learning concepts, d
 Start with **[L-Layer Neural Network](docs/explanation/forward-and-backward-propagation.md)** to understand the fundamental mathematics behind deep learning, including complete derivations and the chain rule applications.
 
 ### For Practical Implementation
-Read **[Parameters Initialization, Regularization, and Gradient Checking](training-techniques/Parameters%20Initialization,%20Regularization,%20and%20Gradient%20Checking.md)** to learn essential training techniques with modern best practices and working code examples.  
+Read **[Parameters Initialization, Regularization, and Gradient Checking](docs/explanation/parameter-initialization.md)** to learn essential training techniques with modern best practices and working code examples.
 Next, explore **[Optimization Algorithms](docs/explanation/optimization-algorithms.md)** to understand how different optimizers, learning rate schedules, and gradient-based methods impact training efficiency and convergence, accompanied by practical implementations.
 
 ### To Run the Code
@@ -227,7 +227,7 @@ We welcome contributions from the community! Please see our [Contributing Guidel
 
 ## 📊 Repository Statistics
 
-- **Total Documents**: 12
+- **Total Documents**: 18
 - **Code Examples**: 17 implementations
 - **Frameworks Covered**: NumPy
 

@@ -38,7 +38,7 @@ the document decomposition files here:
 
 - **[How to choose an optimizer](choose-an-optimizer.md)** — from the practical guidelines and optimizer
   selection sections of the optimization algorithms document.
-- **How to run a gradient check** — from the gradient checking procedure,
+- **[How to run a gradient check](run-a-gradient-check.md)** — from the gradient checking procedure,
   including how to read the resulting relative error.
 - **How to tune a learning rate** — from the learning rate finder material and
   the tuning starting strategy.

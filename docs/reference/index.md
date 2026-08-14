@@ -45,6 +45,11 @@ Drawn from the lookup material currently embedded in the source documents:
 - **[Optimizer update rules](optimizer-update-rules.md)** — the update equation and default hyperparameters
   for each method, plus the comparison table.
 - **[Learning rate schedules](learning-rate-schedules.md)** — each schedule's formula and parameters.
+- **[Initialisation schemes](parameter-initialization.md)** — the variance each scheme uses and when it applies.
+- **[Regularisation methods](regularization.md)** — equations, implementations,
+  and framework examples for regularisation techniques.
+- **[Gradient checking](gradient-checking.md)** — result tolerances and links to
+  the generated implementation reference.
 
 ## API reference
 

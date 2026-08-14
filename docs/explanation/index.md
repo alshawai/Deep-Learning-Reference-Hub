@@ -46,3 +46,9 @@ Drawn from the conceptual material currently embedded in the source documents:
 - **[Exponential weighted averages](optimization-algorithms.md#exponential-weighted-averages)** — the shared mechanism underneath momentum,
   RMSprop, and Adam, and why bias correction is needed.
 - **[Adaptive methods](optimization-algorithms.md#what-the-methods-trade)** — what per-parameter learning rates buy, and their costs.
+- **[Why initialisation matters](parameter-initialization.md)** — vanishing and exploding gradients, symmetry
+  breaking, and the variance argument behind each scheme.
+- **[Regularisation theory](regularization.md)** — the bias-variance tradeoff, and how L1, L2,
+  dropout, and batch normalisation each act on it.
+- **[How gradient checking works](gradient-checking.md)** — the finite-difference approximation and why
+  it is a debugging tool rather than a training one.
