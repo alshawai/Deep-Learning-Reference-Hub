@@ -41,3 +41,8 @@ Drawn from the conceptual material currently embedded in the source documents:
   document, including the recursive formula for hidden layers.
 - **[Matrix calculus for neural networks](matrix-calculus-for-neural-networks.md)** — the chain rule in matrix form, and
   why vectorisation changes the complexity.
+- **[The optimization landscape](optimization-algorithms.md)** — why optimization is difficult, and what
+  gradient descent variants trade against each other.
+- **[Exponential weighted averages](optimization-algorithms.md#exponential-weighted-averages)** — the shared mechanism underneath momentum,
+  RMSprop, and Adam, and why bias correction is needed.
+- **[Adaptive methods](optimization-algorithms.md#what-the-methods-trade)** — what per-parameter learning rates buy, and their costs.

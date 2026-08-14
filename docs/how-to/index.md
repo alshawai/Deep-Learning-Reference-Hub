@@ -36,7 +36,7 @@ reader would arrive already wanting the outcome.
 Drawn from procedural material currently embedded in the source documents, which
 the document decomposition files here:
 
-- **How to choose an optimizer** — from the practical guidelines and optimizer
+- **[How to choose an optimizer](choose-an-optimizer.md)** — from the practical guidelines and optimizer
   selection sections of the optimization algorithms document.
 - **How to run a gradient check** — from the gradient checking procedure,
   including how to read the resulting relative error.

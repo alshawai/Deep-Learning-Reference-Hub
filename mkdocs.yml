@@ -88,11 +88,14 @@ nav:
   - Tutorials: tutorials/index.md
   - How-to guides:
       - how-to/index.md
+      - Choose an optimizer: how-to/choose-an-optimizer.md
   - Reference:
       - reference/index.md
       - Network shapes and dimensions: reference/network-shapes-and-dimensions.md
       - Activation functions: reference/activation-functions.md
       - Parameter update rule: reference/parameter-update-rule.md
+      - Optimizer update rules: reference/optimizer-update-rules.md
+      - Learning-rate schedules: reference/learning-rate-schedules.md
       - API:
           - Optimizers: reference/api/optimizers.md
           - Tuning: reference/api/tuning.md
@@ -102,3 +105,4 @@ nav:
       - explanation/index.md
       - Forward and backward propagation: explanation/forward-and-backward-propagation.md
       - Matrix calculus for neural networks: explanation/matrix-calculus-for-neural-networks.md
+      - Optimization algorithms: explanation/optimization-algorithms.md

@@ -42,6 +42,9 @@ Drawn from the lookup material currently embedded in the source documents:
 - **[Activation functions](activation-functions.md)** — each function with its derivative.
 - **[Parameter update rule](parameter-update-rule.md)** — the gradient-descent
   update equations for an L-layer network.
+- **[Optimizer update rules](optimizer-update-rules.md)** — the update equation and default hyperparameters
+  for each method, plus the comparison table.
+- **[Learning rate schedules](learning-rate-schedules.md)** — each schedule's formula and parameters.
 
 ## API reference
 

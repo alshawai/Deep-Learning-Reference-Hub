@@ -77,7 +77,7 @@ These have the most significant effect on model performance and should be tuned 
    - **Range**: Typically $10^{-5}$ to $10^{-1}$
    - **Architecture dependency**: Transformers often need lower rates than CNNs
 Using a _learning rate scheduler_ and _warmup strategies_ can greatly impact the training speed and accuracy of the models.
-> For more details about **learning rate schedulers**, read the related topic in [Optimization Algorithms](./Optimization%20Algorithms.md)
+> For more details about **learning rate schedulers**, read the [learning-rate schedules reference](../docs/reference/learning-rate-schedules.md)
 > _You can find learning rate schedulers implementation using numpy in [Examples](#implementation-examples)_
 
 2. **Architecture Parameters**

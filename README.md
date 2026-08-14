@@ -67,7 +67,7 @@ This repository serves as a living reference guide for deep learning concepts, d
   - Regularization methods (L1, L2, dropout, batch normalization)
   - Gradient checking for debugging neural networks
   - Includes practical code examples and recent best practices
-- **[Optimization Algorithms](training-techniques/Optimization%20Algorithms.md)**
+- **[Optimization Algorithms](docs/explanation/optimization-algorithms.md)**
   - Comprehensive overview of optimization methods for deep learning
   - Covers theoretical foundations and practical considerations
   - Includes step-by-step derivations and use cases for each method
@@ -81,7 +81,7 @@ Start with **[L-Layer Neural Network](docs/explanation/forward-and-backward-prop
 
 ### For Practical Implementation
 Read **[Parameters Initialization, Regularization, and Gradient Checking](training-techniques/Parameters%20Initialization,%20Regularization,%20and%20Gradient%20Checking.md)** to learn essential training techniques with modern best practices and working code examples.  
-Next, explore **[Optimization Algorithms](training-techniques/Optimization%20Algorithms.md)** to understand how different optimizers, learning rate schedules, and gradient-based methods impact training efficiency and convergence, accompanied by practical implementations.
+Next, explore **[Optimization Algorithms](docs/explanation/optimization-algorithms.md)** to understand how different optimizers, learning rate schedules, and gradient-based methods impact training efficiency and convergence, accompanied by practical implementations.
 
 ### To Run the Code
 
@@ -227,7 +227,7 @@ We welcome contributions from the community! Please see our [Contributing Guidel
 
 ## 📊 Repository Statistics
 
-- **Total Documents**: 9
+- **Total Documents**: 12
 - **Code Examples**: 17 implementations
 - **Frameworks Covered**: NumPy
 
