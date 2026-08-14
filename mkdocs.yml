@@ -48,7 +48,9 @@ markdown_extensions:
 
 extra_javascript:
   - javascripts/mathjax.js
-  - https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js
+  # Exact version: documentation rendering must not change without a repository
+  # change, and a moving `@3` URL would execute mutable third-party JavaScript.
+  - https://unpkg.com/mathjax@3.2.2/es5/tex-mml-chtml.js
 
 plugins:
   # `search` is on by default, but naming any plugin replaces that default

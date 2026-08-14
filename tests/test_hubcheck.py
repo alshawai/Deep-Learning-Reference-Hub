@@ -169,10 +169,19 @@ class TestPublishedDocs:
             p
             for p in hubcheck.md_files()
             if (hubcheck.read_text(p) or "")
-            and hubcheck.GENERATED_RE.search(hubcheck.read_text(p) or "")
+            and hubcheck.GENERATED_MARKER in (hubcheck.read_text(p) or "")
         ]
         assert generated
         assert not set(generated) & set(hubcheck.published_docs())
+
+    def test_a_handwritten_page_that_embeds_api_reference_is_still_counted(
+        self, hubcheck, monkeypatch, tmp_path
+    ):
+        """A directive alone does not make a prose document generated."""
+        page = tmp_path / "guide.md"
+        page.write_text("# Guide\n\nProse.\n\n::: dlhub.optimizers\n", encoding="utf-8")
+        monkeypatch.setattr(hubcheck, "md_files", lambda: [page])
+        assert hubcheck.published_docs() == [page]
 
 
 class TestCheckDomains:
@@ -270,6 +279,31 @@ class TestCheckDomains:
         assert hubcheck.site_source_dir() is None
         assert hubcheck.built_md_files() == []
         assert hubcheck.unbuilt_md_files() == hubcheck.md_files()
+
+    def test_site_exclusions_fail_closed(self, hubcheck, monkeypatch, tmp_path):
+        """An unsupported partial site domain leaves every page to hubcheck."""
+        config = tmp_path / "mkdocs.yml"
+        config.write_text(
+            "site_name: Hub\nexclude_docs: private.md\n", encoding="utf-8"
+        )
+        monkeypatch.setattr(hubcheck, "MKDOCS_CONFIG", config)
+        assert hubcheck.site_exclusions_configured()
+        assert hubcheck.built_md_files() == []
+        assert hubcheck.unbuilt_md_files() == hubcheck.md_files()
+
+    def test_mkdocs_implicit_exclusions_stay_on_this_tool(
+        self, hubcheck, monkeypatch, tmp_path
+    ):
+        """Templates and dotfiles under docs_dir are not production site pages."""
+        site = tmp_path / "docs"
+        built = site / "guide.md"
+        template = site / "templates" / "fragment.md"
+        hidden = site / ".notes.md"
+        monkeypatch.setattr(hubcheck, "site_source_dir", lambda: site)
+        monkeypatch.setattr(hubcheck, "site_exclusions_configured", lambda: False)
+        monkeypatch.setattr(hubcheck, "md_files", lambda: [built, hidden, template])
+        assert hubcheck.built_md_files() == [built]
+        assert hubcheck.unbuilt_md_files() == [hidden, template]
 
     def test_this_repository_is_split_where_its_config_says(self, hubcheck):
         """

@@ -1,5 +1,7 @@
 # Optimizers
 
+<!-- hubcheck: generated -->
+
 Gradient descent and the adaptive methods built on top of it.
 
 Each optimizer is written to be read alongside the explanation that derives it,

@@ -82,7 +82,9 @@ ROOT = _find_root(TOOLS_DIR)
 FALLBACK_SKIP_DIRS = {".git", ".claude", "__pycache__", ".ruff_cache", ".vscode"}
 
 FENCE_RE = re.compile(r"^(\s*)(`{3,}|~{3,})\s*([A-Za-z0-9_+-]*)\s*$")
-LINK_RE = re.compile(r"(?<!!)\[(?P<text>[^\]\n]*)\]\((?P<href>[^)\s]+)(?:\s+\"[^\"]*\")?\)")
+LINK_RE = re.compile(
+    r"(?<!!)\[(?P<text>[^\]\n]*)\]\((?P<href>[^)\s]+)(?:\s+\"[^\"]*\")?\)"
+)
 HEADING_RE = re.compile(r"^(#{1,6})\s+(.*?)\s*#*\s*$")
 IMPORT_RE = re.compile(r"^\s*(?:import|from)\s+([A-Za-z_][\w.]*)", re.MULTILINE)
 SKIP_MARK = "hubcheck: skip"
@@ -125,14 +127,13 @@ REPO_META = {
 # wherever the documentation tree is later moved to.
 SIGNPOSTS = {"index.md"}
 
-# A page whose body is a docstring-extraction directive publishes code that is
-# counted already, as an implementation. It holds no prose of its own: the words
-# a reader sees come from the module. Counting it would report the same work
-# twice, once as a module and once as a document about that module.
+# A marked page publishes code that is counted already, as an implementation.
+# Counting it would report the same work twice, once as a module and once as a
+# document about that module.
 #
-# Matched by the directive rather than by location, so the rule follows the
-# generated pages wherever in the documentation tree they are filed.
-GENERATED_RE = re.compile(r"^:::\s+\S", re.MULTILINE)
+# Explicit rather than inferred from a mkdocstrings directive: a hand-written
+# document may embed generated API reference without becoming generated itself.
+GENERATED_MARKER = "<!-- hubcheck: generated -->"
 
 PLACEHOLDERS = (
     "yourusername",
@@ -172,6 +173,7 @@ MKDOCS_CONFIG = ROOT / "mkdocs.yml"
 # dependencies on purpose, and one key off the top level of a YAML file does
 # not justify acquiring one.
 DOCS_DIR_RE = re.compile(r"^docs_dir:\s*(?P<value>\S.*?)\s*$")
+MKDOCS_EXCLUSION_RE = re.compile(r"^(?:exclude_docs|draft_docs):")
 
 _REPO_FILES: Optional[List[Path]] = None
 
@@ -199,8 +201,16 @@ def repo_files() -> List[Path]:
     listing = None
     try:
         done = subprocess.run(
-            ["git", "-C", str(ROOT), "ls-files", "--cached", "--others",
-             "--exclude-standard", "-z"],
+            [
+                "git",
+                "-C",
+                str(ROOT),
+                "ls-files",
+                "--cached",
+                "--others",
+                "--exclude-standard",
+                "-z",
+            ],
             capture_output=True,
             text=True,
             timeout=30,
@@ -258,6 +268,22 @@ def site_source_dir() -> Optional[Path]:
     return (ROOT / "docs").resolve()
 
 
+def site_exclusions_configured() -> bool:
+    """Return whether MkDocs is configured to omit source documents.
+
+    Hubcheck deliberately supports only a single contiguous site domain. If
+    MkDocs exclusions are added, treating every file under ``docs_dir`` as
+    built would silently remove the excluded files from link checking.
+
+    Returns
+    -------
+    bool
+        True when a top-level exclusion setting is present.
+    """
+    text = read_text(MKDOCS_CONFIG) or ""
+    return any(MKDOCS_EXCLUSION_RE.match(line) for line in text.splitlines())
+
+
 def built_md_files() -> List[Path]:
     """Return the Markdown the site build renders, and therefore checks itself.
 
@@ -267,9 +293,15 @@ def built_md_files() -> List[Path]:
         Sorted absolute paths; empty when the repository has no site config.
     """
     site = site_source_dir()
-    if site is None:
+    if site is None or site_exclusions_configured():
         return []
-    return [p for p in md_files() if site in p.parents]
+    return [
+        p
+        for p in md_files()
+        if site in p.parents
+        and "templates" not in p.relative_to(site).parts
+        and not any(part.startswith(".") for part in p.relative_to(site).parts)
+    ]
 
 
 def unbuilt_md_files() -> List[Path]:
@@ -292,9 +324,10 @@ def unbuilt_md_files() -> List[Path]:
         Sorted absolute paths.
     """
     site = site_source_dir()
-    if site is None:
+    if site is None or site_exclusions_configured():
         return md_files()
-    return [p for p in md_files() if site not in p.parents]
+    built = set(built_md_files())
+    return [p for p in md_files() if p not in built]
 
 
 def published_docs() -> List[Path]:
@@ -314,7 +347,7 @@ def published_docs() -> List[Path]:
         if path.name.lower() in REPO_META or path.name.lower() in SIGNPOSTS:
             continue
         text = read_text(path)
-        if text is not None and GENERATED_RE.search(text):
+        if text is not None and GENERATED_MARKER in text:
             continue
         out.append(path)
     return out
@@ -718,12 +751,20 @@ def readme_claims(text: str) -> Iterator[Tuple[int, str, str]]:
     for line_no, line in strip_fences(text):
         match = CLAIM_RE.match(line)
         if match:
-            yield line_no, match.group("label").strip().lower(), match.group("value").strip()
+            yield (
+                line_no,
+                match.group("label").strip().lower(),
+                match.group("value").strip(),
+            )
 
 
 COUNTABLE = (
     (("document", "doc", "guide", "article"), "document(s)", published_docs),
-    (("code example", "implementation", "module", "script"), "code example(s)", code_modules),
+    (
+        ("code example", "implementation", "module", "script"),
+        "code example(s)",
+        code_modules,
+    ),
     (("notebook",), "notebook(s)", notebooks),
     (("test",), "test(s)", test_modules),
 )
