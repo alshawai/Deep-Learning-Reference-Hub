@@ -1,254 +1,208 @@
 # Deep Learning Reference Hub 🧠
 
-_A comprehensive collection of deep learning concepts, techniques, and best practices - carefully curated and documented for practitioners and researchers._
+<div align="center">
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Last Updated](https://img.shields.io/github/last-commit/eima40x4c/Deep-Learning-Reference-Hub?label=Last%20Updated&color=blue)](https://github.com/eima40x4c/Deep-Learning-Reference-Hub/commits/main)
+[![CI](https://github.com/alshawai/Deep-Learning-Reference-Hub/actions/workflows/ci.yml/badge.svg?branch=main)](https://github.com/alshawai/Deep-Learning-Reference-Hub/actions/workflows/ci.yml)
+[![Documentation](https://img.shields.io/badge/docs-MkDocs-526CFE?logo=materialformkdocs&logoColor=white)](https://alshawai.github.io/Deep-Learning-Reference-Hub/)
+[![Python 3.10+](https://img.shields.io/badge/Python-3.10%2B-3776AB?logo=python&logoColor=white)](https://github.com/alshawai/Deep-Learning-Reference-Hub/blob/main/pyproject.toml)
+[![NumPy 1.26+](https://img.shields.io/badge/NumPy-1.26%2B-013243?logo=numpy&logoColor=white)](https://github.com/alshawai/Deep-Learning-Reference-Hub/blob/main/pyproject.toml)
+[![PyTorch 2.3+](https://img.shields.io/badge/PyTorch-2.3%2B-EE4C2C?logo=pytorch&logoColor=white)](https://github.com/alshawai/Deep-Learning-Reference-Hub/blob/main/pyproject.toml)
+[![TensorFlow 2.17+](https://img.shields.io/badge/TensorFlow-2.17%2B-FF6F00?logo=tensorflow&logoColor=white)](https://github.com/alshawai/Deep-Learning-Reference-Hub/blob/main/pyproject.toml)
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
+[![Last updated](https://img.shields.io/github/last-commit/alshawai/Deep-Learning-Reference-Hub?label=Last%20updated&color=blue)](https://github.com/alshawai/Deep-Learning-Reference-Hub/commits/main)
 
----
+</div>
 
-## 📌 Table of Contents
+Deep learning is easier to understand when the equations, implementation, and
+engineering decisions are visible together. This hub pairs readable,
+from-scratch implementations with mathematical explanations, practical guides,
+and concise reference material.
 
-- [Deep Learning Reference Hub](#deep-learning-reference-hub-)
-  - [Table of Contents](#-table-of-contents)
-  - [Purpose](#-purpose)
-  - [Current Content](#-current-content)
-    - [Mathematical Foundations](#-mathematical-foundations)
-    - [Training Techniques](#-training-techniques)
-  - [Quick Start](#-quick-start)
-    - [For Mathematical Understanding](#for-mathematical-understanding)
-    - [For practical Implementation](#for-practical-implementation)
-    - [To Run the Code](#to-run-the-code)
-  - [Code Examples](#️-code-examples)
-  - [Learning Path Recommendations](#-learning-path-recommendations)
-    - [Path 1: Academic/Research Focus](#path-1-academicresearch-focus)
-    - [Path 2: Industry/Practical Focus](#path-2-industrypractical-focus)
-    - [Path 3: Domain-Specific Focus](#path-3-domain-specific-focus)
-  - [How to Navigate](#-how-to-navigate)
-    - [By Difficulty Level](#by-difficulty-level)
-    - [By Application Domain](#by-application-domain)
-    - [By Framework](#by-framework)
-  - [Repository Growth](#-repository-growth)
-  - [Quality Standards](#-quality-standards)
-  - [External Resources](#-external-resources)
-  - [License](#-license)
-  - [Contributing](#-contributing)
-    - [Quick Contribution Steps](#quick-contribution-steps)
-  - [Repository Statistics](#-repository-statistics)
-  - [Acknowledgments](#-acknowledgments)
-  - [Contact](#-contact)
+**[Read the documentation](https://alshawai.github.io/Deep-Learning-Reference-Hub/)**
 
----
+## What you will find here
 
-## 🎯 Purpose
+- **Readable implementations** of optimizers, hyperparameter-search methods,
+  neural-network building blocks, and training techniques.
+- **Mathematical explanations** that derive the algorithms rather than treating
+  them as black boxes.
+- **Practical how-to guides** for choosing optimizers, checking gradients,
+  tuning learning rates, and running hyperparameter searches.
+- **Reference pages** for equations, defaults, tensor shapes, and the public
+  Python API.
+- **Tests grounded in the mathematics**, including hand-computed values,
+  closed-form results, and finite-difference checks.
 
-This repository serves as a living reference guide for deep learning concepts, documenting key techniques, mathematical foundations, and modern best practices. Each document is crafted to be:
+The documentation follows [Diátaxis](https://diataxis.fr/), so learning,
+problem-solving, lookup, and deeper understanding each have a clear home:
 
-- **Comprehensive**: Covers theory, implementation, and practical considerations
-- **Up-to-date**: Incorporates latest research and industry standards
-- **Practical**: Includes working code examples and real-world applications
-- **Educational**: Suitable for both beginners and experienced practitioners
+| If you want to... | Start here |
+| --- | --- |
+| Learn by building something | [Tutorials](https://alshawai.github.io/Deep-Learning-Reference-Hub/tutorials/) |
+| Complete a specific task | [How-to guides](https://alshawai.github.io/Deep-Learning-Reference-Hub/how-to/) |
+| Look up an equation, default, shape, or API | [Reference](https://alshawai.github.io/Deep-Learning-Reference-Hub/reference/) |
+| Understand why a method works | [Explanation](https://alshawai.github.io/Deep-Learning-Reference-Hub/explanation/) |
 
----
+## Suggested learning paths
 
-## 📚 Current Content
+The hub is a reference rather than a fixed course, but these routes provide a
+useful order through the material that exists today.
 
-### 🧮 Mathematical Foundations
-- **[L-Layer Neural Network](docs/explanation/forward-and-backward-propagation.md)**
-  - Complete mathematical derivation for L-layered neural networks
-  - Step-by-step forward and backward propagation equations
-  - Chain rule applications and dimensional analysis
-  - Activation functions and their derivatives
-  - Pure mathematical approach without code examples
+### Foundations
 
-### 🔧 Training Techniques
-- **[Parameters Initialization, Regularization, and Gradient Checking](docs/explanation/parameter-initialization.md)**
-  - Modern parameter initialization techniques (He, Xavier, etc.)
-  - Regularization methods (L1, L2, dropout, batch normalization)
-  - Gradient checking for debugging neural networks
-  - Includes practical code examples and recent best practices
-- **[Optimization Algorithms](docs/explanation/optimization-algorithms.md)**
-  - Comprehensive overview of optimization methods for deep learning
-  - Covers theoretical foundations and practical considerations
-  - Includes step-by-step derivations and use cases for each method
+1. [Forward and backward propagation](https://alshawai.github.io/Deep-Learning-Reference-Hub/explanation/forward-and-backward-propagation/)
+2. [Network shapes and dimensions](https://alshawai.github.io/Deep-Learning-Reference-Hub/reference/network-shapes-and-dimensions/)
+3. [Matrix calculus for neural networks](https://alshawai.github.io/Deep-Learning-Reference-Hub/explanation/matrix-calculus-for-neural-networks/)
+4. [Run a gradient check](https://alshawai.github.io/Deep-Learning-Reference-Hub/how-to/run-a-gradient-check/)
 
----
+### Training a model well
 
-## 🚀 Quick Start
+1. [Parameter initialization](https://alshawai.github.io/Deep-Learning-Reference-Hub/explanation/parameter-initialization/)
+2. [Regularization](https://alshawai.github.io/Deep-Learning-Reference-Hub/explanation/regularization/)
+3. [Optimization algorithms](https://alshawai.github.io/Deep-Learning-Reference-Hub/explanation/optimization-algorithms/)
+4. [Choose an optimizer](https://alshawai.github.io/Deep-Learning-Reference-Hub/how-to/choose-an-optimizer/)
+5. [Tune a learning rate](https://alshawai.github.io/Deep-Learning-Reference-Hub/how-to/tune-learning-rate/)
 
-### For Mathematical Understanding
-Start with **[L-Layer Neural Network](docs/explanation/forward-and-backward-propagation.md)** to understand the fundamental mathematics behind deep learning, including complete derivations and the chain rule applications.
+### Hyperparameter optimization
 
-### For Practical Implementation
-Read **[Parameters Initialization, Regularization, and Gradient Checking](docs/explanation/parameter-initialization.md)** to learn essential training techniques with modern best practices and working code examples.
-Next, explore **[Optimization Algorithms](docs/explanation/optimization-algorithms.md)** to understand how different optimizers, learning rate schedules, and gradient-based methods impact training efficiency and convergence, accompanied by practical implementations.
+1. [The hyperparameter-tuning landscape](https://alshawai.github.io/Deep-Learning-Reference-Hub/explanation/hyperparameter-tuning-landscape/)
+2. [Hyperparameter search methods](https://alshawai.github.io/Deep-Learning-Reference-Hub/reference/hyperparameter-search-methods/)
+3. [Run a hyperparameter search](https://alshawai.github.io/Deep-Learning-Reference-Hub/how-to/run-hyperparameter-search/)
 
-### To Run the Code
+## Install
 
-The implementations install as a package, which puts every dependency they need on your machine in one step:
+Clone the repository and install the NumPy reference package:
 
 ```bash
-git clone https://github.com/eima40x4c/Deep-Learning-Reference-Hub.git
+git clone https://github.com/alshawai/Deep-Learning-Reference-Hub.git
 cd Deep-Learning-Reference-Hub
-pip install -e .
+python -m pip install -e .
 ```
 
-That covers NumPy, SciPy, and Matplotlib, which is everything the from-scratch implementations use. Some documents also show the same idea in TensorFlow or PyTorch; to run those snippets, install the frameworks as well:
+The base installation includes NumPy, SciPy, and Matplotlib. NumPy is the
+reference platform used by the published implementation modules.
+
+Some documentation also demonstrates the same ideas with PyTorch 2.3+ and
+TensorFlow 2.17+ using its bundled Keras API. The framework badges communicate
+the intended minimum compatibility for those optional examples. They do not
+claim that every NumPy implementation already has a framework port; expanding
+that parity is part of the hub's future growth.
+
+Install the optional frameworks when you need those examples:
 
 ```bash
-pip install -e ".[frameworks]"
+python -m pip install -e ".[frameworks]"
 ```
 
-Installing into a virtual environment is worth the extra command, since it keeps these versions from colliding with the rest of your machine:
+## Run the gate
+
+Install the development and documentation dependencies:
 
 ```bash
-python -m venv .venv && source .venv/bin/activate
+python -m pip install -e ".[dev,docs]"
 ```
 
-Contributors need the test and lint tools too — see [CONTRIBUTING.md](CONTRIBUTING.md).
+Then run the same checks enforced by CI:
 
----
-
-## 🛠️ Code Examples
-
-The practical documents include implementations using modern frameworks and techniques:
-- **TensorFlow/Keras** - Production-ready, industry-standard framework
-- **Current best practices** - Industry-standard approaches
-- **Working examples** - Tested and functional code snippets
-
-```python
-# Example: He Initialization in TensorFlow/Keras
-import tensorflow as tf
-
-model = tf.keras.Sequential(
-    [
-        tf.keras.layers.Dense(
-            256, input_shape=(784,), kernel_initializer="he_normal", activation="relu"
-        )
-    ]
-)
-```
----
-
-## 🎓 Learning Path Recommendations
-
-### Path 1: Academic/Research Focus
-```
-Theory → Training Techniques → Architectures → Generative Models → Latest Papers
+```bash
+python tools/hubcheck.py all
+mkdocs build --strict
+ruff format --check .
+ruff check .
+python -m pytest -q
 ```
 
-### Path 2: Industry/Practical Focus
-```
-Theory → Training Techniques → Practical Guides → Code Examples → Deployment → Debugging
-```
+See [CONTRIBUTING.md](CONTRIBUTING.md) for the repository conventions and
+contribution workflow.
 
-### Path 3: Domain-Specific Focus
-```
-Theory → Training Techniques → [Computer Vision OR NLP] → Architectures → Practical Guides
-```
+## Navigate by experience and interest
 
----
+### By depth
 
-## 🔍 How to Navigate
+- **Starting out:** forward propagation, activation functions, parameter
+  initialization, and the optimizer-selection guide.
+- **Building confidence:** backpropagation, regularization, gradient checking,
+  learning-rate schedules, and random search.
+- **Going deeper:** matrix calculus, adaptive optimization, Bayesian
+  optimization, multi-fidelity methods, and population-based training.
 
-### By Difficulty Level
-- 🟢 **Beginner**: Fundamentals, basic architectures
-- 🟡 **Intermediate**: Advanced architectures, optimization techniques
-- 🔴 **Advanced**: Generative models, research-level topics
+These labels describe the background a page assumes, not the importance of its
+subject. The [documentation navigation](https://alshawai.github.io/Deep-Learning-Reference-Hub/)
+is the authoritative index as the hub grows.
 
-### By Application Domain
-- 🖼️ **Computer Vision**: CNN architectures, image processing
-- 📝 **Natural Language Processing**: RNNs, Transformers, language models
-- 🎨 **Generative AI**: GANs, VAEs, diffusion models
+### By subject
 
-### By Framework
-- 🔥 **PyTorch**: Research-oriented implementations
-- 🌊 **TensorFlow**: Production-ready code
-- 🔢 **NumPy**: Educational, algorithmic implementations
+- **Neural-network foundations:** propagation, activations, tensor shapes, and
+  parameter updates.
+- **Training techniques:** initialization, regularization, gradient checking,
+  early stopping, optimizers, and learning-rate schedules.
+- **Hyperparameter optimization:** random and Bayesian search, ASHA and
+  multi-fidelity methods, population-based training, and learning-rate finding.
 
----
+Computer vision, natural language processing, and generative modelling are
+natural future directions, but the README does not list them as current coverage
+until the repository contains material readers can use.
 
-## 📈 Repository Growth
+### By framework
 
-This repository is _actively growing_. New documents will be added covering:
-- Advanced architectures (CNNs, RNNs, Transformers)
-- Optimization techniques
-- Computer vision applications
-- Natural language processing
-- Generative models
+- **NumPy:** the current from-scratch reference implementations.
+- **PyTorch:** optional examples targeting PyTorch 2.3 and newer.
+- **TensorFlow/Keras:** optional examples targeting TensorFlow 2.17 and newer,
+  using the Keras API bundled with TensorFlow.
 
-Each new addition will maintain the same high standards of mathematical rigor and practical applicability.
+## Quality standards
 
----
+The hub aims to be educational without becoming approximate. Contributions are
+expected to preserve:
 
-## 🏆 Quality Standards
+- **Mathematical accuracy:** equations and numerical behavior agree.
+- **Readable implementations:** teaching code exposes the algorithm's important
+  steps instead of hiding them behind abstractions.
+- **Behavioral tests:** tests assert meaningful values and invariants, not only
+  output shapes.
+- **Reproducibility:** examples state seeds, shapes, dtypes, and tolerances when
+  those details affect the result.
+- **Documentation integrity:** strict site builds reject broken links, missing
+  navigation entries, and invalid cross-references.
+- **Consistent Python quality:** Ruff enforces formatting, imports, and NumPy
+  docstring conventions.
 
-Every document in this repository follows strict quality guidelines:
-- ✅ **Mathematical Accuracy**: All derivations are verified and complete
-- ✅ **Practical Relevance**: Modern techniques and best practices
-- ✅ **Educational Value**: Suitable for both learning and reference
-- ✅ **Code Quality**: All examples are tested and functional (where applicable)
-
----
-
-## 📚 External Resources
-
-For a full list of curated deep learning resources (papers, books, and courses), see [Resources.md](Resources.md).
-
-Essential references:
-- **Deep Learning (Goodfellow et al.)** – [deeplearningbook.org](https://www.deeplearningbook.org/)
-- **Adam Optimizer (Kingma & Ba, 2014)** – [arxiv.org/abs/1412.6980](https://arxiv.org/abs/1412.6980)
-
----
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
----
-
-## 🤝 Contributing
-
-We welcome contributions from the community! Please see our [Contributing Guidelines](CONTRIBUTING.md) for details on:
-
-- 📝 **Documentation**: Improving existing guides or adding new topics
-- 💻 **Code Examples**: Adding implementations in different frameworks
-- 🐛 **Bug Reports**: Fixing errors or outdated information
-- 💡 **Suggestions**: Proposing new topics or improvements
-
-### Quick Contribution Steps
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-topic`)
-3. Follow our documentation style guide
-4. Add your contribution
-5. Submit a pull request
-
----
-
-## 📊 Repository Statistics
+## Repository statistics
 
 - **Total Documents**: 21
 - **Code Examples**: 17 implementations
 - **Frameworks Covered**: NumPy
 
+The framework badges above describe optional example compatibility. The checked
+statistics count published implementation modules, which are currently NumPy
+based.
+
+## Contributing
+
+Corrections, clearer explanations, stronger tests, new implementations, and
+carefully chosen references are welcome. Start with
+[CONTRIBUTING.md](CONTRIBUTING.md), and use
+[GitHub Issues](https://github.com/alshawai/Deep-Learning-Reference-Hub/issues)
+to propose or discuss larger changes.
+
+## Acknowledgements
+
+This project builds on the work of researchers, educators, and open-source
+maintainers who make deep learning knowledge accessible. In particular, it
+owes much to Andrew Ng and the Deep Learning Specialization, the authors of the
+papers and books cited throughout the documentation, and the NumPy, SciPy,
+Matplotlib, PyTorch, TensorFlow, and Keras communities.
+
+## License
+
+This project is available under the [MIT License](LICENSE).
+
 ---
 
-## 🙏 Acknowledgments
+<div align="center">
 
-- **Andrew Ng** and the Deep Learning Specialization team for foundational education
-- **The PyTorch and TensorFlow teams** for excellent frameworks
-- **The open-source community** for continuous contributions and feedback
-- **Researchers worldwide** who make their work freely available
+### Learn the mathematics. Read the implementation. Verify the behavior.
 
----
+_A living deep learning reference, built to be understood and improved._
 
-## 📞 Contact
-
-- **Issues**: Please use [GitHub Issues](https://github.com/eima40x4c/deep-learning-reference-hub/issues)
-- **Email**: [Eima40x4c](mailto:imalwaysforlife@gmail.com)
-
----
-
-#### ⭐ **Star this repository** if you find it helpful! It motivates us to keep improving and adding new content.
-
-## $\text{Happy Learning! - Made with Love}$ ❤️
+</div>
