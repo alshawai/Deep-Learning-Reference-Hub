@@ -104,12 +104,13 @@ class MultiFidelityResult:
 
     Attributes
     ----------
-    best_config : dict
-        Best hyperparameter configuration found
-    best_score : float
-        Best score achieved
-    best_fidelity : int
-        Fidelity level of best result
+    best_config : dict or None
+        Best hyperparameter configuration found, or None if the run recorded no
+        results at all (see Notes)
+    best_score : float or None
+        Best score achieved, or None for a run with no results
+    best_fidelity : int or None
+        Fidelity level of best result, or None for a run with no results
     all_results : list
         All evaluation results
     total_time : float
@@ -117,12 +118,25 @@ class MultiFidelityResult:
     total_budget_used : int
         Total computational budget consumed
     statistics : dict
-        Optimization statistics and analysis
+        Optimization statistics and analysis, empty for a run with no results
+
+    Notes
+    -----
+    A run can legitimately record nothing: `max_iterations=0` grants no budget,
+    and a `timeout` that has already elapsed stops the first submission. Both
+    return this dataclass with the three `best_*` fields set to None rather than
+    raising, so the three are optional together -- either all are None or none
+    are. `all_results` is empty and `statistics` is `{}` in exactly those runs,
+    so `if result.best_config is None` and `if not result.all_results` are
+    equivalent tests.
+
+    An empty `initial_configurations` is caller error rather than an empty run,
+    and `ASHAOptimizer.optimize` rejects it with a ValueError.
     """
 
-    best_config: dict[str, Any]
-    best_score: float
-    best_fidelity: int
+    best_config: dict[str, Any] | None
+    best_score: float | None
+    best_fidelity: int | None
     all_results: list[CandidateResult]
     total_time: float
     total_budget_used: int
@@ -434,7 +448,7 @@ class ASHAOptimizer:
         Parameters
         ----------
         initial_configurations : list
-            Initial hyperparameter configurations to evaluate
+            Initial hyperparameter configurations to evaluate. Must be non-empty.
         max_iterations : int, default=100
             Maximum number of evaluations to perform. Counted at submission, and
             every submitted evaluation is recorded, so this bounds the results as
@@ -449,8 +463,24 @@ class ASHAOptimizer:
         Returns
         -------
         MultiFidelityResult
-            Optimization results
+            Optimization results. A run granted no budget -- `max_iterations=0`,
+            or a `timeout` already elapsed -- records nothing and reports
+            `best_config`, `best_score`, and `best_fidelity` as None.
+
+        Raises
+        ------
+        ValueError
+            If `initial_configurations` is empty. A search with no candidates has
+            no answer to return, and an empty list is more often a search space
+            that filtered down to nothing than a deliberate no-op -- so it is
+            reported rather than absorbed into an empty result.
         """
+        if not initial_configurations:
+            raise ValueError(
+                "initial_configurations is empty; ASHA needs at least one "
+                "candidate to search"
+            )
+
         if verbose:
             print("Starting ASHA Multi-Fidelity Optimization...")
             print(f"Reduction factor: {self.reduction_factor}")
@@ -482,11 +512,19 @@ class ASHAOptimizer:
             self._add_result(result)
             evaluations_completed += 1
 
-            if verbose and evaluations_completed % max(1, max_iterations // 20) == 0:
+            # `_add_result` has just run, so `best_result` is set; reading it into
+            # a local says that to the type checker, and takes one attribute read
+            # rather than two off an object other threads are writing.
+            best = self.best_result
+            if (
+                verbose
+                and best is not None
+                and evaluations_completed % max(1, max_iterations // 20) == 0
+            ):
                 print(
                     f"Completed {evaluations_completed} evaluations - "
-                    f"Best score: {self.best_result.score:.6f} "  # type: ignore
-                    f"(fidelity {self.best_result.fidelity})"  # type: ignore
+                    f"Best score: {best.score:.6f} "
+                    f"(fidelity {best.fidelity})"
                 )
 
         with ThreadPoolExecutor(max_workers=self.max_concurrent) as executor:
@@ -572,14 +610,22 @@ class ASHAOptimizer:
             print(f"\nOptimization completed in {total_time:.2f} seconds!")
             print(f"Total evaluations: {evaluations_completed}")
             print(f"Total budget used: {self.total_budget_used}")
-            print(f"Best score: {self.best_result.score:.6f}")  # type: ignore
-            print(f"Best configuration: {self.best_result.hyperparams}")  # type: ignore
-            print(f"Best fidelity: {self.best_result.fidelity}")  # type: ignore
+            # `best_result` is None exactly when nothing was recorded, which the
+            # budget limits make reachable without any caller error: the summary
+            # says so rather than dereferencing it.
+            if self.best_result is None:
+                print("No evaluation completed - no best configuration to report")
+            else:
+                print(f"Best score: {self.best_result.score:.6f}")
+                print(f"Best configuration: {self.best_result.hyperparams}")
+                print(f"Best fidelity: {self.best_result.fidelity}")
+
+        best = self.best_result
 
         return MultiFidelityResult(
-            best_config=self.best_result.hyperparams,  # type: ignore
-            best_score=self.best_result.score,  # type: ignore
-            best_fidelity=self.best_result.fidelity,  # type: ignore
+            best_config=best.hyperparams if best is not None else None,
+            best_score=best.score if best is not None else None,
+            best_fidelity=best.fidelity if best is not None else None,
             all_results=self.results_history,
             total_time=total_time,
             total_budget_used=self.total_budget_used,
@@ -609,6 +655,12 @@ class ASHAOptimizer:
         all_scores = [r.score for r in self.results_history if r.score != -np.inf]
         all_times = [r.training_time for r in self.results_history]
 
+        # Reached only past the empty-history guard at the top of the method, so
+        # `_add_result` has run and this is set. Testing it anyway is what lets
+        # the `type: ignore` come off -- the guard is real, but a checker cannot
+        # connect it to this attribute.
+        best = self.best_result
+
         statistics = {
             "total_evaluations": len(self.results_history),
             "successful_evaluations": len(all_scores),
@@ -619,8 +671,8 @@ class ASHAOptimizer:
             "total_training_time": np.sum(all_times),
             "fidelity_analysis": fidelity_analysis,
             "budget_efficiency": (
-                self.best_result.score / self.total_budget_used  # type: ignore
-                if self.total_budget_used > 0
+                best.score / self.total_budget_used
+                if best is not None and self.total_budget_used > 0
                 else 0.0
             ),
             "rungs_used": len([r for r in self.rungs if r["candidates"]]),
@@ -649,7 +701,7 @@ def asha_optimize(
     eval_function : callable
         Function that takes (hyperparams, fidelity) and returns (score, metadata)
     initial_configurations : list
-        Initial hyperparameter configurations to evaluate
+        Initial hyperparameter configurations to evaluate; must be non-empty
     min_fidelity : int, default=1
         Minimum fidelity level
     max_fidelity : int, default=81
@@ -670,7 +722,13 @@ def asha_optimize(
     Returns
     -------
     MultiFidelityResult
-        Optimization results
+        Optimization results. The three `best_*` fields are None if the run was
+        granted no budget and so recorded nothing.
+
+    Raises
+    ------
+    ValueError
+        If `initial_configurations` is empty
 
     Examples
     --------

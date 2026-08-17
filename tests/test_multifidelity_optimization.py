@@ -338,6 +338,95 @@ class TestBudgetAndLimits:
         assert result.total_budget_used == sum(r.fidelity for r in result.all_results)
 
 
+class TestARunThatRecordsNothing:
+    """
+    The empty run (issue #12).
+
+    `best_result` starts as None and only `_add_result` assigns it, so a run that
+    records nothing used to dereference None and raise `AttributeError` naming
+    `NoneType` -- from the return statement, or one line earlier from the verbose
+    summary. Three inputs reach it, and they do not all mean the same thing:
+
+    No candidates is caller error. An empty list is more often a search space
+    that filtered down to nothing than a deliberate no-op, so it is reported as a
+    `ValueError` naming the argument.
+
+    No budget is a limit doing its job. `max_iterations=0` grants none, and a
+    `timeout` already elapsed stops the first submission; both are legitimate and
+    return the dataclass with the three `best_*` fields None.
+    """
+
+    def test_no_candidates_to_search_is_rejected(self):
+        with pytest.raises(ValueError, match="initial_configurations is empty"):
+            run(n_configs=0)
+
+    def test_the_rejection_names_the_argument_the_caller_passed(self):
+        """
+        The point of the change. `AttributeError: 'NoneType' object has no
+        attribute 'hyperparams'` names an internal that no caller passed; the
+        message has to name `initial_configurations` to be actionable.
+        """
+        with pytest.raises(ValueError) as excinfo:
+            run(n_configs=0)
+        assert "initial_configurations" in str(excinfo.value)
+
+    @pytest.mark.parametrize(
+        "label, options",
+        [
+            ("no budget", {"max_iterations": 0}),
+            ("timeout already elapsed", {"max_iterations": 10, "timeout": 1e-9}),
+        ],
+    )
+    def test_a_run_granted_no_budget_reports_an_empty_run(self, label, options):
+        result = run(n_configs=27, **options)
+
+        assert result.all_results == []
+        assert result.best_config is None
+        assert result.best_score is None
+        assert result.best_fidelity is None
+        assert result.total_budget_used == 0
+        assert result.statistics == {}
+
+    def test_the_three_best_fields_are_absent_together(self):
+        """
+        The invariant the optional fields carry: either all three describe a real
+        evaluation or all three are None. A half-populated result would let a
+        caller read `best_score` as a number while `best_config` is None.
+        """
+        empty = run(n_configs=27, max_iterations=0)
+        populated = run(n_configs=9)
+
+        assert [empty.best_config, empty.best_score, empty.best_fidelity] == [
+            None,
+            None,
+            None,
+        ]
+        assert all(
+            field is not None
+            for field in (
+                populated.best_config,
+                populated.best_score,
+                populated.best_fidelity,
+            )
+        )
+
+    def test_an_empty_run_is_recognizable_without_touching_the_best_fields(self):
+        """
+        `all_results` being empty and `best_config` being None are the same
+        condition, so a caller may branch on whichever reads better.
+        """
+        result = run(n_configs=27, max_iterations=0)
+        assert (result.best_config is None) == (not result.all_results)
+
+    def test_the_verbose_summary_of_an_empty_run_says_so(self, capsys):
+        """
+        `verbose=True` raised one line before the return statement, for the same
+        reason. It has its own guard, so it needs its own test.
+        """
+        run(n_configs=27, max_iterations=0, verbose=True)
+        assert "no best configuration to report" in capsys.readouterr().out
+
+
 class TestConcurrency:
     """
     What extra workers must preserve, and what they are allowed to change.
