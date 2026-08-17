@@ -436,9 +436,13 @@ class ASHAOptimizer:
         initial_configurations : list
             Initial hyperparameter configurations to evaluate
         max_iterations : int, default=100
-            Maximum number of evaluations to perform
+            Maximum number of evaluations to perform. Counted at submission, and
+            every submitted evaluation is recorded, so this bounds the results as
+            well as the work -- at any `max_concurrent`.
         timeout : float, optional
-            Maximum time in seconds (None for no timeout)
+            Maximum time in seconds (None for no timeout). Evaluations already
+            running when the clock runs out are still awaited and recorded; the
+            timeout stops new submissions, it does not cancel paid-for work.
         verbose : bool, default=True
             Whether to print progress information
 
@@ -464,6 +468,26 @@ class ASHAOptimizer:
         for config_id, (config, fidelity) in self.active_evaluations.items():
             work_queue.append((config_id, config, fidelity))
         self.active_evaluations.clear()
+
+        def record(future, config_id: int) -> None:
+            """Move one finished evaluation into the results, or warn."""
+            nonlocal evaluations_completed
+
+            try:
+                result = future.result()
+            except Exception as e:
+                warnings.warn(f"Future failed for config {config_id}: {e}")
+                return
+
+            self._add_result(result)
+            evaluations_completed += 1
+
+            if verbose and evaluations_completed % max(1, max_iterations // 20) == 0:
+                print(
+                    f"Completed {evaluations_completed} evaluations - "
+                    f"Best score: {self.best_result.score:.6f} "  # type: ignore
+                    f"(fidelity {self.best_result.fidelity})"  # type: ignore
+                )
 
         with ThreadPoolExecutor(max_workers=self.max_concurrent) as executor:
             active_futures = {}
@@ -513,27 +537,8 @@ class ASHAOptimizer:
                         pass
 
                     for future in completed_futures:
-                        config_id, hyperparams, fidelity = active_futures[future]
-                        del active_futures[future]
-
-                        try:
-                            result = future.result()
-                            self._add_result(result)
-                            evaluations_completed += 1
-
-                            if (
-                                verbose
-                                and evaluations_completed % max(1, max_iterations // 20)
-                                == 0
-                            ):
-                                print(
-                                    f"Completed {evaluations_completed} evaluations - "
-                                    f"Best score: {self.best_result.score:.6f} "  # type: ignore
-                                    f"(fidelity {self.best_result.fidelity})"  # type: ignore
-                                )
-
-                        except Exception as e:
-                            warnings.warn(f"Future failed for config {config_id}: {e}")
+                        config_id, _, _ = active_futures.pop(future)
+                        record(future, config_id)
 
                 # Break if no more work and no active evaluations
                 if not active_futures and not work_queue:
@@ -546,6 +551,18 @@ class ASHAOptimizer:
                             print("No more configurations to evaluate - stopping")
                         break
                     work_queue.append(next_work)
+
+            # Whatever is still in flight when the loop exits has already been
+            # submitted, so the pool will compute it whether or not anyone waits:
+            # `ThreadPoolExecutor.__exit__` joins every worker. Recording it is
+            # therefore free, and discarding it would under-report
+            # `total_budget_used` by up to `max_concurrent - 1` evaluations --
+            # flattering `budget_efficiency` with work the run really paid for.
+            # This also keeps `max_iterations` meaning one thing at any worker
+            # count: submissions, which now all become results.
+            for future, (config_id, _, _) in list(active_futures.items()):
+                record(future, config_id)
+            active_futures.clear()
 
         total_time = time.time() - start_time
 
@@ -640,11 +657,11 @@ def asha_optimize(
     reduction_factor : int, default=3
         ASHA reduction factor
     max_iterations : int, default=100
-        Maximum number of evaluations
+        Maximum number of evaluations, performed and recorded alike
     max_concurrent : int, default=4
         Maximum concurrent evaluations
     timeout : float, optional
-        Timeout in seconds
+        Timeout in seconds; evaluations already running are still awaited
     random_state : int, optional
         Random seed
     verbose : bool, default=True

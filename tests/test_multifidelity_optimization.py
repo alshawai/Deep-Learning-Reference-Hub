@@ -248,6 +248,35 @@ class TestBudgetAndLimits:
         result = run(n_configs=27, max_iterations=10)
         assert len(result.all_results) <= 10
 
+    @pytest.mark.parametrize("max_concurrent", [1, 2, 4, 8])
+    def test_max_iterations_means_the_same_at_every_worker_count(self, max_concurrent):
+        """
+        Regression test (issue #11). `max_iterations` is counted at submission,
+        and the pool computes every submission whether or not the loop is still
+        watching -- `ThreadPoolExecutor.__exit__` joins its workers. So the
+        evaluations in flight when the limit tripped used to be paid for and then
+        dropped, leaving `max_iterations` a cap on evaluations *performed* when
+        serial and on evaluations *recorded* when parallel, short by up to
+        `max_concurrent - 1`.
+        """
+        counted = []
+        lock = threading.Lock()
+
+        def counting_eval(hyperparams, fidelity):
+            with lock:
+                counted.append(fidelity)
+            return ranked_eval(hyperparams, fidelity)
+
+        result = run(
+            n_configs=27,
+            eval_function=counting_eval,
+            max_iterations=10,
+            max_concurrent=max_concurrent,
+        )
+
+        assert len(counted) == 10
+        assert len(result.all_results) == len(counted)
+
     def test_the_run_stops_when_the_ladder_is_exhausted(self):
         """With three configurations there is one promotion available, then none."""
         result = run(n_configs=3, max_iterations=300)
@@ -255,6 +284,57 @@ class TestBudgetAndLimits:
 
     def test_the_recorded_budget_is_the_sum_of_the_fidelities_evaluated(self):
         result = run(n_configs=9)
+        assert result.total_budget_used == sum(r.fidelity for r in result.all_results)
+
+    def test_the_budget_accounts_for_every_evaluation_the_run_paid_for(self):
+        """
+        The module's headline claim. `budget_efficiency` and the ladder-is-cheaper
+        test both rest on `total_budget_used` being what the run actually spent,
+        so an evaluation computed by the pool and dropped by the scheduler makes
+        the efficiency number flattering by exactly the fidelity it cost.
+        """
+        spent = []
+        lock = threading.Lock()
+
+        def counting_eval(hyperparams, fidelity):
+            with lock:
+                spent.append(fidelity)
+            return ranked_eval(hyperparams, fidelity)
+
+        result = run(
+            n_configs=27,
+            eval_function=counting_eval,
+            max_iterations=10,
+            max_concurrent=4,
+        )
+
+        assert result.total_budget_used == sum(spent)
+
+    def test_a_timeout_still_records_the_evaluations_already_running(self):
+        """
+        The timeout stops new submissions; it cannot un-spend an evaluation the
+        pool is already running.
+
+        The slow evaluation has to outlast the scheduler's one-second poll, or
+        `as_completed` hands it back inside the loop and the drain is never
+        reached -- at half a second this test passes against the unfixed
+        scheduler.
+        """
+
+        def slow_on_the_strongest(hyperparams, fidelity):
+            if hyperparams["q"] == 0.0:
+                time.sleep(1.3)
+            return ranked_eval(hyperparams, fidelity)
+
+        result = run(
+            n_configs=3,
+            eval_function=slow_on_the_strongest,
+            max_fidelity=9,
+            max_concurrent=2,
+            timeout=0.1,
+        )
+
+        assert 0.0 in {r.hyperparams["q"] for r in result.all_results}
         assert result.total_budget_used == sum(r.fidelity for r in result.all_results)
 
 
