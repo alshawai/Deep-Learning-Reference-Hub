@@ -38,6 +38,7 @@ from abc import ABC, abstractmethod
 from collections import defaultdict
 from collections.abc import Callable
 from concurrent.futures import ThreadPoolExecutor, as_completed
+from concurrent.futures import TimeoutError as FuturesTimeoutError
 from dataclasses import dataclass, field
 from typing import Any
 
@@ -494,10 +495,22 @@ class ASHAOptimizer:
                         break
 
                 if active_futures:
+                    # The one-second bound is a poll interval, not a deadline: it
+                    # returns control to the loop so `max_iterations` and
+                    # `timeout` get re-checked while evaluations are still
+                    # running. `as_completed` reports an elapsed poll by raising,
+                    # and a tuner exists to run evaluations that take minutes, so
+                    # letting that escape would abort every realistic run the
+                    # moment no evaluation happened to finish within a second.
+                    # Before 3.11 this is not the builtin `TimeoutError`, so it
+                    # is caught under its own name rather than by coincidence.
                     completed_futures = []
-                    for future in as_completed(active_futures, timeout=1.0):
-                        completed_futures.append(future)
-                        break  # Process one at a time for responsiveness
+                    try:
+                        for future in as_completed(active_futures, timeout=1.0):
+                            completed_futures.append(future)
+                            break  # Process one at a time for responsiveness
+                    except FuturesTimeoutError:
+                        pass
 
                     for future in completed_futures:
                         config_id, hyperparams, fidelity = active_futures[future]

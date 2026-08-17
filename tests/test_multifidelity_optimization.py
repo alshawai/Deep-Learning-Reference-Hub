@@ -12,6 +12,12 @@ The evaluator used throughout is a pure function of the configuration and the
 fidelity, so which configuration deserves promotion is known before the run
 starts.
 
+Concurrency gets its own class, because the interesting property of ASHA is one
+it deliberately gives up. Promotion happens on partial information, so the
+promotion set depends on arrival order and two worker counts need not agree.
+`TestConcurrency` asserts what does survive extra workers and documents what
+does not.
+
 Author
 ------
 Deep Learning Reference Hub
@@ -21,6 +27,8 @@ License
 MIT
 """
 
+import threading
+import time
 from collections import Counter
 
 import numpy as np
@@ -36,6 +44,9 @@ from dlhub.tuning.multifidelity import (
     asha_optimize,
 )
 
+# The rung budgets for min_fidelity=1, max_fidelity=81, reduction_factor=3.
+LADDER = [1, 3, 9, 27, 81]
+
 
 def ranked_eval(hyperparams, fidelity):
     """
@@ -43,6 +54,11 @@ def ranked_eval(hyperparams, fidelity):
 
     Deterministic on purpose: the ordering of configurations is fixed, so a test
     can name which ones should survive to the top rung.
+
+    The quality term also dominates the fidelity term -- the whole ladder is
+    worth 0.01 * 81 = 0.81, less than the gap of 1.0 between adjacent `q`. So no
+    amount of extra budget lets one configuration overtake a better one, and the
+    winner of a run is known without knowing how far up the ladder it climbed.
     """
     return hyperparams["q"] + 0.01 * fidelity, {"fidelity": fidelity}
 
@@ -51,7 +67,7 @@ def configs(n):
     return [{"q": float(i)} for i in range(n)]
 
 
-def run(n_configs=27, **kwargs):
+def run(n_configs=27, eval_function=ranked_eval, **kwargs):
     options = {
         "min_fidelity": 1,
         "max_fidelity": 81,
@@ -61,7 +77,64 @@ def run(n_configs=27, **kwargs):
         "verbose": False,
     }
     options.update(kwargs)
-    return asha_optimize(ranked_eval, configs(n_configs), **options)
+    return asha_optimize(eval_function, configs(n_configs), **options)
+
+
+class HoldsBackTheStrongest:
+    """
+    Evaluator that forces the arrival order concurrency makes possible.
+
+    An evaluator that returns instantly arrives in submission order, so a
+    parallel run lands on the serial answer every time and the asynchronous path
+    goes untested -- 200 runs of the old test in isolation produced the serial
+    result 200 times, while a full-suite run failed roughly one time in ten.
+    Reproducing the skew deliberately is the only way to assert anything about
+    it: the strongest configurations are withheld at the cheapest fidelity until
+    `release_after_promotions` promotions have been claimed without them, which
+    is what a loaded machine does by accident.
+
+    Needs at least two workers, one to hold and one to claim promotions. Given
+    one worker the held evaluations wait out `timeout` instead, which leaves the
+    run correct and merely slow.
+
+    Parameters
+    ----------
+    hold_at_or_above : float
+        Configurations whose `q` is at least this are held at the cheapest
+        fidelity.
+    release_after_promotions : int
+        How many promotions to let through before releasing them.
+    timeout : float, default=2.0
+        Upper bound on a single hold, so that a change to the scheduler cannot
+        hang the suite waiting for a promotion that never comes.
+    """
+
+    def __init__(self, hold_at_or_above, release_after_promotions, timeout=2.0):
+        self.hold_at_or_above = hold_at_or_above
+        self.release_after_promotions = release_after_promotions
+        self.timeout = timeout
+        self._released = threading.Event()
+        self._lock = threading.Lock()
+        self._promotions = 0
+
+    def __call__(self, hyperparams, fidelity):
+        if fidelity > LADDER[0]:  # anything above the cheapest rung is a promotion
+            with self._lock:
+                self._promotions += 1
+                reached = self._promotions >= self.release_after_promotions
+            if reached:
+                self._released.set()
+        elif hyperparams["q"] >= self.hold_at_or_above:
+            self._released.wait(timeout=self.timeout)
+        return ranked_eval(hyperparams, fidelity)
+
+
+def promoted_out_of_the_cheapest_rung(result):
+    """The `q` of every configuration that reached the second rung, best first."""
+    return sorted(
+        (r.hyperparams["q"] for r in result.all_results if r.fidelity == LADDER[1]),
+        reverse=True,
+    )
 
 
 class TestRungLadder:
@@ -184,17 +257,146 @@ class TestBudgetAndLimits:
         result = run(n_configs=9)
         assert result.total_budget_used == sum(r.fidelity for r in result.all_results)
 
-    def test_concurrency_does_not_change_which_configurations_win(self):
+
+class TestConcurrency:
+    """
+    What extra workers must preserve, and what they are allowed to change.
+
+    The "A" in ASHA is asynchronous. A rung promotes the top
+    1 / reduction_factor of whatever has arrived, without waiting for the rung to
+    fill, so the promotion set is a function of arrival order and arrival order
+    is a function of thread scheduling. Pinning the set to the serial run's
+    asserts something the algorithm does not offer, and the assertion that did
+    so failed roughly one full-suite run in ten (issue #4). Exact
+    cross-worker reproducibility would be a change to the scheduler -- drain
+    each rung before promoting -- and it would cost the asynchrony that makes
+    ASHA worth using.
+
+    What concurrency does have to preserve is the bookkeeping: the lock's job,
+    the shape of the ladder, and the identity of the winner. Every test here
+    holds back the strongest configurations, because a parallel run whose
+    evaluator returns instantly reproduces the serial run and proves nothing.
+    """
+
+    def test_no_configuration_is_evaluated_twice_at_one_fidelity(self):
         """
-        The promotion bookkeeping is shared mutable state behind a lock. Four
-        workers claiming promotions must reach the same survivors as one.
+        The lock's real job. Two workers claiming the same promotion would spend
+        the budget twice and report the same configuration twice at one rung.
         """
-        serial = run(n_configs=27, max_concurrent=1)
-        parallel = run(n_configs=27, max_concurrent=4)
-        assert parallel.best_config == serial.best_config
-        assert Counter(r.fidelity for r in parallel.all_results) == Counter(
-            r.fidelity for r in serial.all_results
+        result = run(max_concurrent=4, eval_function=HoldsBackTheStrongest(24.0, 6))
+        seen = Counter((r.config_id, r.fidelity) for r in result.all_results)
+        assert max(seen.values()) == 1
+
+    def test_no_configuration_is_dropped_before_it_is_judged(self):
+        """
+        A promotion claimed and then discarded costs a configuration its only
+        evaluation, and the run would still look healthy -- one fewer result at
+        the cheapest rung is invisible in the reported best.
+        """
+        result = run(max_concurrent=4, eval_function=HoldsBackTheStrongest(24.0, 6))
+        evaluated = {r.config_id for r in result.all_results if r.fidelity == LADDER[0]}
+        assert evaluated == set(range(27))
+
+    def test_a_promotion_climbs_the_ladder_one_rung_at_a_time(self):
+        """
+        Rung geometry. Every fidelity is a rung budget, and a configuration that
+        reached rung k was evaluated at every rung below it -- no configuration
+        skips a rung to arrive at an expensive fidelity unjudged.
+        """
+        result = run(max_concurrent=4, eval_function=HoldsBackTheStrongest(24.0, 6))
+        reached = {}
+        for record in result.all_results:
+            reached.setdefault(record.config_id, set()).add(record.fidelity)
+        for fidelities in reached.values():
+            top = max(LADDER.index(f) for f in fidelities)
+            assert sorted(fidelities) == LADDER[: top + 1]
+
+    def test_every_configuration_the_serial_run_promotes_is_still_promoted(self):
+        """
+        The strong are never lost. A run ends only once no promotion is
+        claimable, and by then the cheapest rung holds every result -- so
+        whichever configurations the full rung ranks in its top third have all
+        been promoted, however the arrivals were ordered.
+        """
+        serial = run(max_concurrent=1)
+        parallel = run(max_concurrent=4, eval_function=HoldsBackTheStrongest(24.0, 6))
+        assert set(promoted_out_of_the_cheapest_rung(serial)) <= set(
+            promoted_out_of_the_cheapest_rung(parallel)
         )
+
+    def test_the_winner_is_the_one_the_serial_run_finds(self):
+        """
+        Not luck, and not a weaker claim than the old assertion: `ranked_eval`
+        gives the whole ladder less weight than one step of `q`, and every
+        configuration is evaluated at the cheapest fidelity, so the best `q`
+        wins whatever the scheduling did. Only `best_score` is free to vary,
+        with how far the winner climbed.
+        """
+        serial = run(max_concurrent=1)
+        parallel = run(max_concurrent=4, eval_function=HoldsBackTheStrongest(24.0, 6))
+        assert parallel.best_config == serial.best_config
+
+    def test_a_partial_rung_may_promote_more_than_the_serial_run(self):
+        """
+        The behaviour the old assertion forbade, pinned here so that it is not
+        quietly forbidden again.
+
+        Seven promotions are claimed while the three strongest configurations
+        are still reporting, so the rung is judged on 24 results and promotes
+        its top 24 // 3 = 8 -- reaching q=17, which the full rung of 27 ranks
+        tenth and would not have promoted. The three then arrive and are
+        promoted as the top of 27 // 3 = 9. Ten promotions where the serial run
+        makes nine, and both are correct ASHA.
+
+        The overshoot is at the margin, not arbitrary: the promoted set stays a
+        contiguous block from the top, so asynchrony costs a little wasted
+        budget on near-misses rather than promoting a bad configuration.
+        """
+        serial = run(max_concurrent=1)
+        parallel = run(max_concurrent=4, eval_function=HoldsBackTheStrongest(24.0, 6))
+        serial_promoted = promoted_out_of_the_cheapest_rung(serial)
+        parallel_promoted = promoted_out_of_the_cheapest_rung(parallel)
+
+        assert serial_promoted == [float(q) for q in range(26, 17, -1)]
+        assert len(parallel_promoted) > len(serial_promoted)
+        assert parallel_promoted == [
+            float(q) for q in range(26, 26 - len(parallel_promoted), -1)
+        ]
+
+    def test_an_evaluation_slower_than_the_scheduler_poll_completes(self):
+        """
+        Regression test. The scheduler collects results with
+        `as_completed(..., timeout=1.0)`, meaning it to be a poll interval that
+        returns control to the loop so the iteration and time limits get
+        re-checked. `as_completed` reports an elapsed timeout by raising, and
+        that was not caught, so a run aborted with `TimeoutError` whenever no
+        evaluation happened to finish inside a second.
+
+        Which is every run this module is for -- its own notes recommend it when
+        "training time is expensive". Every other test here passes only because
+        its evaluator returns in microseconds.
+
+        Only the first evaluation needs to outlast the poll: what is under test
+        is that the scheduler survives an elapsed poll, not how many it survives.
+        """
+        slow_calls = []
+
+        def slow_on_the_first_call(hyperparams, fidelity):
+            slow_calls.append(fidelity)
+            if len(slow_calls) == 1:
+                time.sleep(1.2)
+            return ranked_eval(hyperparams, fidelity)
+
+        result = run(
+            n_configs=3,
+            eval_function=slow_on_the_first_call,
+            max_fidelity=9,
+            max_concurrent=2,
+        )
+        assert max(r.training_time for r in result.all_results) > 1.0
+        # Three at the cheapest rung, then the one promotion the ladder allows.
+        assert len(result.all_results) == 4
+        assert result.best_fidelity == LADDER[1]
 
 
 class TestFailureHandling:
