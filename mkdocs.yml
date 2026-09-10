@@ -53,6 +53,15 @@ plugins:
   # `search` is on by default, but naming any plugin replaces that default
   # rather than adding to it, so it has to be listed again here.
   - search
+  # Renders the tutorial notebooks as pages. `execute: true` re-runs every
+  # notebook at build time, so a committed output cannot drift from the code
+  # that produced it -- the same reason the API reference is generated rather
+  # than hand-written. It follows that a tutorial notebook may import only what
+  # the docs build installs (numpy, scipy, the dlhub package): a notebook that
+  # imports a framework would need that framework in the docs CI job to build.
+  - mkdocs-jupyter:
+      execute: true
+      include_source: true
   # The API reference is generated from the docstrings the house style already
   # requires, which is what keeps that section true without anyone maintaining
   # it. A hand-written signature is the first documentation to go stale.

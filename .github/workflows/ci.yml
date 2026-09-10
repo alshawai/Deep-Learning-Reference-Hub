@@ -26,6 +26,11 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -e ".[dev,docs]"
+          # execute: true in mkdocs.yml runs each tutorial notebook at build
+          # time, which needs a discoverable kernel. pip installs ipykernel but
+          # does not register a kernelspec; --sys-prefix puts one inside this
+          # job's environment without touching a shared user directory.
+          python -m ipykernel install --sys-prefix
 
       # These two cover the Markdown the site build does not: README,
       # CONTRIBUTING, and anything not yet filed into docs/. The strict build
