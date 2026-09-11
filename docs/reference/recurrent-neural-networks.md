@@ -1,4 +1,4 @@
-# Recurrent Neural Networks
+# Recurrent neural networks
 
 This page is the lookup reference for the vanilla (simple) recurrent network: the
 recurrence relation, forward propagation through time, backpropagation through
