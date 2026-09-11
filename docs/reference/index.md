@@ -39,6 +39,8 @@ Drawn from the lookup material currently embedded in the source documents:
 
 - **[Network shapes and dimensions](network-shapes-and-dimensions.md)** — the forward and backward dimension tables
   from the L-layer derivation, and its dimensional-analysis verifications.
+- **[Recurrent neural networks](recurrent-neural-networks.md)** — the RNN recurrence and its forward/backward
+  shapes, with the backpropagation-through-time gradient equations in lookup form.
 - **[Activation functions](activation-functions.md)** — each function with its derivative.
 - **[Parameter update rule](parameter-update-rule.md)** — the gradient-descent
   update equations for an L-layer network.

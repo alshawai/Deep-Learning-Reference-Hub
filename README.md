@@ -169,13 +169,14 @@ expected to preserve:
 
 ## Repository statistics
 
-- **Total Documents**: 21
-- **Code Examples**: 17 implementations
-- **Frameworks Covered**: NumPy
+- **Total Documents**: 23
+- **Code Examples**: 19 implementations
+- **Jupyter Notebooks**: 1
+- **Frameworks Covered**: NumPy, PyTorch
 
 The framework badges above describe optional example compatibility. The checked
-statistics count published implementation modules, which are currently NumPy
-based.
+statistics count published implementation modules: the NumPy from-scratch
+references and, so far, one PyTorch parity port checked against them.
 
 ## Contributing
 

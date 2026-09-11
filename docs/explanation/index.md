@@ -54,3 +54,5 @@ Drawn from the conceptual material currently embedded in the source documents:
   it is a debugging tool rather than a training one.
 - **[The hyperparameter tuning landscape](hyperparameter-tuning-landscape.md)** — why some hyperparameters matter far
   more than others, and why random search beats grid search.
+- **[Recurrent neural networks](recurrent-neural-networks.md)** — why a long-range gradient vanishes or explodes in an
+  RNN, tied to the recurrent weight's spectral radius, and what gradient clipping does and does not fix.

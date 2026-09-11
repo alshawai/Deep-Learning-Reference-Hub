@@ -4,23 +4,27 @@ A tutorial is a lesson. It takes a reader who does not yet know the subject and
 walks them through building one working thing, end to end, making every decision
 for them along the way.
 
-## This section is empty
+## Tutorials here
 
-That is a gap, not an oversight, and it is recorded here rather than hidden.
-Nothing in this hub currently takes a reader from nothing to a working network
-in a single guided pass — the material that exists explains the mathematics and
-documents the implementations, both of which assume a reader who already knows
-what they are building.
+- **[Recurrent neural networks: watching gradients vanish through time](01-recurrent-neural-networks.ipynb)**
+  — a runnable notebook. You supervise a single timestep of a vanilla RNN,
+  back-propagate through time, and measure how much of the learning signal
+  survives the trip back to each earlier step, turning the vanishing-gradient
+  problem from a claim into a curve you have plotted. It imports the hub's
+  canonical `dlhub.nn.sequence.rnn`, so the lesson cannot drift from the code it
+  teaches.
 
-**The first tutorial should be the construction of an L-layer network from
-scratch**: initialise the parameters, implement one forward pass, derive and
-implement one backward pass, verify the gradients numerically, then train it on
-a small problem the reader can watch converge. The
+## Still missing
+
+**A from-scratch construction of an L-layer network**: initialise the
+parameters, implement one forward pass, derive and implement one backward pass,
+verify the gradients numerically, then train it on a small problem the reader
+can watch converge. The
 [forward- and backward-propagation derivation](../explanation/forward-and-backward-propagation.md)
 it draws on is already written; what is missing is the guided path through it.
 
 Writing that tutorial is a content project rather than a documentation move, so
-it is deliberately out of scope for the restructuring that created this section.
+it remains out of scope here — recorded as a gap rather than hidden.
 
 ## What belongs here
 
