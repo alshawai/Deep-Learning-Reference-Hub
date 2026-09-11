@@ -91,7 +91,9 @@ validation:
 
 nav:
   - Home: index.md
-  - Tutorials: tutorials/index.md
+  - Tutorials:
+      - tutorials/index.md
+      - Recurrent neural networks: tutorials/01-recurrent-neural-networks.ipynb
   - How-to guides:
       - how-to/index.md
       - Choose an optimizer: how-to/choose-an-optimizer.md
@@ -101,6 +103,7 @@ nav:
   - Reference:
       - reference/index.md
       - Network shapes and dimensions: reference/network-shapes-and-dimensions.md
+      - Recurrent neural networks: reference/recurrent-neural-networks.md
       - Activation functions: reference/activation-functions.md
       - Parameter update rule: reference/parameter-update-rule.md
       - Optimizer update rules: reference/optimizer-update-rules.md
@@ -124,3 +127,4 @@ nav:
       - Regularization: explanation/regularization.md
       - Gradient checking: explanation/gradient-checking.md
       - Hyperparameter tuning landscape: explanation/hyperparameter-tuning-landscape.md
+      - Recurrent neural networks: explanation/recurrent-neural-networks.md
