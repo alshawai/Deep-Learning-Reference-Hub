@@ -14,6 +14,15 @@ for them along the way.
   canonical `dlhub.nn.sequence.rnn`, so the lesson cannot drift from the code it
   teaches.
 
+- **[LSTM and GRU: the gate that decides what a gradient survives](02-lstm-and-gru.ipynb)**
+  — a runnable notebook, and the answer to the problem the first one measures.
+  You difference the imported LSTM cell to find the forget gate sitting on the
+  diagonal of $\partial c^{\langle t\rangle} / \partial c^{\langle t-1\rangle}$,
+  watch five units of one cell choose five different memory timescales, then pin
+  that gate by hand and measure what it does to the gradient reaching the start
+  of the sequence. It imports `dlhub.nn.sequence.lstm`, `.gru`, and
+  `.min_gated`, and implements nothing of its own.
+
 ## Still missing
 
 **A from-scratch construction of an L-layer network**: initialise the

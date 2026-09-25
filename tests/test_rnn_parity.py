@@ -40,6 +40,9 @@ import pytest
 # import succeeds and every assertion below runs.
 torch = pytest.importorskip("torch")
 
+from dlhub.nn.sequence._gradient_check import (  # noqa: E402  (after the gate)
+    relative_error,
+)
 from dlhub.nn.sequence.rnn import (  # noqa: E402  (after the torch gate)
     compute_loss,
     make_fixture,
@@ -58,13 +61,6 @@ GRAD_RELATIVE_TOLERANCE = 1e-6
 
 # The reference's analytic gradients, each keyed as both modules name it.
 GRADIENT_KEYS = ["dWax", "dWaa", "dWya", "dba", "dby", "da0", "dx"]
-
-
-def relative_error(analytic: np.ndarray, numeric: np.ndarray) -> float:
-    """Norm-based relative difference, the metric the hub's gradient check uses."""
-    numerator = np.linalg.norm(analytic - numeric)
-    denominator = np.linalg.norm(analytic) + np.linalg.norm(numeric)
-    return 0.0 if denominator == 0 else float(numerator / denominator)
 
 
 @pytest.fixture(scope="module")
