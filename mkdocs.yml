@@ -61,6 +61,13 @@ plugins:
   # imports a framework would need that framework in the docs CI job to build.
   - mkdocs-jupyter:
       execute: true
+      # Notebooks listed here import a framework the docs job does not install,
+      # so the framework-free `hub` CI job renders them from their committed
+      # outputs instead of executing them; the `framework-notebooks` job in
+      # .github/workflows/ci.yml executes them for real. A pattern that matches a
+      # not-yet-created file is harmless.
+      execute_ignore:
+        - "tutorials/03-language-modeling-and-sampling.ipynb"
       include_source: true
   # The API reference is generated from the docstrings the house style already
   # requires, which is what keeps that section true without anyone maintaining
