@@ -23,6 +23,24 @@ for them along the way.
   of the sequence. It imports `dlhub.nn.sequence.lstm`, `.gru`, and
   `.min_gated`, and implements nothing of its own.
 
+## Framework tutorial notebooks
+
+The two notebooks above import only what the docs build installs — numpy, scipy,
+and the `dlhub` package — so `mkdocs build --strict` re-executes them and their
+committed outputs cannot drift from the code that produced them. A tutorial that
+imports a framework instead — PyTorch or TensorFlow — cannot run in that
+framework-free build. Such a notebook is a *framework tutorial notebook*, and it
+carries three obligations:
+
+- Its first cell is a banner that names the framework and gives the install
+  command, `pip install -e '.[frameworks]'`, so a reader knows what the lesson
+  needs before the first import runs.
+- It is listed under `execute_ignore` in `mkdocs.yml`, so the docs build renders
+  it from its committed outputs rather than executing it.
+- The `framework-notebooks` job in `.github/workflows/ci.yml` installs the
+  framework and executes it end to end, so a broken cell or a stale output still
+  fails CI.
+
 ## Still missing
 
 **A from-scratch construction of an L-layer network**: initialise the
