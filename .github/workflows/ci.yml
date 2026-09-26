@@ -90,3 +90,39 @@ jobs:
           else
             echo "no parity tests yet"
           fi
+
+  framework-notebooks:
+    name: Framework tutorial notebooks
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install
+        run: |
+          python -m pip install --upgrade pip
+          pip install -e ".[dev,docs]"
+          # A framework tutorial notebook imports torch, which the docs job does
+          # not install; the CPU wheel comes by index for the same reason the
+          # parity job installs it that way -- plain torch is the CUDA build.
+          pip install torch --index-url https://download.pytorch.org/whl/cpu
+          # These notebooks execute here rather than in the docs build, and
+          # nbconvert --execute needs a discoverable kernel just as the hub job
+          # does; --sys-prefix registers one inside this job's environment.
+          python -m ipykernel install --sys-prefix
+
+      # The docs `hub` job renders these notebooks from their committed outputs
+      # (execute_ignore in mkdocs.yml); this job runs each one end to end so a
+      # cell error or a drifted output fails CI rather than shipping. The guard
+      # keeps the job green until the first framework notebook exists, the same
+      # shape the parity job uses for its tests.
+      - name: Execute framework notebooks
+        run: |
+          if ls docs/tutorials/03-language-modeling-and-sampling.ipynb >/dev/null 2>&1; then
+            jupyter nbconvert --to notebook --execute --stdout docs/tutorials/03-language-modeling-and-sampling.ipynb >/dev/null
+          else
+            echo "no framework notebooks yet"
+          fi
