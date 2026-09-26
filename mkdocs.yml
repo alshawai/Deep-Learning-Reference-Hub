@@ -102,11 +102,13 @@ nav:
       - Tune a learning rate: how-to/tune-learning-rate.md
       - Run a hyperparameter search: how-to/run-hyperparameter-search.md
       - Choose a gated cell: how-to/choose-a-gated-cell.md
+      - Train a language model: how-to/train-a-language-model.md
   - Reference:
       - reference/index.md
       - Network shapes and dimensions: reference/network-shapes-and-dimensions.md
       - Recurrent neural networks: reference/recurrent-neural-networks.md
       - LSTM and GRU: reference/lstm-and-gru.md
+      - Language modeling and sampling: reference/language-modeling-and-sampling.md
       - Activation functions: reference/activation-functions.md
       - Parameter update rule: reference/parameter-update-rule.md
       - Optimizer update rules: reference/optimizer-update-rules.md
@@ -132,3 +134,4 @@ nav:
       - Hyperparameter tuning landscape: explanation/hyperparameter-tuning-landscape.md
       - Recurrent neural networks: explanation/recurrent-neural-networks.md
       - LSTM and GRU: explanation/lstm-and-gru.md
+      - Language modeling and sampling: explanation/language-modeling-and-sampling.md

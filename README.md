@@ -169,15 +169,18 @@ expected to preserve:
 
 ## Repository statistics
 
-- **Total Documents**: 26
-- **Code Examples**: 25 implementations
+- **Total Documents**: 29
+- **Code Examples**: 26 implementations
 - **Jupyter Notebooks**: 2
 - **Frameworks Covered**: NumPy, PyTorch, TensorFlow
 
 The framework badges above describe optional example compatibility. The checked
 statistics count published implementation modules: the NumPy from-scratch
-references, plus the framework parity ports checked against them — one in
-PyTorch and one in TensorFlow/Keras.
+references, plus their framework ports. Most framework modules are parity ports
+checked against a NumPy reference; the exception is the
+language-modeling-and-sampling topic, which is framework-canonical — its PyTorch
+module is the only implementation, because the topic introduces no new
+from-scratch mathematics.
 
 ## Contributing
 
