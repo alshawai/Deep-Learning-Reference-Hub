@@ -169,14 +169,15 @@ expected to preserve:
 
 ## Repository statistics
 
-- **Total Documents**: 23
-- **Code Examples**: 19 implementations
-- **Jupyter Notebooks**: 1
-- **Frameworks Covered**: NumPy, PyTorch
+- **Total Documents**: 26
+- **Code Examples**: 25 implementations
+- **Jupyter Notebooks**: 2
+- **Frameworks Covered**: NumPy, PyTorch, TensorFlow
 
 The framework badges above describe optional example compatibility. The checked
 statistics count published implementation modules: the NumPy from-scratch
-references and, so far, one PyTorch parity port checked against them.
+references, plus the framework parity ports checked against them — one in
+PyTorch and one in TensorFlow/Keras.
 
 ## Contributing
 

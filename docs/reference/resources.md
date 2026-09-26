@@ -24,6 +24,12 @@ and documentation in this hub.
 - **Adam Optimizer**: Kingma & Ba (2014) – [https://arxiv.org/abs/1412.6980](https://arxiv.org/abs/1412.6980)
 - **Batch Normalization**: Ioffe & Szegedy (2015) – [https://arxiv.org/abs/1502.03167](https://arxiv.org/abs/1502.03167)
 - **Dropout**: Srivastava et al. (2014) – [https://jmlr.org/papers/v15/srivastava14a.html](https://jmlr.org/papers/v15/srivastava14a.html)
+- **Long Short-Term Memory**: Hochreiter & Schmidhuber (1997) – *Neural Computation* 9(8), 1735–1780.  
+- **Learning to Forget (LSTM forget gate)**: Gers, Schmidhuber & Cummins (2000) – *Neural Computation* 12(10), 2451–2471.  
+- **Gated Recurrent Unit (RNN Encoder–Decoder)**: Cho et al. (2014) – [https://arxiv.org/abs/1406.1078](https://arxiv.org/abs/1406.1078)
+- **Empirical Evaluation of Gated RNNs (GRU vs LSTM)**: Chung, Gulcehre, Cho & Bengio (2014) – [https://arxiv.org/abs/1412.3555](https://arxiv.org/abs/1412.3555)
+- **Were RNNs All We Needed? (minGRU / minLSTM)**: Feng et al. (2024) – [https://arxiv.org/abs/2410.01201](https://arxiv.org/abs/2410.01201)
+- **Parallelizing Linear Recurrences (log-space scan)**: Heinsen (2023) – [https://arxiv.org/abs/2311.06281](https://arxiv.org/abs/2311.06281)
 
 ---
 

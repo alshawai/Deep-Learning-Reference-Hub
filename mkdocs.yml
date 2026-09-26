@@ -94,16 +94,19 @@ nav:
   - Tutorials:
       - tutorials/index.md
       - Recurrent neural networks: tutorials/01-recurrent-neural-networks.ipynb
+      - LSTM and GRU: tutorials/02-lstm-and-gru.ipynb
   - How-to guides:
       - how-to/index.md
       - Choose an optimizer: how-to/choose-an-optimizer.md
       - Run a gradient check: how-to/run-a-gradient-check.md
       - Tune a learning rate: how-to/tune-learning-rate.md
       - Run a hyperparameter search: how-to/run-hyperparameter-search.md
+      - Choose a gated cell: how-to/choose-a-gated-cell.md
   - Reference:
       - reference/index.md
       - Network shapes and dimensions: reference/network-shapes-and-dimensions.md
       - Recurrent neural networks: reference/recurrent-neural-networks.md
+      - LSTM and GRU: reference/lstm-and-gru.md
       - Activation functions: reference/activation-functions.md
       - Parameter update rule: reference/parameter-update-rule.md
       - Optimizer update rules: reference/optimizer-update-rules.md
@@ -128,3 +131,4 @@ nav:
       - Gradient checking: explanation/gradient-checking.md
       - Hyperparameter tuning landscape: explanation/hyperparameter-tuning-landscape.md
       - Recurrent neural networks: explanation/recurrent-neural-networks.md
+      - LSTM and GRU: explanation/lstm-and-gru.md

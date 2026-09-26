@@ -13,6 +13,12 @@ flip drives the relative error to order one.
 The other two contracts guard the fixture's determinism and the shapes the topic
 promises, including the single-timestep edge where the recurrence degenerates.
 
+The finite-difference machinery itself lives in
+:mod:`dlhub.nn.sequence._gradient_check`, extracted there when the LSTM and GRU
+suites became its second and third consumers. It is imported rather than
+redefined so the three sequence suites cannot drift into disagreeing about what
+"agrees" means.
+
 Author
 ------
 Deep Learning Reference Hub
@@ -22,11 +28,14 @@ License
 MIT
 """
 
-from collections.abc import Callable
-
 import numpy as np
 import pytest
 
+from dlhub.nn.sequence._gradient_check import (
+    global_norm,
+    numeric_gradient,
+    relative_error,
+)
 from dlhub.nn.sequence.rnn import (
     bidirectional_rnn_forward,
     clip_gradients,
@@ -39,46 +48,10 @@ from dlhub.nn.sequence.rnn import (
     update_parameters,
 )
 
-# The dossier's finite-difference contract: central differences with this step,
-# analytic-vs-numeric relative error below this tolerance, for every parameter.
-FD_EPSILON = 1e-7
+# The dossier's finite-difference contract: analytic-vs-numeric relative error
+# below this tolerance, for every parameter. The step is the shared default,
+# `_gradient_check.FD_EPSILON`, which is the 1e-7 this topic pinned.
 FD_TOLERANCE = 1e-7
-
-
-def numeric_gradient(
-    loss: Callable[[], float], theta: np.ndarray, eps: float = FD_EPSILON
-) -> np.ndarray:
-    """
-    Central finite-difference gradient of ``loss`` with respect to ``theta``.
-
-    ``loss`` must read ``theta`` in place (it is a closure over the same array),
-    so each entry is perturbed by +/- eps, the loss re-evaluated, and the entry
-    restored. The array is unchanged on return.
-    """
-    grad = np.zeros_like(theta)
-    for idx in np.ndindex(theta.shape):
-        original = theta[idx]
-
-        theta[idx] = original + eps
-        loss_plus = loss()
-        theta[idx] = original - eps
-        loss_minus = loss()
-        theta[idx] = original
-
-        grad[idx] = (loss_plus - loss_minus) / (2 * eps)
-    return grad
-
-
-def relative_error(analytic: np.ndarray, numeric: np.ndarray) -> float:
-    """Norm-based relative difference, the metric the hub's gradient check uses."""
-    numerator = np.linalg.norm(analytic - numeric)
-    denominator = np.linalg.norm(analytic) + np.linalg.norm(numeric)
-    return 0.0 if denominator == 0 else float(numerator / denominator)
-
-
-def global_norm(gradients: dict[str, np.ndarray]) -> float:
-    """L2 norm of all gradients viewed as one concatenated vector."""
-    return float(np.sqrt(sum(np.sum(g**2) for g in gradients.values())))
 
 
 # --- Gradient agreement (the sign-flip catcher) --------------------------
