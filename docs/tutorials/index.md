@@ -41,6 +41,15 @@ carries three obligations:
   framework and executes it end to end, so a broken cell or a stale output still
   fails CI.
 
+The hub's framework tutorial notebooks:
+
+- **[Language modeling and sampling: train a character model, then turn the temperature knob](03-language-modeling-and-sampling.ipynb)**
+  — a runnable PyTorch notebook. You train a character-level RNN language model,
+  watch its perplexity fall from uniform guessing among 18 characters to fewer
+  than four, sample novel words from it, and slide the temperature between
+  cautious and reckless without touching a weight. It imports the canonical
+  `dlhub.pytorch.sequence.language_model`.
+
 ## Still missing
 
 **A from-scratch construction of an L-layer network**: initialise the
