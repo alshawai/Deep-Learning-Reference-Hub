@@ -169,36 +169,37 @@ import numpy as np
 
 def softmax(z):
     """Stable softmax over a length-V logit vector."""
-    z = z - np.max(z)              # subtract the max: exp never overflows
+    z = z - np.max(z)  # subtract the max: exp never overflows
     e = np.exp(z)
     return e / np.sum(e)
 
 
-def sample(step, init_state, char_to_ix, ix_to_char, seed,
-           temperature=1.0, max_length=50):
+def sample(
+    step, init_state, char_to_ix, ix_to_char, seed, temperature=1.0, max_length=50
+):
     """Generate one sequence autoregressively from a trained char-LM.
 
     `step(x, state) -> (logits, next_state)` runs one recurrent cell step for
     any framework and returns a length-V logit vector; everything else here is
     the sampling mechanism itself.
     """
-    rng = np.random.default_rng(seed)      # explicit, seeded RNG -> reproducible
+    rng = np.random.default_rng(seed)  # explicit, seeded RNG -> reproducible
     vocab_size = len(char_to_ix)
     newline = char_to_ix["\n"]
 
-    x = np.zeros(vocab_size)               # x^{<1>} = 0: no prior character
-    state = init_state                     # a^{<0>} = 0
+    x = np.zeros(vocab_size)  # x^{<1>} = 0: no prior character
+    state = init_state  # a^{<0>} = 0
     drawn = []
 
-    for _ in range(max_length):            # max_length is the hard cap L
-        logits, state = step(x, state)     # read-out logits z^{<t>}
+    for _ in range(max_length):  # max_length is the hard cap L
+        logits, state = step(x, state)  # read-out logits z^{<t>}
         p = softmax(logits / temperature)  # temperature-scaled distribution p^{<t>}
         idx = rng.choice(vocab_size, p=p)  # multinomial draw i^{<t>} ~ p^{<t>}
         drawn.append(idx)
-        if idx == newline:                 # stop as soon as "\n" is drawn ...
+        if idx == newline:  # stop as soon as "\n" is drawn ...
             break
-        x = np.zeros(vocab_size)           # ... otherwise feed the draw back
-        x[idx] = 1.0                       # as the one-hot input x^{<t+1>}
+        x = np.zeros(vocab_size)  # ... otherwise feed the draw back
+        x[idx] = 1.0  # as the one-hot input x^{<t+1>}
 
     return "".join(ix_to_char[i] for i in drawn)
 ```
@@ -305,11 +306,11 @@ published.
 
 | Reader wants to | Go to |
 | --- | --- |
-| Learn it step by step | Language modeling and sampling (notebook) — *ships with the framework-notebook toolchain* |
+| Learn it step by step | [Language modeling and sampling (notebook)](../tutorials/03-language-modeling-and-sampling.ipynb) |
 | Do it in a project | [Train a language model](../how-to/train-a-language-model.md) |
 | Look up the factorisation or sampling algorithm | [Language modeling and sampling](../reference/language-modeling-and-sampling.md) |
 | Understand why it works | Language modeling and sampling — *this page* |
-| Learn by running it | Language modeling and sampling (notebook) — *ships with the framework-notebook toolchain* |
+| Learn by running it | [Language modeling and sampling (notebook)](../tutorials/03-language-modeling-and-sampling.ipynb) |
 
 ## References
 

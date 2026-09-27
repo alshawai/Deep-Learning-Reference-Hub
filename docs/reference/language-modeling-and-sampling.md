@@ -260,11 +260,11 @@ published.
 
 | Reader wants to | Go to |
 | --- | --- |
-| Learn it step by step | Language modeling and sampling (notebook) — *ships with the framework-notebook toolchain* |
+| Learn it step by step | [Language modeling and sampling (notebook)](../tutorials/03-language-modeling-and-sampling.ipynb) |
 | Do it in a project | [Train a language model](../how-to/train-a-language-model.md) |
 | Look up the factorisation or sampling algorithm | Language modeling and sampling — *this page* |
 | Understand why it works | [Language modeling and sampling](../explanation/language-modeling-and-sampling.md) |
-| Learn by running it | Language modeling and sampling (notebook) — *ships with the framework-notebook toolchain* |
+| Learn by running it | [Language modeling and sampling (notebook)](../tutorials/03-language-modeling-and-sampling.ipynb) |
 
 ## Key Takeaways
 

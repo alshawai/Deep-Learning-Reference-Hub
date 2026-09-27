@@ -40,10 +40,10 @@ integer for the same character — and include the newline `\n`, because it is t
 token that ends a generated sequence.
 
 ```python
-corpus = ["cat\n", "dog\n", "bird\n"]        # newline-terminated sequences
+corpus = ["cat\n", "dog\n", "bird\n"]  # newline-terminated sequences
 text = "".join(corpus)
-vocab = sorted(set(text))                     # sorted -> deterministic mapping
-V = len(vocab)                                # n_x = n_y = V
+vocab = sorted(set(text))  # sorted -> deterministic mapping
+V = len(vocab)  # n_x = n_y = V
 char_to_ix = {ch: i for i, ch in enumerate(vocab)}
 ix_to_char = {i: ch for i, ch in enumerate(vocab)}
 ```
@@ -84,8 +84,8 @@ class CharRNN(torch.nn.Module):
         self.readout = torch.nn.Linear(n_a, V)
 
     def forward(self, x, a0=None):
-        a, a_last = self.rnn(x, a0)   # a: (T, m, n_a) -- PyTorch's (seq, batch, feature)
-        logits = self.readout(a)      # (T, m, V) -- one score per character, per step
+        a, a_last = self.rnn(x, a0)  # a: (T, m, n_a) -- PyTorch's (seq, batch, feature)
+        logits = self.readout(a)  # (T, m, V) -- one score per character, per step
         return logits, a_last
 ```
 
@@ -120,11 +120,11 @@ def make_example(word: str, char_to_ix: dict[str, int], V: int):
     inputs : (T, 1, V) one-hot, with x^{<1>} the zero vector.
     targets: (T,) class indices, y^{<t>} = x^{<t+1>}, ending in the newline.
     """
-    idx = [char_to_ix[ch] for ch in word]     # e.g. c, a, t, \n
+    idx = [char_to_ix[ch] for ch in word]  # e.g. c, a, t, \n
     targets = torch.tensor(idx)
-    inputs = torch.zeros(len(idx), 1, V)       # x^{<1>} is the zero vector
+    inputs = torch.zeros(len(idx), 1, V)  # x^{<1>} is the zero vector
     for t, prev in enumerate(idx[:-1], start=1):
-        inputs[t, 0, prev] = 1.0               # x^{<t+1>} is character t, one-hot
+        inputs[t, 0, prev] = 1.0  # x^{<t+1>} is character t, one-hot
     return inputs, targets
 ```
 
@@ -142,9 +142,9 @@ token. **Perplexity** is its exponential:
 ```python
 import torch.nn.functional as F
 
-logits, _ = model(inputs)                     # (T, 1, V)
+logits, _ = model(inputs)  # (T, 1, V)
 loss = F.cross_entropy(logits.reshape(-1, V), targets.reshape(-1))
-perplexity = loss.exp()                        # exp(per-character cross-entropy)
+perplexity = loss.exp()  # exp(per-character cross-entropy)
 ```
 
 Per-character cross-entropy is the standard language-model metric because it is
@@ -173,7 +173,7 @@ with torch.no_grad():
     logits, _ = model(inputs)
     loss = F.cross_entropy(logits.reshape(-1, V), targets.reshape(-1))
 
-print(loss.item(), math.log(V))   # per-character cross-entropy vs. ln V -- close at init
+print(loss.item(), math.log(V))  # per-character cross-entropy vs. ln V -- close at init
 ```
 
 If the step-0 loss is far from $\ln V$, stop and find the wiring bug before you
@@ -214,11 +214,13 @@ for step in range(num_steps):
 
     optimizer.zero_grad()
     loss.backward()
-    torch.nn.utils.clip_grad_norm_(model.parameters(), max_norm=5.0)   # after backward, before step
+    torch.nn.utils.clip_grad_norm_(
+        model.parameters(), max_norm=5.0
+    )  # after backward, before step
     optimizer.step()
 
     if step % 200 == 0:
-        print(step, loss.item(), math.exp(loss.item()))   # step, loss, perplexity
+        print(step, loss.item(), math.exp(loss.item()))  # step, loss, perplexity
 ```
 
 The one ordering that matters: clip **after** `loss.backward()` has populated the
@@ -246,8 +248,7 @@ import torch
 import torch.nn.functional as F
 
 
-def sample(model, char_to_ix, ix_to_char, V,
-           temperature=1.0, max_length=50, seed=1):
+def sample(model, char_to_ix, ix_to_char, V, temperature=1.0, max_length=50, seed=1):
     """Autoregressively sample one newline-terminated string.
 
     Reproducible: draws come from an explicitly-seeded generator, so a fixed
@@ -256,17 +257,17 @@ def sample(model, char_to_ix, ix_to_char, V,
     generator = torch.Generator().manual_seed(seed)
     newline = char_to_ix["\n"]
 
-    x = torch.zeros(1, 1, V)             # x^{<1>} is the zero vector
+    x = torch.zeros(1, 1, V)  # x^{<1>} is the zero vector
     a = None
     chars = []
     for _ in range(max_length):
-        logits, a = model(x, a)          # thread the hidden state across steps
+        logits, a = model(x, a)  # thread the hidden state across steps
         probs = F.softmax(logits[-1, 0] / temperature, dim=-1)
         idx = torch.multinomial(probs, num_samples=1, generator=generator).item()
         if idx == newline:
             break
         chars.append(ix_to_char[idx])
-        x = torch.zeros(1, 1, V)         # feed the drawn character back in
+        x = torch.zeros(1, 1, V)  # feed the drawn character back in
         x[0, 0, idx] = 1.0
     return "".join(chars)
 ```
@@ -280,7 +281,9 @@ def sample(model, char_to_ix, ix_to_char, V,
 
 ```python
 for temperature in (0.5, 1.0, 1.5):
-    print(temperature, sample(model, char_to_ix, ix_to_char, V, temperature=temperature))
+    print(
+        temperature, sample(model, char_to_ix, ix_to_char, V, temperature=temperature)
+    )
 ```
 
 Two details keep the loop honest. **Thread the hidden state**: each call passes
@@ -308,14 +311,14 @@ import torch.nn.functional as F
 from torch.nn.utils.rnn import pad_sequence
 
 # input_sequences: list of (T_i, V) one-hot tensors; target_sequences: (T_i,) index tensors.
-padded_inputs = pad_sequence(input_sequences)                      # (T_max, batch, V)
+padded_inputs = pad_sequence(input_sequences)  # (T_max, batch, V)
 padded_targets = pad_sequence(target_sequences, padding_value=-1)  # (T_max, batch)
 
-logits, _ = model(padded_inputs)                                   # (T_max, batch, V)
+logits, _ = model(padded_inputs)  # (T_max, batch, V)
 loss = F.cross_entropy(
     logits.reshape(-1, V),
     padded_targets.reshape(-1),
-    ignore_index=-1,          # padded steps are skipped, not scored as a class
+    ignore_index=-1,  # padded steps are skipped, not scored as a class
 )
 ```
 
@@ -375,11 +378,11 @@ plain text.
 
 | Reader wants to | Go to |
 | --- | --- |
-| Learn it step by step | Language modeling and sampling (notebook) — *ships with the framework-notebook toolchain* |
+| Learn it step by step | [Language modeling and sampling (notebook)](../tutorials/03-language-modeling-and-sampling.ipynb) |
 | Do it in a project | Train a language model — *this page* |
 | Look up the factorisation or sampling algorithm | [Language modeling and sampling](../reference/language-modeling-and-sampling.md) |
 | Understand why it works | [Language modeling and sampling](../explanation/language-modeling-and-sampling.md) |
-| Learn by running it | Language modeling and sampling (notebook) — *ships with the framework-notebook toolchain* |
+| Learn by running it | [Language modeling and sampling (notebook)](../tutorials/03-language-modeling-and-sampling.ipynb) |
 
 ## Key Takeaways
 
