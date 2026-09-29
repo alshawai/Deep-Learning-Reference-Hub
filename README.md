@@ -169,7 +169,7 @@ expected to preserve:
 
 ## Repository statistics
 
-- **Total Documents**: 29
+- **Total Documents**: 32
 - **Code Examples**: 26 implementations
 - **Jupyter Notebooks**: 3
 - **Frameworks Covered**: NumPy, PyTorch, TensorFlow
