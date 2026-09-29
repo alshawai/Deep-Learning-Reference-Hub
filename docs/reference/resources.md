@@ -30,6 +30,14 @@ and documentation in this hub.
 - **Empirical Evaluation of Gated RNNs (GRU vs LSTM)**: Chung, Gulcehre, Cho & Bengio (2014) – [https://arxiv.org/abs/1412.3555](https://arxiv.org/abs/1412.3555)
 - **Were RNNs All We Needed? (minGRU / minLSTM)**: Feng et al. (2024) – [https://arxiv.org/abs/2410.01201](https://arxiv.org/abs/2410.01201)
 - **Parallelizing Linear Recurrences (log-space scan)**: Heinsen (2023) – [https://arxiv.org/abs/2311.06281](https://arxiv.org/abs/2311.06281)
+- **Attention Is All You Need (Transformer)**: Vaswani et al. (2017) – [https://arxiv.org/abs/1706.03762](https://arxiv.org/abs/1706.03762)
+- **Efficiently Modeling Long Sequences with Structured State Spaces (S4)**: Gu, Goel & Ré (2022) – [https://arxiv.org/abs/2111.00396](https://arxiv.org/abs/2111.00396)
+- **RWKV: Reinventing RNNs for the Transformer Era**: Peng et al. (2023) – [https://arxiv.org/abs/2305.13048](https://arxiv.org/abs/2305.13048)
+- **Retentive Network (RetNet)**: Sun et al. (2023) – [https://arxiv.org/abs/2307.08621](https://arxiv.org/abs/2307.08621)
+- **Mamba: Linear-Time Sequence Modeling with Selective State Spaces**: Gu & Dao (2023) – [https://arxiv.org/abs/2312.00752](https://arxiv.org/abs/2312.00752)
+- **Griffin: Mixing Gated Linear Recurrences with Local Attention**: De et al. (2024) – [https://arxiv.org/abs/2402.19427](https://arxiv.org/abs/2402.19427)
+- **Transformers are SSMs: State Space Duality (Mamba-2)**: Dao & Gu (2024) – [https://arxiv.org/abs/2405.21060](https://arxiv.org/abs/2405.21060)
+- **xLSTM: Extended Long Short-Term Memory**: Beck et al. (2024) – [https://arxiv.org/abs/2405.04517](https://arxiv.org/abs/2405.04517)
 
 ---
 
