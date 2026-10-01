@@ -694,11 +694,11 @@ class GRUSequenceModel(GatedSequenceModel):
 
 def main() -> None:
     """Load both shared fixtures, run the ports, and print a parity report."""
+    from dlhub.nn.sequence import compute_loss
     from dlhub.nn.sequence.gru import gru_backward, gru_forward
     from dlhub.nn.sequence.gru import make_fixture as make_gru_fixture
     from dlhub.nn.sequence.lstm import lstm_backward, lstm_forward
     from dlhub.nn.sequence.lstm import make_fixture as make_lstm_fixture
-    from dlhub.nn.sequence.rnn import compute_loss
 
     def report(title, reference, port, keys):
         print(f"\n{title}")

@@ -85,8 +85,7 @@ Notes
 
 import numpy as np
 
-from dlhub.nn.sequence._common import sigmoid, split_gate_matrix
-from dlhub.nn.sequence.rnn import compute_loss, softmax
+from dlhub.nn.sequence._common import compute_loss, sigmoid, softmax, split_gate_matrix
 
 __all__ = [
     "gru_backward",

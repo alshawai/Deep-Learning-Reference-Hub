@@ -51,6 +51,16 @@ Notes
   difference is divided by the sum of the two norms. That is the standard
   gradient-check metric and it is bounded by 1, so a flipped sign scores close
   to 1 rather than infinity.
+- **This harness stays private -- a recorded decision.** It keeps its leading
+  underscore and is not exported from any package ``__all__``. The taught, public
+  gradient check is :mod:`dlhub.training.gradient_checking`, with its own
+  reference, how-to, and explanation pages; this is a test fixture that happens
+  to live in the package so three suites can share one copy. Promoting it to a
+  second public ``gradient_check`` surface -- same name, different API, different
+  audience -- would recreate the confusion that splitting the two apart was meant
+  to end. If a caller outside the test suites genuinely needs a per-tensor
+  finite-difference primitive, revisit this note rather than quietly widening the
+  import.
 """
 
 from collections.abc import Callable

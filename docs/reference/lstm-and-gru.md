@@ -164,7 +164,7 @@ $$L^{\langle t\rangle} = -\frac{1}{m} \sum_{i=1}^{m} \sum_{k=1}^{n_y} y^{\langle
 | --- | --- | --- |
 | $a^{\langle 0\rangle}$ | $\mathbf{0}$, shape $(n_a, m)$ | supply it only when continuing a sequence across batches |
 | $c^{\langle 0\rangle}$ | $\mathbf{0}$, shape $(n_a, m)$ | LSTM only |
-| $\mathrm{softmax}$, loss | imported from the vanilla RNN module | one canonical implementation, including its max-subtraction stability shift |
+| $\mathrm{softmax}$, loss | one shared helper, re-exported by the vanilla RNN module | one canonical implementation, including its max-subtraction stability shift |
 | gate nonlinearity | the shared overflow-free $\sigma$ | never exponentiates a positive number, so no clipping and no epsilon |
 
 Both cells return the whole state trajectory and the per-timestep caches the
@@ -560,6 +560,14 @@ floor drops tenfold while the truncation error it trades against stays near
 $10^{-12}$, and every gradient lands at or under $1.1 \times 10^{-8}$. Central
 differences are required either way: the one-sided form's $O(\varepsilon)$ error
 would fail a correct implementation at this tolerance.
+
+The finite-difference machinery — `numeric_gradient`, `relative_error`,
+`global_norm`, and the shared `FD_EPSILON` — lives in
+`dlhub.nn.sequence._gradient_check`, shared by the three sequence suites so they cannot disagree about what "agrees" means. It is a
+deliberately private, per-tensor test fixture, not the hub's taught,
+whole-network gradient check (`dlhub.training.gradient_checking`, which has its
+own pages); the two carry different APIs on purpose, and the per-tensor one is
+not part of the public API.
 
 ## Failure modes
 

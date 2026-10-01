@@ -144,9 +144,9 @@ gradients = lstm_backward(y, caches, parameters)
 
 Substituting the GRU changes two lines and nothing else: `gru_forward` returns
 `(a, y_pred, caches)` — there is no cell state — and its gradients are keyed
-`dWr`, `dWu`, `dWc` instead of the LSTM's four. Both cells import `softmax` and
-`compute_loss` from `dlhub.nn.sequence.rnn`, so the read-out and loss cannot
-drift away from the vanilla RNN's.
+`dWr`, `dWu`, `dWc` instead of the LSTM's four. Both cells read their `softmax`
+read-out and `compute_loss` from a single shared helper module, re-exported by
+`dlhub.nn.sequence.rnn`, so the read-out and loss cannot drift between the cells.
 
 Two things to get right when you take the step:
 

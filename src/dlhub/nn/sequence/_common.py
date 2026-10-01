@@ -2,9 +2,21 @@
 Shared Sequence-Cell Helpers
 ============================
 
-The small pieces the gated cells in this package share: the logistic sigmoid
-every gate is squashed by, and the column split that recovers the recurrent and
-input halves of a concatenated gate matrix.
+The small pieces every sequence cell in this package shares, kept in one home so
+the vanilla RNN, the LSTM, and the GRU cannot drift into disagreeing copies:
+
+- the logistic ``sigmoid`` every gate is squashed by,
+- the column-wise ``softmax`` read-out that turns logits into class
+  probabilities,
+- the ``compute_loss`` softmax cross-entropy summed over timesteps, and
+- the ``split_gate_matrix`` split that recovers the recurrent and input halves
+  of a concatenated gate matrix.
+
+``softmax`` and ``compute_loss`` are re-exported by :mod:`dlhub.nn.sequence.rnn`,
+the module whose lesson derives the softmax read-out and its max-subtraction
+stability shift. They live here, not there, because all three cells read them,
+and a shared helper imported from one particular cell reads as a dependency the
+architecture does not have.
 
 References
 ----------
@@ -29,6 +41,11 @@ Notes
   ``z >= 0`` and ``e^{-|z|} / (1 + e^{-|z|})`` where ``z < 0``. Both branches are
   finite for every input, so no clipping and no epsilon are needed, and the
   result stays exact enough for the finite-difference gradient check.
+- **Stable softmax.** ``softmax`` subtracts the per-column maximum before
+  exponentiating, so large logits cannot overflow and the output stays strictly
+  positive -- which is why ``compute_loss`` takes its ``log`` with no epsilon
+  guard. The vanilla RNN module, whose read-out lesson this helper serves,
+  derives at length why the shift leaves the result exact.
 """
 
 import numpy as np
@@ -58,6 +75,55 @@ def sigmoid(z: np.ndarray) -> np.ndarray:
         1.0 / (1.0 + exp_neg_abs),  # z >= 0: divide through by e^{z}
         exp_neg_abs / (1.0 + exp_neg_abs),  # z <  0: the unshifted form
     )
+
+
+def softmax(z: np.ndarray) -> np.ndarray:
+    """
+    Column-wise softmax with the max-subtraction stability shift.
+
+    Normalizes over ``axis=0`` (the class/feature axis), so each column is a
+    probability distribution that sums to one. See the module ``Notes`` for why
+    the maximum is subtracted first.
+
+    Parameters
+    ----------
+    z : np.ndarray
+        Logits of shape ``(n_y, m)``.
+
+    Returns
+    -------
+    np.ndarray
+        Probabilities of shape ``(n_y, m)``, strictly positive, columns summing
+        to one.
+    """
+    z_shifted = z - np.max(z, axis=0, keepdims=True)
+    exp_z = np.exp(z_shifted)
+    return exp_z / np.sum(exp_z, axis=0, keepdims=True)
+
+
+def compute_loss(y_pred: np.ndarray, y: np.ndarray) -> float:
+    """
+    Total softmax cross-entropy loss, summed over timesteps.
+
+    Implements ``L = sum_t L^{<t>}`` with each per-step loss the batch-mean
+    cross-entropy ``L^{<t>} = -(1/m) sum_{i,c} y^{<t>}_{c,i} log y_hat^{<t>}_{c,i}``.
+    No epsilon guards the ``log``: the stable softmax output is strictly
+    positive (see module ``Notes``).
+
+    Parameters
+    ----------
+    y_pred : np.ndarray
+        Predicted distributions, shape ``(n_y, m, T_x)``.
+    y : np.ndarray
+        One-hot targets, same shape ``(n_y, m, T_x)``.
+
+    Returns
+    -------
+    float
+        The scalar loss summed over all timesteps.
+    """
+    m = y_pred.shape[1]
+    return float(-np.sum(y * np.log(y_pred)) / m)
 
 
 def split_gate_matrix(matrix: np.ndarray, n_a: int) -> tuple[np.ndarray, np.ndarray]:
