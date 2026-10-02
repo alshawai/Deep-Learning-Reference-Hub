@@ -21,7 +21,12 @@ License
 MIT
 """
 
-from dlhub.nn.sequence._common import sigmoid, split_gate_matrix
+from dlhub.nn.sequence._common import (
+    compute_loss,
+    sigmoid,
+    softmax,
+    split_gate_matrix,
+)
 from dlhub.nn.sequence.gru import (
     gru_backward,
     gru_cell_backward,
@@ -58,14 +63,12 @@ from dlhub.nn.sequence.min_gated import (
 from dlhub.nn.sequence.rnn import (
     bidirectional_rnn_forward,
     clip_gradients,
-    compute_loss,
     deep_rnn_forward,
     make_fixture,
     rnn_backward,
     rnn_cell_backward,
     rnn_cell_forward,
     rnn_forward,
-    softmax,
     update_parameters,
 )
 

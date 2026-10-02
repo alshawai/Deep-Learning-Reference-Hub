@@ -8,6 +8,21 @@ them to analytical gradients from backpropagation.
 
 This helps validate correctness of gradient computations and debug implementation errors.
 
+This is the *whole-network* checker: hand it a parameter dictionary, the matching
+analytic gradients, and a ``cost_function(X, Y, parameters)``; it flattens the
+dictionary into one vector, perturbs every entry, and prints a human-readable
+verdict. It is the taught, public gradient check, with its own reference,
+how-to, and explanation pages.
+
+It is not the only gradient check in the hub, and the two are not
+interchangeable. The sequence test suites use a *per-tensor, closure-driven*
+harness, :mod:`dlhub.nn.sequence._gradient_check` -- the caller perturbs one
+tensor against a zero-argument loss that reads it in place, which is what a
+recurrent forward pass over a fixture needs. That harness is deliberately
+private (see its module docstring); reach for this module when you want a
+network-level verdict, and for that one when you are differentiating a single
+tensor inside a test.
+
 References
 ----------
 - Karpathy, A. (n.d.). *Numerical Limits and Gradient Checking*, in "CS231n". Stanford University.

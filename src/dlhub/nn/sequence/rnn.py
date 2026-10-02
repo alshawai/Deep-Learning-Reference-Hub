@@ -56,12 +56,16 @@ MIT
 Notes
 -----
 - **Stable softmax.** The textbook softmax ``exp(z) / sum(exp(z))`` overflows
-  for large logits. This module subtracts the per-column maximum before
+  for large logits. The read-out subtracts the per-column maximum before
   exponentiating, which is algebraically identical (the shift cancels in the
   ratio) but keeps every exponent ``<= 0``. Because the shifted denominator is
   ``>= 1``, the output is strictly positive, so the cross-entropy ``log`` is
   taken without any epsilon guard -- and the analytic gradient
-  ``(y_hat - y) / m`` stays exact for the finite-difference check.
+  ``(y_hat - y) / m`` stays exact for the finite-difference check. The ``softmax``
+  and ``compute_loss`` implementations are the shared sequence-cell helpers in
+  :mod:`dlhub.nn.sequence._common`, re-exported here -- the module whose lesson
+  this is -- and from the package root, so every existing import path still
+  resolves.
 - **The tanh backward** uses ``1 - tanh(z)^2 = 1 - (a^{<t>})^2``: since
   ``a^{<t>}`` is already the tanh output, its derivative is read straight off
   the cached activation with no second tanh evaluation.
@@ -76,29 +80,7 @@ Notes
 
 import numpy as np
 
-
-def softmax(z: np.ndarray) -> np.ndarray:
-    """
-    Column-wise softmax with the max-subtraction stability shift.
-
-    Normalizes over ``axis=0`` (the class/feature axis), so each column is a
-    probability distribution that sums to one. See the module ``Notes`` for why
-    the maximum is subtracted first.
-
-    Parameters
-    ----------
-    z : np.ndarray
-        Logits of shape ``(n_y, m)``.
-
-    Returns
-    -------
-    np.ndarray
-        Probabilities of shape ``(n_y, m)``, strictly positive, columns summing
-        to one.
-    """
-    z_shifted = z - np.max(z, axis=0, keepdims=True)
-    exp_z = np.exp(z_shifted)
-    return exp_z / np.sum(exp_z, axis=0, keepdims=True)
+from dlhub.nn.sequence._common import compute_loss, softmax
 
 
 def rnn_cell_forward(
@@ -209,31 +191,6 @@ def rnn_forward(
         a_prev = a_next  # carry the state forward to t+1
 
     return a, y_pred, caches
-
-
-def compute_loss(y_pred: np.ndarray, y: np.ndarray) -> float:
-    """
-    Total softmax cross-entropy loss, summed over timesteps.
-
-    Implements ``L = sum_t L^{<t>}`` with each per-step loss the batch-mean
-    cross-entropy ``L^{<t>} = -(1/m) sum_{i,c} y^{<t>}_{c,i} log y_hat^{<t>}_{c,i}``.
-    No epsilon guards the ``log``: the stable softmax output is strictly
-    positive (see module ``Notes``).
-
-    Parameters
-    ----------
-    y_pred : np.ndarray
-        Predicted distributions, shape ``(n_y, m, T_x)``.
-    y : np.ndarray
-        One-hot targets, same shape ``(n_y, m, T_x)``.
-
-    Returns
-    -------
-    float
-        The scalar loss summed over all timesteps.
-    """
-    m = y_pred.shape[1]
-    return float(-np.sum(y * np.log(y_pred)) / m)
 
 
 def rnn_cell_backward(
