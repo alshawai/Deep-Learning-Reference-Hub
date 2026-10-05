@@ -23,6 +23,7 @@ Please follow these guidelines to keep the repository consistent and high-qualit
   - [Adding New Resources](#-adding-new-resources)
   - [Pull Requests](#-pull-requests)
     - [Commit Message Guidelines](#commit-message-guidelines)
+  - [Versioning and Releases](#versioning-and-releases)
 
 ---
 
@@ -246,6 +247,22 @@ Example:
 feat: add RMSprop optimizer with full documentation
 ```
 Keeping a consistent commit style helps maintainers review PRs efficiently and improves changelog generation.
+
+---
+
+## Versioning and Releases
+
+The hub's version number records what the hub *covers*, not a contract about its Python API. A reader who installs `dlhub` to study the implementations can watch the number grow with the material; a reader who imports it as a library should know the API is **not** held stable across versions, because the implementations are written to be read first.
+
+The scheme borrows the shape of [semantic versioning](https://semver.org/) — `MAJOR.MINOR.PATCH` — but reads the fields editorially:
+
+- **Patch** (`x.y.Z`) — a correction to existing material: a fixed defect, a wrong equation, a broken link. Nothing new is covered.
+- **Minor** (`x.Y.0`) — one completed topic, across the documentation views, implementation, framework ports, and notebook it earns.
+- **Major** (`X.0.0`) — a project milestone: a structural change to the whole hub, or a body of material large enough to mark an era. Not the breaking-API signal that strict semantic versioning reserves this field for. `1.0.0` marks the hub becoming a tested, documented, published package rather than a folder of notes.
+
+Strict semantic versioning answers "will upgrading break my import?"; the hub answers "what does it cover now?", because it is read far more often than it is imported. That is why the major field tracks milestones, and why the API carries no stability guarantee.
+
+A release rides with the work that earns it. When a topic is about to merge, its version bump (`src/dlhub/__init__.py`) and its [`CHANGELOG.md`](CHANGELOG.md) entry go into the topic's own pull request; after the merge, the merge commit is tagged `vX.Y.0`, and pushing that tag builds the GitHub Release through [`.github/workflows/release.yml`](.github/workflows/release.yml). The tag belongs on the merge commit, not a branch. As a backstop, `tools/releasecheck.py` runs in CI: it fails the build when the version, the latest tag, and `CHANGELOG.md` fall out of step, and warns when a feature has landed with no release prepared.
 
 
 **Thank you for helping improve this project! 🚀**
