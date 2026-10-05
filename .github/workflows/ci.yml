@@ -126,3 +126,19 @@ jobs:
           else
             echo "no framework notebooks yet"
           fi
+
+  release-hygiene:
+    name: Version, tag, and changelog agree
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        # Full history and tags: releasecheck compares __version__ against the
+        # latest release tag and scans the commits since it, neither of which a
+        # shallow clone carries.
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Version, tag, and changelog agree
+        run: python tools/releasecheck.py

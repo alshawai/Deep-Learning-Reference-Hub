@@ -4,7 +4,8 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "dlhub"
-version = "0.1.0"
+# Single-sourced from the package's __version__; see [tool.setuptools.dynamic].
+dynamic = ["version"]
 description = "From-scratch implementations of core deep learning methods, written to be read"
 readme = "README.md"
 requires-python = ">=3.10"
@@ -39,6 +40,12 @@ docs = [
     "nbconvert>=7.16.0",
     "ipykernel>=6.29.0",
 ]
+
+# The version is read from the package at build time, so src/dlhub/__init__.py's
+# __version__ is the single source of truth. setuptools AST-parses that literal
+# -- it does not import the package -- so this adds no import-time cost or risk.
+[tool.setuptools.dynamic]
+version = { attr = "dlhub.__version__" }
 
 # src layout, so the tests exercise the installed package. Without it, a bare
 # `dlhub/` beside the tests is importable straight from the working directory and

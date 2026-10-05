@@ -1,0 +1,35 @@
+name: Release
+
+# A pushed version tag is the release trigger. The tag sits on a merge commit
+# that already passed CI on main, so this workflow does not re-run the gate --
+# it only turns the tag into a GitHub Release. Future tags are created by the
+# release ritual (see docs/explanation/versioning-and-releases.md); historical
+# releases were back-filled by hand with curated notes.
+
+on:
+  push:
+    tags:
+      - "v[0-9]+.[0-9]+.[0-9]+"
+
+# gh release create needs write access to publish the release.
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Publish GitHub Release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        # Full history so --generate-notes can diff against the previous tag.
+        with:
+          fetch-depth: 0
+
+      # --verify-tag refuses to publish if the ref is not an existing tag;
+      # --generate-notes writes release notes from the merged pull requests
+      # since the previous tag, which is why the conventional-commit titles and
+      # PR discipline are important.
+      - name: Create the release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release create "$GITHUB_REF_NAME" --verify-tag --generate-notes
