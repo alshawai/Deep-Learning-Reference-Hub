@@ -34,12 +34,12 @@ for them along the way.
 
 ## Framework tutorial notebooks
 
-The three notebooks above import only what the docs build installs — numpy,
-scipy, and the `dlhub` package — so `mkdocs build --strict` re-executes them and
-their committed outputs cannot drift from the code that produced them. A tutorial
-that imports a framework instead — PyTorch or TensorFlow — cannot run in that
-framework-free build. Such a notebook is a *framework tutorial notebook*, and it
-carries three obligations:
+The three notebooks listed before this heading import only what the docs build
+installs — numpy, scipy, and the `dlhub` package — so `mkdocs build --strict`
+re-executes them and their committed outputs cannot drift from the code that
+produced them. A tutorial that imports a framework instead — PyTorch or
+TensorFlow — cannot run in that framework-free build. Such a notebook is a
+*framework tutorial notebook*, and it carries three obligations:
 
 - Its first cell is a banner that names the framework and gives the install
   command, `pip install -e '.[frameworks]'`, so a reader knows what the lesson

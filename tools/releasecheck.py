@@ -6,7 +6,7 @@ Release Check
 One mechanical check that the hub's release bookkeeping is internally
 consistent: the version the package declares, the latest release tag, and
 ``CHANGELOG.md`` must tell the same story. It is the CI backstop behind the
-release ritual described in ``docs/explanation/versioning-and-releases.md``.
+release ritual described in ``CONTRIBUTING.md`` (see "Versioning and Releases").
 
 This is a utility, not a deep learning implementation. Like ``hubcheck.py`` it
 has no third-party dependencies, so it runs in any environment the hub is cloned

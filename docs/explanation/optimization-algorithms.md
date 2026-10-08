@@ -59,7 +59,7 @@ At $t=1$:
 
 $$v_1^{corrected} = \frac{(1-\beta)\theta_1}{1-\beta} = \theta_1$$
 
-As $t \to \infty$, $\beta^t \to 0$ when $\beta < 1$, so $v_t^{corrected} \to v_t$. The implementation is available in [`exponential_weighted_averages.py`](https://github.com/eima40x4c/Deep-Learning-Reference-Hub/blob/main/src/dlhub/optimizers/exponential_weighted_averages.py).
+As $t \to \infty$, $\beta^t \to 0$ when $\beta < 1$, so $v_t^{corrected} \to v_t$. The implementation is available in [`exponential_weighted_averages.py`](https://github.com/alshawai/Deep-Learning-Reference-Hub/blob/main/src/dlhub/optimizers/exponential_weighted_averages.py).
 
 ```python
 def exponential_weighted_average(values, beta=0.9, bias_correction=True):

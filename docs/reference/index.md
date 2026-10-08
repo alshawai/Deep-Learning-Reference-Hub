@@ -33,14 +33,20 @@ reader should do.
   signature is the first thing in a repository to go stale, and the docstring is
   already required by the house style.
 
-## Planned contents
-
-Drawn from the lookup material currently embedded in the source documents:
+## Contents
 
 - **[Network shapes and dimensions](network-shapes-and-dimensions.md)** — the forward and backward dimension tables
   from the L-layer derivation, and its dimensional-analysis verifications.
 - **[Recurrent neural networks](recurrent-neural-networks.md)** — the RNN recurrence and its forward/backward
   shapes, with the backpropagation-through-time gradient equations in lookup form.
+- **[LSTM and GRU](lstm-and-gru.md)** — the gate equations, cell-state recurrence, and the
+  minGRU/minLSTM linear recurrence forms, with the parameter shapes each one expects.
+- **[Language modeling and sampling](language-modeling-and-sampling.md)** — the per-timestep
+  loss and gradient, the sampling procedure, and what temperature does to the distribution.
+- **[Word embeddings](word-embeddings.md)** — the embedding matrix and its lookup identity,
+  cosine similarity, the analogy arithmetic, and nearest-neighbour ranking.
+- **[Modern Sequence Models](modern-sequence-models.md)** — attention, state-space models,
+  and the gated linear recurrences that compete with them, with their complexity per layer.
 - **[Activation functions](activation-functions.md)** — each function with its derivative.
 - **[Parameter update rule](parameter-update-rule.md)** — the gradient-descent
   update equations for an L-layer network.

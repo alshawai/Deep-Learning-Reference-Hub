@@ -10,7 +10,7 @@ hand-computed values, closed-form results, or finite-difference gradient checks.
 ## Install
 
 ```bash
-git clone https://github.com/eima40x4c/Deep-Learning-Reference-Hub.git
+git clone https://github.com/alshawai/Deep-Learning-Reference-Hub.git
 cd Deep-Learning-Reference-Hub
 pip install -e .
 ```
