@@ -11,6 +11,33 @@ API stability — see the versioning policy in
 
 ## [Unreleased]
 
+## [1.5.1] - 2026-10-08
+
+### Fixed
+- The reference, how-to, and explanation indexes still called their sections
+  "Planned contents" and omitted eleven pages that had already shipped, so a
+  reader browsing them would conclude the sequence-model material did not exist.
+  The sections are now "Contents" and list every published page.
+- Six crosswalk sections carried a preamble saying sibling pages "are not yet
+  published" when every row beneath them was already a live link.
+- Nine internal links and one clone command named the repository owner
+  `eima40x4c`, which resolves only through a GitHub redirect; they now name
+  `alshawai`, matching the remote and the rest of the documentation.
+- `release.yml` and `tools/releasecheck.py` pointed at
+  `docs/explanation/versioning-and-releases.md`, a page that does not exist.
+  Both now cite the versioning policy where it actually lives, in
+  `CONTRIBUTING.md`.
+- The recurrent-neural-networks crosswalk sent readers to a topic slug as a
+  placeholder for a how-to guide that has since shipped.
+- The tutorials index described its framework-free notebooks as "the three
+  notebooks above" while a fourth sat below the heading in another section.
+- The `README.md` subject list omitted modern sequence models, and no
+  sequence-model page appeared in any of the three depth tiers.
+
+### Removed
+- `.pylintrc`, a UTF-16 encoded configuration file that no parser could read and
+  no part of the toolchain referenced.
+
 ## [1.5.0] - 2026-10-08
 
 ### Added
@@ -83,7 +110,8 @@ package rather than a folder of notes.
 - A CI quality gate running ruff, pytest, the `hubcheck` integrity checks, and a
   strict documentation build.
 
-[Unreleased]: https://github.com/alshawai/Deep-Learning-Reference-Hub/compare/v1.5.0...HEAD
+[Unreleased]: https://github.com/alshawai/Deep-Learning-Reference-Hub/compare/v1.5.1...HEAD
+[1.5.1]: https://github.com/alshawai/Deep-Learning-Reference-Hub/compare/v1.5.0...v1.5.1
 [1.5.0]: https://github.com/alshawai/Deep-Learning-Reference-Hub/compare/v1.4.0...v1.5.0
 [1.4.0]: https://github.com/alshawai/Deep-Learning-Reference-Hub/compare/v1.3.0...v1.4.0
 [1.3.0]: https://github.com/alshawai/Deep-Learning-Reference-Hub/compare/v1.2.0...v1.3.0

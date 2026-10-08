@@ -411,9 +411,6 @@ the generated
 
 ## Crosswalk
 
-Live links are added as each sibling ships; entries marked *planned* are not yet
-published.
-
 | Reader wants to | Go to |
 | --- | --- |
 | Learn it step by step | [LSTM and GRU (notebook)](../tutorials/02-lstm-and-gru.ipynb) |

@@ -277,13 +277,10 @@ disturb the arrays a forward-parity check compares.
 
 ## Crosswalk
 
-Live links are added as each sibling ships; entries marked *planned* are not yet
-published.
-
 | Reader wants to | Go to |
 | --- | --- |
 | Learn it step by step | [Recurrent neural networks (notebook)](../tutorials/01-recurrent-neural-networks.ipynb) |
-| Do it in a project | Not written for this topic; see the language-modeling-and-sampling topic |
+| Do it in a project | [Train a language model and generate text](../how-to/train-a-language-model.md) |
 | Look up an equation or shape | Recurrent neural networks — *this page* |
 | Understand why it works | [Recurrent neural networks](../explanation/recurrent-neural-networks.md) |
 | Learn by running it | [Recurrent neural networks (notebook)](../tutorials/01-recurrent-neural-networks.ipynb) |

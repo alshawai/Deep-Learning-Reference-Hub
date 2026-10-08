@@ -3,7 +3,7 @@ name: Release
 # A pushed version tag is the release trigger. The tag sits on a merge commit
 # that already passed CI on main, so this workflow does not re-run the gate --
 # it only turns the tag into a GitHub Release. Future tags are created by the
-# release ritual (see docs/explanation/versioning-and-releases.md); historical
+# release ritual (see CONTRIBUTING.md, "Versioning and Releases"); historical
 # releases were back-filled by hand with curated notes.
 
 on:

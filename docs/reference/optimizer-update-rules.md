@@ -58,7 +58,7 @@ Suggested batch sizes:
 - **Large datasets**: 256-512 samples.
 - **Very large datasets**: 512-1024 samples.
 
-Powers of 2 work well with GPU memory architecture. The implementation is available in [`mini_batch.py`](https://github.com/eima40x4c/Deep-Learning-Reference-Hub/blob/main/src/dlhub/optimizers/mini_batch.py).
+Powers of 2 work well with GPU memory architecture. The implementation is available in [`mini_batch.py`](https://github.com/alshawai/Deep-Learning-Reference-Hub/blob/main/src/dlhub/optimizers/mini_batch.py).
 
 ## Momentum
 
@@ -78,7 +78,7 @@ v_t &= \beta v_{t-1} + (1-\beta) \nabla_\theta J(\theta_t) \\
 \theta_{t+1} &= \theta_t - \alpha v_t
 \end{align}$$
 
-Typical choices are $\beta = 0.9$ for a standard setting, $\beta = 0.99$ for noisier gradients, and $\beta = 0.5$ for rapidly changing landscapes. See [`momentum.py`](https://github.com/eima40x4c/Deep-Learning-Reference-Hub/blob/main/src/dlhub/optimizers/momentum.py).
+Typical choices are $\beta = 0.9$ for a standard setting, $\beta = 0.99$ for noisier gradients, and $\beta = 0.5$ for rapidly changing landscapes. See [`momentum.py`](https://github.com/alshawai/Deep-Learning-Reference-Hub/blob/main/src/dlhub/optimizers/momentum.py).
 
 ## RMSprop
 
@@ -100,7 +100,7 @@ s_t &= \beta s_{t-1} + (1-\beta) (\nabla_\theta J(\theta_t))^2 \\
 \theta_{t+1} &= \theta_t - \frac{\alpha}{\sqrt{s_t} + \epsilon} \nabla_\theta J(\theta_t)
 \end{align}$$
 
-Parameters with frequent large gradients receive smaller effective learning rates; parameters with small or rare gradients receive larger ones. $\beta = 0.999$ is a typical setting. See [`rmsprop.py`](https://github.com/eima40x4c/Deep-Learning-Reference-Hub/blob/main/src/dlhub/optimizers/rmsprop.py).
+Parameters with frequent large gradients receive smaller effective learning rates; parameters with small or rare gradients receive larger ones. $\beta = 0.999$ is a typical setting. See [`rmsprop.py`](https://github.com/alshawai/Deep-Learning-Reference-Hub/blob/main/src/dlhub/optimizers/rmsprop.py).
 
 ## Adam
 
@@ -132,7 +132,7 @@ v_t &= \beta_2 v_{t-1} + (1-\beta_2) (\nabla_\theta J(\theta_t))^2 \\
 \theta_{t+1} &= \theta_t - \frac{\alpha}{\sqrt{\hat{v}_t} + \epsilon} \hat{m}_t
 \end{align}$$
 
-Default hyperparameters are $\alpha = 0.001$, $\beta_1 = 0.9$, $\beta_2 = 0.999$, and $\epsilon = 1e^{-8}$. See [`adam.py`](https://github.com/eima40x4c/Deep-Learning-Reference-Hub/blob/main/src/dlhub/optimizers/adam.py).
+Default hyperparameters are $\alpha = 0.001$, $\beta_1 = 0.9$, $\beta_2 = 0.999$, and $\epsilon = 1e^{-8}$. See [`adam.py`](https://github.com/alshawai/Deep-Learning-Reference-Hub/blob/main/src/dlhub/optimizers/adam.py).
 
 ## AdamW and AMSGrad
 
@@ -149,4 +149,4 @@ AMSGrad maintains the maximum of past squared gradients instead of only their ex
 
 ## Implementation Reference
 
-The generated [optimizer API reference](api/optimizers.md) documents the package implementation. A side-by-side comparison is available in [`comparison.py`](https://github.com/eima40x4c/Deep-Learning-Reference-Hub/blob/main/src/dlhub/optimizers/comparison.py).
+The generated [optimizer API reference](api/optimizers.md) documents the package implementation. A side-by-side comparison is available in [`comparison.py`](https://github.com/alshawai/Deep-Learning-Reference-Hub/blob/main/src/dlhub/optimizers/comparison.py).

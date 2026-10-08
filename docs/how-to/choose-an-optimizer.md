@@ -73,4 +73,4 @@ optimizer = tf.keras.optimizers.SGD(learning_rate=0.01, momentum=0.9)
 - **Need for a stable default**: Use Adam or AdamW.
 - **Need for better final vision-model performance**: Try SGD with momentum in the final training phase.
 
-For complete runnable examples, see the [`comparison.py`](https://github.com/eima40x4c/Deep-Learning-Reference-Hub/blob/main/src/dlhub/optimizers/comparison.py) implementation and the generated [optimizer API reference](../reference/api/optimizers.md).
+For complete runnable examples, see the [`comparison.py`](https://github.com/alshawai/Deep-Learning-Reference-Hub/blob/main/src/dlhub/optimizers/comparison.py) implementation and the generated [optimizer API reference](../reference/api/optimizers.md).

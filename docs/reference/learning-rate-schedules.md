@@ -48,4 +48,4 @@ def reduce_on_plateau(val_loss, lr, patience=10, factor=0.5):
     return lr
 ```
 
-The schedule implementations are collected in [`schedules.py`](https://github.com/eima40x4c/Deep-Learning-Reference-Hub/blob/main/src/dlhub/optimizers/schedules.py).
+The schedule implementations are collected in [`schedules.py`](https://github.com/alshawai/Deep-Learning-Reference-Hub/blob/main/src/dlhub/optimizers/schedules.py).

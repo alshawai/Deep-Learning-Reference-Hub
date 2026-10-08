@@ -301,9 +301,6 @@ reference.
 
 ## Crosswalk
 
-Live links are added as each sibling ships; plain-text entries are not yet
-published.
-
 | Reader wants to | Go to |
 | --- | --- |
 | Learn it step by step | [Language modeling and sampling (notebook)](../tutorials/03-language-modeling-and-sampling.ipynb) |

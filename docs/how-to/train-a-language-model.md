@@ -373,9 +373,6 @@ mechanism, which is why this loop is worth understanding before you scale it up.
 
 ## Crosswalk
 
-Live links are added as each sibling ships; entries not yet published render as
-plain text.
-
 | Reader wants to | Go to |
 | --- | --- |
 | Learn it step by step | [Language modeling and sampling (notebook)](../tutorials/03-language-modeling-and-sampling.ipynb) |

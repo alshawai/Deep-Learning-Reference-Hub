@@ -31,10 +31,7 @@ reader would arrive already wanting the outcome.
   optimizer" is a reference or explanation page. "How to choose an optimizer" is
   a how-to.
 
-## Planned contents
-
-Drawn from procedural material currently embedded in the source documents, which
-the document decomposition files here:
+## Contents
 
 - **[How to choose an optimizer](choose-an-optimizer.md)** — from the practical guidelines and optimizer
   selection sections of the optimization algorithms document.
@@ -44,3 +41,9 @@ the document decomposition files here:
   the tuning starting strategy.
 - **[How to run a hyperparameter search](run-hyperparameter-search.md)** — from the search strategy guidance,
   covering search space design and the pitfalls documented alongside it.
+- **[How to choose a gated cell](choose-a-gated-cell.md)** — picking between the LSTM, the GRU, and
+  the minimal gated recurrences when a gate is what the task needs.
+- **[How to choose a sequence model](choose-a-sequence-model.md)** — choosing between a recurrent
+  network, a state-space model, and attention, from the sequence's length and what it costs to process.
+- **[How to train a language model and generate text](train-a-language-model.md)** — the training
+  loop, what perplexity tells you, and how to sample from the trained distribution.

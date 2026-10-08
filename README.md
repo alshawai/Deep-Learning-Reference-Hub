@@ -120,11 +120,13 @@ contribution workflow.
 ### By depth
 
 - **Starting out:** forward propagation, activation functions, parameter
-  initialization, and the optimizer-selection guide.
+  initialization, the optimizer-selection guide, and word embeddings.
 - **Building confidence:** backpropagation, regularization, gradient checking,
-  learning-rate schedules, and random search.
+  learning-rate schedules, random search, recurrent networks, LSTM and GRU
+  gating, and language modeling and sampling.
 - **Going deeper:** matrix calculus, adaptive optimization, Bayesian
-  optimization, multi-fidelity methods, and population-based training.
+  optimization, multi-fidelity methods, population-based training, attention, and
+  state-space sequence models.
 
 These labels describe the background a page assumes, not the importance of its
 subject. The [documentation navigation](https://alshawai.github.io/Deep-Learning-Reference-Hub/)
@@ -139,8 +141,9 @@ is the authoritative index as the hub grows.
 - **Hyperparameter optimization:** random and Bayesian search, ASHA and
   multi-fidelity methods, population-based training, and learning-rate finding.
 - **Sequence models:** recurrent networks, LSTM and GRU gating, language
-  modeling and sampling, and word embeddings — from one-hot to vectors you can
-  do arithmetic on.
+  modeling and sampling, word embeddings — from one-hot to vectors you can do
+  arithmetic on — and the modern alternatives to the recurrence: attention,
+  state-space models, and gated linear recurrences.
 
 Computer vision and generative modelling are natural future directions, so the
 README does not list them as current coverage

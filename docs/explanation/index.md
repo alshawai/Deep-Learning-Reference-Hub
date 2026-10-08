@@ -33,9 +33,7 @@ consequence.
   page a reader consults to find that number.
 - **Restated API documentation.** Link to the generated reference instead.
 
-## Planned contents
-
-Drawn from the conceptual material currently embedded in the source documents:
+## Contents
 
 - **[Forward and backward propagation](forward-and-backward-propagation.md)** — the full derivation from the L-layer
   document, including the recursive formula for hidden layers.
@@ -56,3 +54,12 @@ Drawn from the conceptual material currently embedded in the source documents:
   more than others, and why random search beats grid search.
 - **[Recurrent neural networks](recurrent-neural-networks.md)** — why a long-range gradient vanishes or explodes in an
   RNN, tied to the recurrent weight's spectral radius, and what gradient clipping does and does not fix.
+- **[LSTM and GRU](lstm-and-gru.md)** — the constant error carousel, what the forget gate does to the
+  cell-state derivative, and why a gate is what buys a longer memory.
+- **[Language modeling and sampling](language-modeling-and-sampling.md)** — what a language model
+  estimates, why perplexity is the loss exponentiated, and what temperature is doing to the distribution
+  it samples from.
+- **[Word embeddings](word-embeddings.md)** — how a discrete symbol becomes a vector, why linear
+  structure appears in the geometry, and what the analogy arithmetic is actually computing.
+- **[Modern sequence models](modern-sequence-models.md)** — what attention buys and what it costs,
+  and how state-space models and gated linear recurrences recover linear-time inference.
