@@ -38,6 +38,14 @@ and documentation in this hub.
 - **Griffin: Mixing Gated Linear Recurrences with Local Attention**: De et al. (2024) – [https://arxiv.org/abs/2402.19427](https://arxiv.org/abs/2402.19427)
 - **Transformers are SSMs: State Space Duality (Mamba-2)**: Dao & Gu (2024) – [https://arxiv.org/abs/2405.21060](https://arxiv.org/abs/2405.21060)
 - **xLSTM: Extended Long Short-Term Memory**: Beck et al. (2024) – [https://arxiv.org/abs/2405.04517](https://arxiv.org/abs/2405.04517)
+- **Distributional Structure (the distributional hypothesis)**: Harris (1954) – *Word* 10(2–3), 146–162.
+- **A synopsis of linguistic theory 1930–1955 ("a word by the company it keeps")**: Firth (1957) – in *Studies in Linguistic Analysis*, Blackwell.
+- **A Neural Probabilistic Language Model**: Bengio, Ducharme, Vincent & Jauvin (2003) – *JMLR* 3, 1137–1155. Learned distributed word-feature vectors.
+- **Efficient Estimation of Word Representations in Vector Space (Word2Vec)**: Mikolov, Chen, Corrado & Dean (2013) – [https://arxiv.org/abs/1301.3781](https://arxiv.org/abs/1301.3781)
+- **Linguistic Regularities in Continuous Space Word Representations (analogies)**: Mikolov, Yih & Zweig (2013) – NAACL-HLT, 746–751.
+- **GloVe: Global Vectors for Word Representation**: Pennington, Socher & Manning (2014) – [https://nlp.stanford.edu/pubs/glove.pdf](https://nlp.stanford.edu/pubs/glove.pdf)
+- **Improving Distributional Similarity with Lessons Learned from Word Embeddings (3CosMul)**: Levy, Goldberg & Dagan (2015) – *TACL* 3, 211–225.
+- **Visualizing Data using t-SNE**: van der Maaten & Hinton (2008) – *JMLR* 9, 2579–2605.
 
 ---
 

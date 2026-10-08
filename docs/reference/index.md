@@ -64,4 +64,5 @@ Generated from the package docstrings, one page per subpackage:
 - [Optimizers](api/optimizers.md) — gradient descent and the adaptive methods.
 - [Tuning](api/tuning.md) — hyperparameter search strategies.
 - [Neural networks](api/nn.md) — network construction and the training loop.
+- [Word embeddings](api/embeddings.md) — the embedding matrix, similarity, and analogy.
 - [Training techniques](api/training.md) — early stopping and gradient checking.
