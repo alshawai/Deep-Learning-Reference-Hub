@@ -172,11 +172,11 @@ import torch
 
 # Ng writes E as (d, V); torch.nn.Embedding stores the transpose,
 # so its weight has shape (V, d) -- one word per row.
-weight = torch.tensor(E.T)                        # (V, d)
+weight = torch.tensor(E.T)  # (V, d)
 embedding = torch.nn.Embedding.from_pretrained(weight)
 
 # A word vector is therefore a row, not a column:
-e_w = embedding(torch.tensor(i))                  # == weight[i] == E[:, i]
+e_w = embedding(torch.tensor(i))  # == weight[i] == E[:, i]
 ```
 
 A reader who conflates the two conventions transposes their matrix and gets $d$
