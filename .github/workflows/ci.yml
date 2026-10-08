@@ -81,11 +81,17 @@ jobs:
           pip install torch --index-url https://download.pytorch.org/whl/cpu
           pip install tensorflow-cpu
 
-      # -p no:randomly and --strict-markers keep a skipped parity test from
-      # reading as a pass. If a parity test cannot run, this job fails.
+      # Selects by class name (``-k parity``), not filename. The file guard
+      # counts both naming conventions: parity ports use ``test_<topic>_parity.py``
+      # and framework idiom tracks ``test_<topic>_torch.py`` -- an idiom track
+      # still selects under ``-k parity`` (its class name carries ``Parity``) and
+      # would otherwise collect-and-skip green in the framework-free hub job.
+      # This job installs torch/tensorflow, so a framework test runs here for
+      # real; if nothing is selected at all, the job still runs pytest to prove
+      # the selection is live rather than vacuous.
       - name: Parity tests
         run: |
-          if ls tests/*parity*.py >/dev/null 2>&1; then
+          if ls tests/*parity*.py tests/*_torch.py >/dev/null 2>&1; then
             python -m pytest tests -k parity -q -rs --strict-markers
           else
             echo "no parity tests yet"
