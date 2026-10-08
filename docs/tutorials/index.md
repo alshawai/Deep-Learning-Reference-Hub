@@ -23,12 +23,21 @@ for them along the way.
   of the sequence. It imports `dlhub.nn.sequence.lstm`, `.gru`, and
   `.min_gated`, and implements nothing of its own.
 
+- **[Word embeddings: from one-hot to a vector you can do arithmetic on](04-word-embeddings.ipynb)**
+  — a runnable notebook. You start from a one-hot column, replace it with a
+  lookup into a small planted embedding matrix, and then *use* the vectors:
+  measure meaning with cosine, run `king − man + woman` through a 3CosAdd
+  analogy, rank nearest neighbours, and project the whole vocabulary to two
+  dimensions with PCA to see the geometry the arithmetic relies on. It imports
+  the hub's canonical `dlhub.embeddings`, so the lesson cannot drift from the
+  code it teaches.
+
 ## Framework tutorial notebooks
 
-The two notebooks above import only what the docs build installs — numpy, scipy,
-and the `dlhub` package — so `mkdocs build --strict` re-executes them and their
-committed outputs cannot drift from the code that produced them. A tutorial that
-imports a framework instead — PyTorch or TensorFlow — cannot run in that
+The three notebooks above import only what the docs build installs — numpy,
+scipy, and the `dlhub` package — so `mkdocs build --strict` re-executes them and
+their committed outputs cannot drift from the code that produced them. A tutorial
+that imports a framework instead — PyTorch or TensorFlow — cannot run in that
 framework-free build. Such a notebook is a *framework tutorial notebook*, and it
 carries three obligations:
 

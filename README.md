@@ -138,9 +138,12 @@ is the authoritative index as the hub grows.
   early stopping, optimizers, and learning-rate schedules.
 - **Hyperparameter optimization:** random and Bayesian search, ASHA and
   multi-fidelity methods, population-based training, and learning-rate finding.
+- **Sequence models:** recurrent networks, LSTM and GRU gating, language
+  modeling and sampling, and word embeddings — from one-hot to vectors you can
+  do arithmetic on.
 
-Computer vision, natural language processing, and generative modelling are
-natural future directions, but the README does not list them as current coverage
+Computer vision and generative modelling are natural future directions, so the
+README does not list them as current coverage
 until the repository contains material readers can use.
 
 ### By framework
@@ -169,18 +172,19 @@ expected to preserve:
 
 ## Repository statistics
 
-- **Total Documents**: 32
-- **Code Examples**: 26 implementations
-- **Jupyter Notebooks**: 3
+- **Total Documents**: 34
+- **Code Examples**: 28 implementations
+- **Jupyter Notebooks**: 4
 - **Frameworks Covered**: NumPy, PyTorch, TensorFlow
 
 The framework badges above describe optional example compatibility. The checked
 statistics count published implementation modules: the NumPy from-scratch
 references, plus their framework ports. Most framework modules are parity ports
-checked against a NumPy reference; the exception is the
-language-modeling-and-sampling topic, which is framework-canonical — its PyTorch
-module is the only implementation, because the topic introduces no new
-from-scratch mathematics.
+checked against a NumPy reference; framework-canonical topics are the exception —
+language-modeling-and-sampling, whose PyTorch module is its only implementation
+because the topic introduces no new from-scratch mathematics, and word-embeddings,
+whose PyTorch module is an idiom track (a lookup is a gather, so there is nothing
+to hold to a tolerance) showing the `(V × d)` row convention of `nn.Embedding`.
 
 ## Contributing
 

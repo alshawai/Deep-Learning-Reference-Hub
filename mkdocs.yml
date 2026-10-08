@@ -103,6 +103,7 @@ nav:
       - Recurrent neural networks: tutorials/01-recurrent-neural-networks.ipynb
       - LSTM and GRU: tutorials/02-lstm-and-gru.ipynb
       - Language modeling and sampling: tutorials/03-language-modeling-and-sampling.ipynb
+      - Word embeddings: tutorials/04-word-embeddings.ipynb
   - How-to guides:
       - how-to/index.md
       - Choose an optimizer: how-to/choose-an-optimizer.md
@@ -119,6 +120,7 @@ nav:
       - LSTM and GRU: reference/lstm-and-gru.md
       - Modern sequence models: reference/modern-sequence-models.md
       - Language modeling and sampling: reference/language-modeling-and-sampling.md
+      - Word embeddings: reference/word-embeddings.md
       - Activation functions: reference/activation-functions.md
       - Parameter update rule: reference/parameter-update-rule.md
       - Optimizer update rules: reference/optimizer-update-rules.md
@@ -132,6 +134,7 @@ nav:
           - Optimizers: reference/api/optimizers.md
           - Tuning: reference/api/tuning.md
           - Neural networks: reference/api/nn.md
+          - Word embeddings: reference/api/embeddings.md
           - Training techniques: reference/api/training.md
   - Explanation:
       - explanation/index.md
@@ -146,3 +149,4 @@ nav:
       - LSTM and GRU: explanation/lstm-and-gru.md
       - Modern sequence models: explanation/modern-sequence-models.md
       - Language modeling and sampling: explanation/language-modeling-and-sampling.md
+      - Word embeddings: explanation/word-embeddings.md
