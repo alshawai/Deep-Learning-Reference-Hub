@@ -11,7 +11,14 @@ API stability — see the versioning policy in
 
 ## [Unreleased]
 
+## [1.5.0] - 2026-10-08
+
 ### Added
+- [Word embeddings](docs/explanation/word-embeddings.md): static word vectors
+  and their geometry — the embedding matrix and lookup identity, cosine
+  similarity, nearest neighbours, analogy arithmetic, and PCA projection — with
+  an explanation, a reference, a from-scratch NumPy implementation, a PyTorch
+  `nn.Embedding` idiom port, and a tutorial notebook.
 - A tag-triggered GitHub Release workflow, and a `releasecheck` CI guard that
   keeps the version, the latest tag, and this file in agreement.
 - The versioning and release policy, documented in `CONTRIBUTING.md`.
@@ -76,7 +83,8 @@ package rather than a folder of notes.
 - A CI quality gate running ruff, pytest, the `hubcheck` integrity checks, and a
   strict documentation build.
 
-[Unreleased]: https://github.com/alshawai/Deep-Learning-Reference-Hub/compare/v1.4.0...HEAD
+[Unreleased]: https://github.com/alshawai/Deep-Learning-Reference-Hub/compare/v1.5.0...HEAD
+[1.5.0]: https://github.com/alshawai/Deep-Learning-Reference-Hub/compare/v1.4.0...v1.5.0
 [1.4.0]: https://github.com/alshawai/Deep-Learning-Reference-Hub/compare/v1.3.0...v1.4.0
 [1.3.0]: https://github.com/alshawai/Deep-Learning-Reference-Hub/compare/v1.2.0...v1.3.0
 [1.2.0]: https://github.com/alshawai/Deep-Learning-Reference-Hub/compare/v1.1.0...v1.2.0
