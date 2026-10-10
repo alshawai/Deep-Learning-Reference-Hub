@@ -32,9 +32,9 @@ and the in-project task is in its how-to guide, both reachable from the
 - [Fixture and tolerances](#fixture-and-tolerances)
 - [Failure modes](#failure-modes)
 - [Implementation Examples](#implementation-examples)
+- [Key Takeaways](#key-takeaways)
 - [References](#references)
 - [Crosswalk](#crosswalk)
-- [Key Takeaways](#key-takeaways)
 
 ## Notation and shapes
 
@@ -237,6 +237,16 @@ implementation.
 ### Complete Implementations:
 > #### **[Character-level language model — PyTorch (canonical)](https://github.com/alshawai/Deep-Learning-Reference-Hub/blob/main/src/dlhub/pytorch/sequence/language_model.py)** - The char-RNN language model on `torch.nn.RNN` + `nn.Linear`, with per-character cross-entropy and perplexity through `F.cross_entropy`, global-norm clipping through `clip_grad_norm_`, and seeded temperature sampling through `torch.multinomial`. Checked on its own correctness against the shared fixture: the $\approx \ln V$ initialisation anchor, a strictly decreasing training loss, byte-for-byte sampling reproducibility, a shuffled-target discrimination test, and a `clip_grad_norm_`-versus-`clip_gradients` cross-check. This is the hub's first framework-canonical topic; the docs build installs no framework, so there is no generated API page.
 
+## Key Takeaways
+
+1. The language model factorises a sequence autoregressively, $P(x^{\langle 1\rangle}, \ldots, x^{\langle T\rangle}) = \prod_{t} P(x^{\langle t\rangle} \mid x^{\langle 1\rangle}, \ldots, x^{\langle t-1\rangle})$, and the RNN's softmax read-out $\hat{y}^{\langle t\rangle} = \mathrm{softmax}(W_{ya} a^{\langle t\rangle} + b_y)$ supplies each conditional as the distribution over the next character.
+2. Character-level: the vocabulary $V$ is the sorted unique characters (including `\n`), so $n_x = n_y = V$ and every token is a one-hot column; the sorted order makes the encoding deterministic across machines.
+3. Targets are shifted by one, $y^{\langle t\rangle} = x^{\langle t+1\rangle}$, with $x^{\langle 1\rangle} = \mathbf{0}$; the loss is the per-character cross-entropy in nats, and perplexity is its exponential, $\mathrm{PPL} = \exp(\mathrm{CE})$.
+4. At initialisation the model is $\approx$ uniform, so the per-character cross-entropy is $\approx \ln V$ and perplexity is $\approx V$ — the implementation's correctness anchor in place of a NumPy parity check.
+5. Sampling is autoregressive, stochastic, and seeded: $p^{\langle t\rangle} = \mathrm{softmax}(z^{\langle t\rangle}/T)$, draw $i^{\langle t\rangle}$, feed it back as a one-hot input; $T = 1$ is the model's own distribution, $T \to 0^{+}$ is greedy, $T > 1$ diversifies, and generation stops on `\n` or the cap $L$.
+6. Global-norm clipping caps the exploding-gradient case during training, rescaling every gradient by $v / \lVert g\rVert_2$ when the norm exceeds $v$, while leaving direction unchanged.
+7. PyTorch is canonical: `torch.nn.RNN` + `nn.Linear`, `F.cross_entropy`, `clip_grad_norm_`, and a seeded `torch.multinomial`, checked on its own correctness against a deterministic corpus fixture ($n_a = 32$, seed `1`).
+
 ## References
 
 - **Bengio, Y., Ducharme, R., Vincent, P. & Jauvin, C. (2003). A Neural Probabilistic Language Model. _Journal of Machine Learning Research_ 3, 1137–1155.** – The neural language-model factorisation this page states.
@@ -262,13 +272,3 @@ implementation.
 | Look up the factorisation or sampling algorithm | Language modeling and sampling — *this page* |
 | Understand why it works | [Language modeling and sampling](../explanation/language-modeling-and-sampling.md) |
 | Learn by running it | [Language modeling and sampling (notebook)](../tutorials/03-language-modeling-and-sampling.ipynb) |
-
-## Key Takeaways
-
-1. The language model factorises a sequence autoregressively, $P(x^{\langle 1\rangle}, \ldots, x^{\langle T\rangle}) = \prod_{t} P(x^{\langle t\rangle} \mid x^{\langle 1\rangle}, \ldots, x^{\langle t-1\rangle})$, and the RNN's softmax read-out $\hat{y}^{\langle t\rangle} = \mathrm{softmax}(W_{ya} a^{\langle t\rangle} + b_y)$ supplies each conditional as the distribution over the next character.
-2. Character-level: the vocabulary $V$ is the sorted unique characters (including `\n`), so $n_x = n_y = V$ and every token is a one-hot column; the sorted order makes the encoding deterministic across machines.
-3. Targets are shifted by one, $y^{\langle t\rangle} = x^{\langle t+1\rangle}$, with $x^{\langle 1\rangle} = \mathbf{0}$; the loss is the per-character cross-entropy in nats, and perplexity is its exponential, $\mathrm{PPL} = \exp(\mathrm{CE})$.
-4. At initialisation the model is $\approx$ uniform, so the per-character cross-entropy is $\approx \ln V$ and perplexity is $\approx V$ — the implementation's correctness anchor in place of a NumPy parity check.
-5. Sampling is autoregressive, stochastic, and seeded: $p^{\langle t\rangle} = \mathrm{softmax}(z^{\langle t\rangle}/T)$, draw $i^{\langle t\rangle}$, feed it back as a one-hot input; $T = 1$ is the model's own distribution, $T \to 0^{+}$ is greedy, $T > 1$ diversifies, and generation stops on `\n` or the cap $L$.
-6. Global-norm clipping caps the exploding-gradient case during training, rescaling every gradient by $v / \lVert g\rVert_2$ when the norm exceeds $v$, while leaving direction unchanged.
-7. PyTorch is canonical: `torch.nn.RNN` + `nn.Linear`, `F.cross_entropy`, `clip_grad_norm_`, and a seeded `torch.multinomial`, checked on its own correctness against a deterministic corpus fixture ($n_a = 32$, seed `1`).

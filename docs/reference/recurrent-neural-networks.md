@@ -26,9 +26,9 @@ For the reasoning behind the mechanics catalogued here, see the
 - [PyTorch parity](#pytorch-parity)
 - [Fixture and tolerances](#fixture-and-tolerances)
 - [Implementation Examples](#implementation-examples)
+- [Key Takeaways](#key-takeaways)
 - [References](#references)
 - [Crosswalk](#crosswalk)
-- [Key Takeaways](#key-takeaways)
 
 ## Notation and shapes
 
@@ -260,6 +260,16 @@ disturb the arrays a forward-parity check compares.
 > #### **[Vanilla RNN — from scratch (NumPy)](https://github.com/alshawai/Deep-Learning-Reference-Hub/blob/main/src/dlhub/nn/sequence/rnn.py)** - Forward propagation through time, term-by-term BPTT, global-norm gradient clipping, and the bidirectional and deep compositions, all checked against the shared fixture. Rendered signatures and docstrings are in the generated [neural-network API reference](api/nn.md).
 > #### **[Vanilla RNN — PyTorch parity port](https://github.com/alshawai/Deep-Learning-Reference-Hub/blob/main/src/dlhub/pytorch/sequence/rnn.py)** - The same recurrence built on `torch.nn.RNN` with an `nn.Linear` + softmax read-out, showing the weight mapping and the two-bias convention `nn.RNN` uses in place of Ng's single `b_a`. Checked against the NumPy reference on the shared fixture: forward activations and outputs to `atol=1e-8`, and autograd gradients versus the analytic BPTT to relative error below `1e-6`.
 
+## Key Takeaways
+
+1. A vanilla RNN applies one shared cell at every timestep: $a^{\langle t\rangle} = \tanh(W_{aa} a^{\langle t-1\rangle} + W_{ax} x^{\langle t\rangle} + b_a)$, with the softmax read-out $\hat{y}^{\langle t\rangle} = \mathrm{softmax}(W_{ya} a^{\langle t\rangle} + b_y)$ and $a^{\langle 0\rangle} = \mathbf{0}$.
+2. Arrays carry the feature axis first and time last, so $x$ is $(n_x, m, T_x)$, hidden states are $(n_a, m, T_x)$, and outputs are $(n_y, m, T_x)$.
+3. BPTT accumulates each shared weight's gradient over all timesteps, and the gradient at $a^{\langle t\rangle}$ merges two sources: the read-out at $t$ and the recurrence from $t+1$.
+4. The four cardinalities — one-to-one, one-to-many, many-to-one, and many-to-many (equal or unequal length) — all reuse the same cell.
+5. Backpropagating $k$ steps multiplies $k$ Jacobians bounded by $\lVert W_{aa}\rVert_2^{\,k}$: a largest singular value below $1$ vanishes the gradient, above $1$ explodes it. Global-norm clipping caps the exploding case; vanishing motivates the gated cells.
+6. Bidirectional and deep RNNs are compositions of the same cell — a bidirectional layer concatenates two direction passes to width $2 n_a$, and a deep layer feeds one layer's activations to the next.
+7. Parity is fixed by one deterministic `float64` fixture (seed `1`; $n_x, n_a, n_y, m, T_x = 3, 5, 2, 10, 4$), with forward matches to `atol = 1e-8` and analytic-vs-numeric gradients to relative error $< 10^{-7}$.
+
 ## References
 
 - **Rumelhart, D. E., Hinton, G. E. & Williams, R. J. (1986). Learning representations by back-propagating errors. _Nature_ 323, 533–536.** – The backpropagation algorithm that BPTT unrolls through time.
@@ -284,13 +294,3 @@ disturb the arrays a forward-parity check compares.
 | Look up an equation or shape | Recurrent neural networks — *this page* |
 | Understand why it works | [Recurrent neural networks](../explanation/recurrent-neural-networks.md) |
 | Learn by running it | [Recurrent neural networks (notebook)](../tutorials/01-recurrent-neural-networks.ipynb) |
-
-## Key Takeaways
-
-1. A vanilla RNN applies one shared cell at every timestep: $a^{\langle t\rangle} = \tanh(W_{aa} a^{\langle t-1\rangle} + W_{ax} x^{\langle t\rangle} + b_a)$, with the softmax read-out $\hat{y}^{\langle t\rangle} = \mathrm{softmax}(W_{ya} a^{\langle t\rangle} + b_y)$ and $a^{\langle 0\rangle} = \mathbf{0}$.
-2. Arrays carry the feature axis first and time last, so $x$ is $(n_x, m, T_x)$, hidden states are $(n_a, m, T_x)$, and outputs are $(n_y, m, T_x)$.
-3. BPTT accumulates each shared weight's gradient over all timesteps, and the gradient at $a^{\langle t\rangle}$ merges two sources: the read-out at $t$ and the recurrence from $t+1$.
-4. The four cardinalities — one-to-one, one-to-many, many-to-one, and many-to-many (equal or unequal length) — all reuse the same cell.
-5. Backpropagating $k$ steps multiplies $k$ Jacobians bounded by $\lVert W_{aa}\rVert_2^{\,k}$: a largest singular value below $1$ vanishes the gradient, above $1$ explodes it. Global-norm clipping caps the exploding case; vanishing motivates the gated cells.
-6. Bidirectional and deep RNNs are compositions of the same cell — a bidirectional layer concatenates two direction passes to width $2 n_a$, and a deep layer feeds one layer's activations to the next.
-7. Parity is fixed by one deterministic `float64` fixture (seed `1`; $n_x, n_a, n_y, m, T_x = 3, 5, 2, 10, 4$), with forward matches to `atol = 1e-8` and analytic-vs-numeric gradients to relative error $< 10^{-7}$.

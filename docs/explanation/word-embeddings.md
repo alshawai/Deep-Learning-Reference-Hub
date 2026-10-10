@@ -28,9 +28,9 @@ vocabulary words across the columns, one column per word.
 - [The limit that motivates sequence models](#the-limit-that-motivates-sequence-models)
 - [Where embeddings go from here](#where-embeddings-go-from-here)
 - [Implementation Examples](#implementation-examples)
-- [Crosswalk](#crosswalk)
-- [References](#references)
 - [Key Takeaways](#key-takeaways)
+- [References](#references)
+- [Crosswalk](#crosswalk)
 
 ## The problem with one-hot vectors
 
@@ -298,14 +298,33 @@ The contextual-embeddings topic surveys that overlay.
 > #### **[Word embeddings (NumPy)](https://github.com/alshawai/Deep-Learning-Reference-Hub/blob/main/src/dlhub/embeddings/word_embeddings.py)** - The from-scratch teaching reference behind every number on this page: the planted toy matrix, the lookup identity `E o_w = E[:, i]`, cosine similarity with a zero-vector guard, deterministic nearest neighbours, the 3CosAdd analogy with the input words excluded, and a from-scratch PCA-via-SVD projection to 2-D with a sign convention that makes the picture reproducible.
 > #### **[Word embeddings (PyTorch idiom port)](https://github.com/alshawai/Deep-Learning-Reference-Hub/blob/main/src/dlhub/pytorch/embeddings/word_embeddings.py)** - The same vectors in a `torch.nn.Embedding`, the way the lookup is really written in PyTorch: a gather by index rather than the one-hot product, over a weight stored as `(V, d)` — one word per *row*, so `weight == E.T`. An idiom track, not a parity port — it shows the transpose a reader must get right, the `from_pretrained(freeze=True)` default (the opposite of the trainable `nn.Embedding(V, d)` constructor), and weight tying as the forward pointer to the language-modeling topic. Checked on its own correctness: the gather equals the NumPy `lookup` exactly for every word.
 
-## Crosswalk
+## Key Takeaways
 
-| Reader wants to | Go to |
-| --- | --- |
-| Learn it step by step | [Word embeddings (notebook)](../tutorials/04-word-embeddings.ipynb) |
-| Look up an equation or rule | [Word embeddings (reference)](../reference/word-embeddings.md) |
-| Understand why it works | Word embeddings — *this page* |
-| Learn by running it | [Word embeddings (notebook)](../tutorials/04-word-embeddings.ipynb) |
+1. One-hot vectors encode only identity: any two distinct words are orthogonal and
+   equidistant, so the representation carries no similarity and a model built on it
+   cannot generalise from one word to another.
+2. A dense, featurized vector fixes this by placing similar words near each other;
+   the coordinates of a *learned* embedding are not individually interpretable, but
+   directions and offsets in the space are, which is where all the usefulness lives.
+3. An embedding layer *is* a bias-free linear layer on a one-hot input — $e_w = E\,o_w
+   = E_{:,\,i}$ — so in practice you gather column $i$ by index rather than forming the
+   product; the weights are the word vectors. PyTorch stores $E^{\top}$, $(V \times d)$,
+   so a word vector is a row.
+4. Geometry becomes semantics: cosine similarity ranks by direction (on the toy space
+   $\cos(\textit{king}, \textit{queen}) = 0.6$, $\cos(\textit{man}, \textit{woman}) = -1$),
+   nearest neighbours fall out of that ranking, and analogies solve by 3CosAdd,
+   $t = e_b - e_a + e_c$, with the three input words excluded from the candidates.
+5. Analogy-as-arithmetic works because good embedding spaces have linear substructure;
+   PCA via SVD gives an honest, variance-preserving 2-D view (exact on the rank-2 toy),
+   while t-SNE gives the nonlinear, cluster-revealing picture at the cost of quantitative
+   meaning.
+6. Pretrained vectors transfer: a few hundred dimensions trained on a large corpus carry
+   broad language knowledge into small-data tasks — the recipe that made embeddings
+   ubiquitous.
+7. Averaging word vectors into a sentence vector is order-blind — "not good" reads about
+   as positive as "good" — which is precisely the limitation that motivates the
+   order-aware sequence models, and the thread that continues into how embeddings are
+   learned, how they encode bias, and how contextual models replaced the static ones.
 
 ## References
 
@@ -334,30 +353,11 @@ The contextual-embeddings topic surveys that overlay.
 - **Ng, A. (2018). Deep Learning Specialization, Course 5 (Sequence Models), Week 2.**  
   [https://www.coursera.org/specializations/deep-learning](https://www.coursera.org/specializations/deep-learning) – The source of this family's framing and the $(d \times V)$ notation for $E$.
 
-## Key Takeaways
+## Crosswalk
 
-1. One-hot vectors encode only identity: any two distinct words are orthogonal and
-   equidistant, so the representation carries no similarity and a model built on it
-   cannot generalise from one word to another.
-2. A dense, featurized vector fixes this by placing similar words near each other;
-   the coordinates of a *learned* embedding are not individually interpretable, but
-   directions and offsets in the space are, which is where all the usefulness lives.
-3. An embedding layer *is* a bias-free linear layer on a one-hot input — $e_w = E\,o_w
-   = E_{:,\,i}$ — so in practice you gather column $i$ by index rather than forming the
-   product; the weights are the word vectors. PyTorch stores $E^{\top}$, $(V \times d)$,
-   so a word vector is a row.
-4. Geometry becomes semantics: cosine similarity ranks by direction (on the toy space
-   $\cos(\textit{king}, \textit{queen}) = 0.6$, $\cos(\textit{man}, \textit{woman}) = -1$),
-   nearest neighbours fall out of that ranking, and analogies solve by 3CosAdd,
-   $t = e_b - e_a + e_c$, with the three input words excluded from the candidates.
-5. Analogy-as-arithmetic works because good embedding spaces have linear substructure;
-   PCA via SVD gives an honest, variance-preserving 2-D view (exact on the rank-2 toy),
-   while t-SNE gives the nonlinear, cluster-revealing picture at the cost of quantitative
-   meaning.
-6. Pretrained vectors transfer: a few hundred dimensions trained on a large corpus carry
-   broad language knowledge into small-data tasks — the recipe that made embeddings
-   ubiquitous.
-7. Averaging word vectors into a sentence vector is order-blind — "not good" reads about
-   as positive as "good" — which is precisely the limitation that motivates the
-   order-aware sequence models, and the thread that continues into how embeddings are
-   learned, how they encode bias, and how contextual models replaced the static ones.
+| Reader wants to | Go to |
+| --- | --- |
+| Learn it step by step | [Word embeddings (notebook)](../tutorials/04-word-embeddings.ipynb) |
+| Look up an equation or rule | [Word embeddings (reference)](../reference/word-embeddings.md) |
+| Understand why it works | Word embeddings — *this page* |
+| Learn by running it | [Word embeddings (notebook)](../tutorials/04-word-embeddings.ipynb) |

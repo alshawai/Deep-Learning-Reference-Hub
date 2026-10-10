@@ -36,9 +36,9 @@ The modern sources were re-verified against arXiv on 2026-09-29.
 - [Minimal and extended recurrence](#minimal-and-extended-recurrence)
 - [Hybrids: keeping a slice of attention](#hybrids-keeping-a-slice-of-attention)
 - [What the revival proves, and what it does not](#what-the-revival-proves-and-what-it-does-not)
+- [Key Takeaways](#key-takeaways)
 - [References](#references)
 - [Crosswalk](#crosswalk)
-- [Key Takeaways](#key-takeaways)
 
 ## The two structural limits of recurrence
 
@@ -265,6 +265,35 @@ or that the quality question is closed. As of 2026 it is not. The honest framing
 is an **efficiency** story — linear-time training and $O(1)$ inference at long
 context — with the quality verdict open and evolving.
 
+## Key Takeaways
+
+1. Recurrence has two structural limits: it trains serially (step $t$ needs step
+   $t-1$), and its inter-position path length is $O(\lvert t - t' \rvert)$, so
+   long-range signal must survive a chain of Jacobian products. Both are
+   architectural, not tuning problems.
+2. Attention displaced recurrence by removing both limits — fully parallel
+   training and $O(1)$ inter-position path length — at the cost of $O(T^2)$
+   compute, $O(T)$ memory, and a KV-cache that grows $O(T)$ so per-token
+   generation is $O(T)$.
+3. What recurrence still buys is exactly what attention pays for at long context:
+   a fixed-size $O(1)$ state and $O(1)$-per-token inference. Recovering that while
+   keeping parallel training is the entire aim of the revival.
+4. The shared mechanism is that a *linear* recurrence composes associatively, so a
+   parallel scan trains it over $T$ at once while the same model runs as an
+   $O(1)$-per-token recurrence at inference.
+5. The families are different routes to being a scannable linear recurrence: S4 as
+   a global convolution ($O(T \log T)$, LTI); Mamba making the state space
+   input-dependent (selective, recovered by a hardware-aware scan) with Mamba-2's
+   SSD duality unifying attention and selective SSMs; RWKV/RetNet linearising
+   attention; and minGRU/minLSTM and xLSTM reworking the classical gated cells.
+6. Keep the registers separate. The complexity and path-length facts are firm; the
+   performance numbers — Mamba's 5×, Mamba-2's 2–8×, RWKV at 14B, Griffin's 6×,
+   the minGRU/minLSTM and xLSTM comparisons — are each one paper's reported result,
+   dated 2023–2024 and hedged.
+7. The revival is an efficiency story, not a verdict. As of 2026 it does not make
+   Transformers obsolete, and no family universally beats attention on quality —
+   the win is long-context cost, with the quality question open and evolving.
+
 ## References
 
 - **Vaswani, A., Shazeer, N., Parmar, N., Uszkoreit, J., Jones, L., Gomez, A. N., Kaiser, Ł. & Polosukhin, I. (2017). Attention Is All You Need. NeurIPS.**  
@@ -296,34 +325,3 @@ context — with the quality verdict open and evolving.
 | Look up the comparison or a definition | [Modern sequence models](../reference/modern-sequence-models.md) |
 | Understand why it works | Modern sequence models — *this page* |
 | Learn by running it | not written for this topic — situates the landscape, ships no implementation |
-
-## Key Takeaways
-
-1. Recurrence has two structural limits: it trains serially (step $t$ needs step
-   $t-1$), and its inter-position path length is $O(\lvert t - t' \rvert)$, so
-   long-range signal must survive a chain of Jacobian products. Both are
-   architectural, not tuning problems.
-2. Attention displaced recurrence by removing both limits — fully parallel
-   training and $O(1)$ inter-position path length — at the cost of $O(T^2)$
-   compute, $O(T)$ memory, and a KV-cache that grows $O(T)$ so per-token
-   generation is $O(T)$.
-3. What recurrence still buys is exactly what attention pays for at long context:
-   a fixed-size $O(1)$ state and $O(1)$-per-token inference. Recovering that while
-   keeping parallel training is the entire aim of the revival.
-4. The shared mechanism is that a *linear* recurrence composes associatively, so a
-   parallel scan trains it over $T$ at once while the same model runs as an
-   $O(1)$-per-token recurrence at inference.
-5. The families are different routes to being a scannable linear recurrence: S4 as
-   a global convolution ($O(T \log T)$, LTI); Mamba making the state space
-   input-dependent (selective, recovered by a hardware-aware scan) with Mamba-2's
-   SSD duality unifying attention and selective SSMs; RWKV/RetNet linearising
-   attention; and minGRU/minLSTM and xLSTM reworking the classical gated cells.
-6. Keep the registers separate. The complexity and path-length facts are firm; the
-   performance numbers — Mamba's 5×, Mamba-2's 2–8×, RWKV at 14B, Griffin's 6×,
-   the minGRU/minLSTM and xLSTM comparisons — are each one paper's reported result,
-   dated 2023–2024 and hedged.
-7. The revival is an efficiency story, not a verdict. As of 2026 it does not make
-   Transformers obsolete, and no family universally beats attention on quality —
-   the win is long-context cost, with the quality question open and evolving.
-</content>
-</invoke>

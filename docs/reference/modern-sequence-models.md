@@ -29,9 +29,9 @@ modern sources were re-verified against arXiv on 2026-09-29.
 - [Reading the axes](#reading-the-axes)
 - [Reported results, cited and dated](#reported-results-cited-and-dated)
 - [What this comparison does not claim](#what-this-comparison-does-not-claim)
+- [Key Takeaways](#key-takeaways)
 - [References](#references)
 - [Crosswalk](#crosswalk)
-- [Key Takeaways](#key-takeaways)
 
 ## Definitions
 
@@ -141,6 +141,32 @@ conclusions.
   context — linear-time training and $O(1)$ inference — with the quality question
   stated as **open and evolving**.
 
+## Key Takeaways
+
+1. The table reads on five axes: whether training parallelises over $T$, training
+   compute in $T$, per-token inference cost and state size, long-range handling,
+   and a dated maturity note. Axes A–C are asymptotic and asserted; axis E carries
+   the citations.
+2. Attention's trade is $O(1)$ path length and fully parallel training bought with
+   $O(T^2)$ compute and an $O(T)$ KV-cache at inference. Every other family in the
+   table is a different point on that trade.
+3. The recurrence revival is a **linear-time** story: S4 as a global convolution
+   ($O(T \log T)$), selective SSMs (Mamba/Mamba-2) and minimal recurrence
+   (minGRU/minLSTM, xLSTM) via an associative scan ($O(T)$), and linear attention
+   (RWKV, RetNet) via chunkwise-recurrent training — all keeping an $O(1)$ inference
+   state.
+4. The selective step matters: S4 is linear time-invariant and so a convolution,
+   while Mamba's input-dependent parameters break that form and are recovered by a
+   hardware-aware scan; Mamba-2's SSD duality frames attention and selective SSMs
+   as one structured-matrix operation.
+5. Every performance number here is one paper's reported result, dated and hedged
+   — Mamba's 5×, Mamba-2's 2–8×, RWKV at 14B, Griffin's 6×-fewer-tokens, and the
+   "competitive"/"favourable" claims for minGRU/minLSTM and xLSTM. None is repeated
+   as settled fact.
+6. The topic does not claim attention is obsolete or that any alternative
+   universally wins on quality. It frames the revival as efficiency at long
+   context, with the quality question open and evolving as of 2026.
+
 ## References
 
 - **Vaswani, A., Shazeer, N., Parmar, N., Uszkoreit, J., Jones, L., Gomez, A. N., Kaiser, Ł. & Polosukhin, I. (2017). Attention Is All You Need. NeurIPS.**  
@@ -172,29 +198,3 @@ conclusions.
 | Look up the comparison or a definition | Modern sequence models — *this page* |
 | Understand why it works | [Modern sequence models](../explanation/modern-sequence-models.md) |
 | Learn by running it | not written for this topic — situates the landscape, ships no implementation |
-
-## Key Takeaways
-
-1. The table reads on five axes: whether training parallelises over $T$, training
-   compute in $T$, per-token inference cost and state size, long-range handling,
-   and a dated maturity note. Axes A–C are asymptotic and asserted; axis E carries
-   the citations.
-2. Attention's trade is $O(1)$ path length and fully parallel training bought with
-   $O(T^2)$ compute and an $O(T)$ KV-cache at inference. Every other family in the
-   table is a different point on that trade.
-3. The recurrence revival is a **linear-time** story: S4 as a global convolution
-   ($O(T \log T)$), selective SSMs (Mamba/Mamba-2) and minimal recurrence
-   (minGRU/minLSTM, xLSTM) via an associative scan ($O(T)$), and linear attention
-   (RWKV, RetNet) via chunkwise-recurrent training — all keeping an $O(1)$ inference
-   state.
-4. The selective step matters: S4 is linear time-invariant and so a convolution,
-   while Mamba's input-dependent parameters break that form and are recovered by a
-   hardware-aware scan; Mamba-2's SSD duality frames attention and selective SSMs
-   as one structured-matrix operation.
-5. Every performance number here is one paper's reported result, dated and hedged
-   — Mamba's 5×, Mamba-2's 2–8×, RWKV at 14B, Griffin's 6×-fewer-tokens, and the
-   "competitive"/"favourable" claims for minGRU/minLSTM and xLSTM. None is repeated
-   as settled fact.
-6. The topic does not claim attention is obsolete or that any alternative
-   universally wins on quality. It frames the revival as efficiency at long
-   context, with the quality question open and evolving as of 2026.

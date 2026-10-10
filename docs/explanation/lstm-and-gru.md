@@ -34,9 +34,9 @@ that picks a cell, and for a runnable version, see the
 - [What happens when the gates forget the state](#what-happens-when-the-gates-forget-the-state)
 - [Where gated cells stand today](#where-gated-cells-stand-today)
 - [Implementation Examples](#implementation-examples)
+- [Key Takeaways](#key-takeaways)
 - [References](#references)
 - [Crosswalk](#crosswalk)
-- [Key Takeaways](#key-takeaways)
 
 ## The problem the gates were invented for
 
@@ -467,41 +467,6 @@ Rendered signatures and docstrings for the three NumPy modules are in
 the generated
 [neural-network API reference](../reference/api/nn.md).
 
-## Crosswalk
-
-| Reader wants to | Go to |
-| --- | --- |
-| Learn it step by step | [LSTM and GRU (notebook)](../tutorials/02-lstm-and-gru.ipynb) |
-| Do it in a project | [Choose a gated cell](../how-to/choose-a-gated-cell.md) |
-| Look up an equation or shape | [LSTM and GRU](../reference/lstm-and-gru.md) |
-| Understand why it works | LSTM and GRU — *this page* |
-| Learn by running it | [LSTM and GRU (notebook)](../tutorials/02-lstm-and-gru.ipynb) |
-
-## References
-
-- **Long Short-Term Memory — Hochreiter & Schmidhuber (1997)**  
-  *Neural Computation* 9(8), 1735–1780 – the original LSTM and the constant error carousel; the source of the input gate this hub writes $\Gamma_u$.
-- **Learning to Forget: Continual Prediction with LSTM — Gers, Schmidhuber & Cummins (2000)**  
-  *Neural Computation* 12(10), 2451–2471 – the forget gate, without which the 1997 cell could write memory but never release it.
-- **Learning Phrase Representations using RNN Encoder–Decoder for Statistical Machine Translation — Cho et al. (2014)**  
-  [https://arxiv.org/abs/1406.1078](https://arxiv.org/abs/1406.1078) – the GRU, in the reset-before-transform form this hub follows.
-- **Empirical Evaluation of Gated Recurrent Neural Networks on Sequence Modeling — Chung, Gulcehre, Cho & Bengio (2014)**  
-  [https://arxiv.org/abs/1412.3555](https://arxiv.org/abs/1412.3555) – the GRU-versus-LSTM comparison that found no conclusive winner.
-- **Were RNNs All We Needed? — Feng, Tung, Ahmed, Bengio & Hajimirsadeghi (2024)**  
-  [https://arxiv.org/abs/2410.01201](https://arxiv.org/abs/2410.01201) – minGRU and minLSTM, the parallel scan, and the log-space implementation of §B.1.
-- **Learning long-term dependencies with gradient descent is difficult — Bengio, Simard & Frasconi (1994)**  
-  *IEEE Transactions on Neural Networks* 5(2), 157–166 – the vanishing-gradient analysis gating answers.
-- **On the difficulty of training Recurrent Neural Networks — Pascanu, Mikolov & Bengio (2013)**  
-  [https://arxiv.org/abs/1211.5063](https://arxiv.org/abs/1211.5063) – exploding gradients and global-norm clipping, which gating does not replace.
-- **Deep Learning — Goodfellow, Bengio & Courville (2016), Ch. 10**  
-  [https://www.deeplearningbook.org/](https://www.deeplearningbook.org/) – gated architectures, including the forget-gate bias initialisation.
-- **Deep Learning Specialization, Course 5 (Sequence Models), Week 1 — Andrew Ng (2018)**  
-  [https://www.coursera.org/specializations/deep-learning](https://www.coursera.org/specializations/deep-learning) – the notation used here, including $\Gamma_u$ for both cells' update gate.
-- **Keras `GRU` layer documentation**  
-  [https://keras.io/api/layers/recurrent_layers/gru/](https://keras.io/api/layers/recurrent_layers/gru/) – the `reset_after` flag and its cuDNN-compatible default.
-- **PyTorch `torch.nn.GRU` documentation**  
-  [https://pytorch.org/docs/stable/generated/torch.nn.GRU.html](https://pytorch.org/docs/stable/generated/torch.nn.GRU.html) – the reset-after recurrence, with no option to change it.
-
 ## Key Takeaways
 
 1. Gated cells exist to change the *default* behaviour of a recurrent state.
@@ -543,3 +508,38 @@ the generated
    The dropped reset gate, output gate, and candidate $\tanh$ all follow from
    that deletion, and what is traded away is gates that can condition on the
    state (Feng et al., 2024).
+
+## References
+
+- **Long Short-Term Memory — Hochreiter & Schmidhuber (1997)**  
+  *Neural Computation* 9(8), 1735–1780 – the original LSTM and the constant error carousel; the source of the input gate this hub writes $\Gamma_u$.
+- **Learning to Forget: Continual Prediction with LSTM — Gers, Schmidhuber & Cummins (2000)**  
+  *Neural Computation* 12(10), 2451–2471 – the forget gate, without which the 1997 cell could write memory but never release it.
+- **Learning Phrase Representations using RNN Encoder–Decoder for Statistical Machine Translation — Cho et al. (2014)**  
+  [https://arxiv.org/abs/1406.1078](https://arxiv.org/abs/1406.1078) – the GRU, in the reset-before-transform form this hub follows.
+- **Empirical Evaluation of Gated Recurrent Neural Networks on Sequence Modeling — Chung, Gulcehre, Cho & Bengio (2014)**  
+  [https://arxiv.org/abs/1412.3555](https://arxiv.org/abs/1412.3555) – the GRU-versus-LSTM comparison that found no conclusive winner.
+- **Were RNNs All We Needed? — Feng, Tung, Ahmed, Bengio & Hajimirsadeghi (2024)**  
+  [https://arxiv.org/abs/2410.01201](https://arxiv.org/abs/2410.01201) – minGRU and minLSTM, the parallel scan, and the log-space implementation of §B.1.
+- **Learning long-term dependencies with gradient descent is difficult — Bengio, Simard & Frasconi (1994)**  
+  *IEEE Transactions on Neural Networks* 5(2), 157–166 – the vanishing-gradient analysis gating answers.
+- **On the difficulty of training Recurrent Neural Networks — Pascanu, Mikolov & Bengio (2013)**  
+  [https://arxiv.org/abs/1211.5063](https://arxiv.org/abs/1211.5063) – exploding gradients and global-norm clipping, which gating does not replace.
+- **Deep Learning — Goodfellow, Bengio & Courville (2016), Ch. 10**  
+  [https://www.deeplearningbook.org/](https://www.deeplearningbook.org/) – gated architectures, including the forget-gate bias initialisation.
+- **Deep Learning Specialization, Course 5 (Sequence Models), Week 1 — Andrew Ng (2018)**  
+  [https://www.coursera.org/specializations/deep-learning](https://www.coursera.org/specializations/deep-learning) – the notation used here, including $\Gamma_u$ for both cells' update gate.
+- **Keras `GRU` layer documentation**  
+  [https://keras.io/api/layers/recurrent_layers/gru/](https://keras.io/api/layers/recurrent_layers/gru/) – the `reset_after` flag and its cuDNN-compatible default.
+- **PyTorch `torch.nn.GRU` documentation**  
+  [https://pytorch.org/docs/stable/generated/torch.nn.GRU.html](https://pytorch.org/docs/stable/generated/torch.nn.GRU.html) – the reset-after recurrence, with no option to change it.
+
+## Crosswalk
+
+| Reader wants to | Go to |
+| --- | --- |
+| Learn it step by step | [LSTM and GRU (notebook)](../tutorials/02-lstm-and-gru.ipynb) |
+| Do it in a project | [Choose a gated cell](../how-to/choose-a-gated-cell.md) |
+| Look up an equation or shape | [LSTM and GRU](../reference/lstm-and-gru.md) |
+| Understand why it works | LSTM and GRU — *this page* |
+| Learn by running it | [LSTM and GRU (notebook)](../tutorials/02-lstm-and-gru.ipynb) |
