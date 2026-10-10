@@ -34,9 +34,9 @@ obsolete.
 - [Decision table](#decision-table)
 - [Respect what the revival does and does not prove](#respect-what-the-revival-does-and-does-not-prove)
 - [Diagnose a model that does not fit the budget](#diagnose-a-model-that-does-not-fit-the-budget)
+- [Key Takeaways](#key-takeaways)
 - [References](#references)
 - [Crosswalk](#crosswalk)
-- [Key Takeaways](#key-takeaways)
 
 ## Start from attention as the default
 
@@ -225,6 +225,34 @@ overstate what is settled.
 | You cannot find a maintained implementation | Ecosystem is a real constraint. Attention and the classical cells have the deepest tooling; weigh that against the efficiency you would gain. |
 | Global content-based mixing is what you actually need | That is attention's defining strength. A pure recurrence trades some of it for efficiency; a hybrid (Griffin/Hawk) keeps a local slice of it. |
 
+## Key Takeaways
+
+1. This is an architecture-family decision, not a cell decision. Default to a
+   Transformer and move off it only for a named constraint; GRU-versus-LSTM lives
+   one level down in [choose a gated cell](choose-a-gated-cell.md).
+2. Attention's advantages are architectural: fully parallel training and $O(1)$
+   inter-position path length. Its cost is also architectural: $O(T^2)$ compute,
+   $O(T)$ memory, and a KV-cache that grows $O(T)$ so per-token generation is
+   $O(T)$.
+3. Four constraints move you off attention — long sequence length, a fixed
+   inference or memory budget, a need for proven-at-scale quality, and hardware or
+   ecosystem. Name yours; it decides most of the choice.
+4. The linear-time families share one mechanism: a linear recurrence trained by a
+   parallel scan, giving $O(T)$-ish training *and* $O(1)$ per-token inference with
+   a fixed-size state. That combination is what attention cannot offer at long
+   context.
+5. Match the family to the constraint: selective SSMs (Mamba/Mamba-2) for
+   long-context with strong reported quality, linear attention (RWKV/RetNet) for
+   flat per-token inference, minimal/extended recurrence (minGRU/minLSTM, xLSTM)
+   for the smallest step from the classical cells, and Griffin/Hawk when a hybrid
+   fits.
+6. Keep efficiency and quality separate. The complexity advantages are firm; the
+   quality claims are each a specific paper's reported result at its own scale,
+   dated 2023–24 and still evolving. Measure on your own task before you commit.
+7. The revival is an efficiency story, not a verdict. As of 2026 it does not make
+   Transformers obsolete and no family universally beats attention — the win is
+   long-context cost, with quality open.
+
 ## References
 
 - **Vaswani, A. et al. (2017). Attention Is All You Need. NeurIPS.**  
@@ -255,31 +283,3 @@ overstate what is settled.
 | Look up the comparison or a definition | [Modern sequence models](../reference/modern-sequence-models.md) |
 | Understand why it works | [Modern sequence models](../explanation/modern-sequence-models.md) |
 | Learn by running it | not written for this topic — situates the landscape, ships no implementation |
-
-## Key Takeaways
-
-1. This is an architecture-family decision, not a cell decision. Default to a
-   Transformer and move off it only for a named constraint; GRU-versus-LSTM lives
-   one level down in [choose a gated cell](choose-a-gated-cell.md).
-2. Attention's advantages are architectural: fully parallel training and $O(1)$
-   inter-position path length. Its cost is also architectural: $O(T^2)$ compute,
-   $O(T)$ memory, and a KV-cache that grows $O(T)$ so per-token generation is
-   $O(T)$.
-3. Four constraints move you off attention — long sequence length, a fixed
-   inference or memory budget, a need for proven-at-scale quality, and hardware or
-   ecosystem. Name yours; it decides most of the choice.
-4. The linear-time families share one mechanism: a linear recurrence trained by a
-   parallel scan, giving $O(T)$-ish training *and* $O(1)$ per-token inference with
-   a fixed-size state. That combination is what attention cannot offer at long
-   context.
-5. Match the family to the constraint: selective SSMs (Mamba/Mamba-2) for
-   long-context with strong reported quality, linear attention (RWKV/RetNet) for
-   flat per-token inference, minimal/extended recurrence (minGRU/minLSTM, xLSTM)
-   for the smallest step from the classical cells, and Griffin/Hawk when a hybrid
-   fits.
-6. Keep efficiency and quality separate. The complexity advantages are firm; the
-   quality claims are each a specific paper's reported result at its own scale,
-   dated 2023–24 and still evolving. Measure on your own task before you commit.
-7. The revival is an efficiency story, not a verdict. As of 2026 it does not make
-   Transformers obsolete and no family universally beats attention — the win is
-   long-context cost, with quality open.

@@ -11,7 +11,7 @@ same cell wired up differently rather than new mathematics.
 It assumes you already know feedforward networks, backpropagation, and the
 softmax cross-entropy loss. For the equations and tensor shapes in lookup form,
 and for a runnable step-by-step version, see the sibling views under
-[Related documentation](#related-documentation). Throughout, the notation
+[Crosswalk](#crosswalk). Throughout, the notation
 follows Andrew Ng's Deep Learning Specialization, Course 5: activations
 $a^{\langle t\rangle}$, inputs $x^{\langle t\rangle}$, predictions
 $\hat{y}^{\langle t\rangle}$, and shared weights $W_{aa}$, $W_{ax}$, $W_{ya}$.
@@ -27,7 +27,10 @@ $\hat{y}^{\langle t\rangle}$, and shared weights $W_{aa}$, $W_{ax}$, $W_{ya}$.
 - [One cell and many wiring patterns](#one-cell-and-many-wiring-patterns)
 - [Bidirectional and deep RNNs](#bidirectional-and-deep-rnns)
 - [Where RNNs stand today](#where-rnns-stand-today)
+- [Implementation Examples](#implementation-examples)
 - [Key Takeaways](#key-takeaways)
+- [References](#references)
+- [Crosswalk](#crosswalk)
 
 ## Why sequences need recurrence
 
@@ -83,7 +86,7 @@ The two forms are numerically identical. Keeping $W_{aa}$ and $W_{ax}$ separate
 is a teaching choice: it makes the *recurrent-path* gradient and the *input-path*
 gradient appear as distinct terms during backpropagation, which is the core
 lesson of training an RNN. The exact tensor shape of every symbol is tabulated in
-the reference view (see [Related documentation](#related-documentation)).
+the reference view (see [Crosswalk](#crosswalk)).
 
 !!! note "Why a framework's RNN looks different"
     Production libraries factor the cell slightly differently. `torch.nn.RNN`,
@@ -283,39 +286,6 @@ family legible.
 > #### **[Vanilla RNN (NumPy)](https://github.com/alshawai/Deep-Learning-Reference-Hub/blob/main/src/dlhub/nn/sequence/rnn.py)** - From-scratch recurrence, forward propagation through time, and term-by-term BPTT, with global-norm gradient clipping and the bidirectional and deep forward passes built as compositions of the one cell.
 > #### **[Vanilla RNN (PyTorch parity port)](https://github.com/alshawai/Deep-Learning-Reference-Hub/blob/main/src/dlhub/pytorch/sequence/rnn.py)** - The same cell as a `torch.nn.RNN` with an `nn.Linear` + softmax read-out, whose autograd gradients reproduce the hand-derived BPTT on the shared fixture to a relative error below `1e-6` — the proof that the derivation on this page is the one PyTorch computes. It also documents the three conventions in which `torch.nn.RNN` diverges from Ng's notation: two bias vectors, a separately attached read-out, and the `(T_x, m, features)` shape order.
 
-## Related documentation
-
-This topic is published as a family of views that share one set of equations and
-one implementation. This page is the explanation; the other views are listed
-below, and each link activates as its view is published.
-
-| Reader wants to | Go to |
-| --- | --- |
-| Learn it step by step | [Recurrent neural networks (tutorial notebook)](../tutorials/01-recurrent-neural-networks.ipynb) |
-| Do it in a project | Not written for this topic — the application (language modelling and text generation) is a separate topic in this family |
-| Look up an equation or shape | [Recurrent neural networks (reference)](../reference/recurrent-neural-networks.md) |
-| Understand why it works | Recurrent neural networks — this page |
-| Learn by running it | [Recurrent neural networks (tutorial notebook)](../tutorials/01-recurrent-neural-networks.ipynb) |
-
-## References
-
-- **Learning representations by back-propagating errors — Rumelhart, Hinton & Williams (1986)**  
-  *Nature* 323, 533–536 – the backpropagation algorithm that BPTT unrolls through time.
-- **Finding Structure in Time — Elman (1990)**  
-  *Cognitive Science* 14(2), 179–211 – the simple recurrent network this page explains.
-- **Deep Learning — Goodfellow, Bengio & Courville (2016), Ch. 10**  
-  [https://www.deeplearningbook.org/](https://www.deeplearningbook.org/) – reference derivation of forward propagation and BPTT.
-- **Learning long-term dependencies with gradient descent is difficult — Bengio, Simard & Frasconi (1994)**  
-  *IEEE Transactions on Neural Networks* 5(2), 157–166 – the original vanishing-gradient analysis.
-- **On the difficulty of training Recurrent Neural Networks — Pascanu, Mikolov & Bengio (2013)**  
-  [https://arxiv.org/abs/1211.5063](https://arxiv.org/abs/1211.5063) – exploding gradients and gradient clipping.
-- **Bidirectional Recurrent Neural Networks — Schuster & Paliwal (1997)**  
-  *IEEE Transactions on Signal Processing* 45(11), 2673–2681 – the bidirectional construction.
-- **Attention Is All You Need — Vaswani et al. (2017)**  
-  [https://arxiv.org/abs/1706.03762](https://arxiv.org/abs/1706.03762) – where the field moved next; developed in the modern sequence models topic.
-- **Deep Learning Specialization, Course 5 (Sequence Models), Week 1 — Andrew Ng (2018)**  
-  [https://www.coursera.org/specializations/deep-learning](https://www.coursera.org/specializations/deep-learning) – the source of this family's notation.
-
 ## Key Takeaways
 
 1. Recurrence exists to give a network variable-length input, parameter sharing
@@ -344,3 +314,32 @@ below, and each link activates as its view is published.
 8. As of 2026, gated cells and Transformers have largely displaced the vanilla
    RNN for long-range tasks, but its recurrence, unrolling, and BPTT remain the
    vocabulary those methods are explained in.
+
+## References
+
+- **Learning representations by back-propagating errors — Rumelhart, Hinton & Williams (1986)**  
+  *Nature* 323, 533–536 – the backpropagation algorithm that BPTT unrolls through time.
+- **Finding Structure in Time — Elman (1990)**  
+  *Cognitive Science* 14(2), 179–211 – the simple recurrent network this page explains.
+- **Deep Learning — Goodfellow, Bengio & Courville (2016), Ch. 10**  
+  [https://www.deeplearningbook.org/](https://www.deeplearningbook.org/) – reference derivation of forward propagation and BPTT.
+- **Learning long-term dependencies with gradient descent is difficult — Bengio, Simard & Frasconi (1994)**  
+  *IEEE Transactions on Neural Networks* 5(2), 157–166 – the original vanishing-gradient analysis.
+- **On the difficulty of training Recurrent Neural Networks — Pascanu, Mikolov & Bengio (2013)**  
+  [https://arxiv.org/abs/1211.5063](https://arxiv.org/abs/1211.5063) – exploding gradients and gradient clipping.
+- **Bidirectional Recurrent Neural Networks — Schuster & Paliwal (1997)**  
+  *IEEE Transactions on Signal Processing* 45(11), 2673–2681 – the bidirectional construction.
+- **Attention Is All You Need — Vaswani et al. (2017)**  
+  [https://arxiv.org/abs/1706.03762](https://arxiv.org/abs/1706.03762) – where the field moved next; developed in the modern sequence models topic.
+- **Deep Learning Specialization, Course 5 (Sequence Models), Week 1 — Andrew Ng (2018)**  
+  [https://www.coursera.org/specializations/deep-learning](https://www.coursera.org/specializations/deep-learning) – the source of this family's notation.
+
+## Crosswalk
+
+| Reader wants to | Go to |
+| --- | --- |
+| Learn it step by step | [Recurrent neural networks (tutorial notebook)](../tutorials/01-recurrent-neural-networks.ipynb) |
+| Do it in a project | Not written for this topic — the application (language modelling and text generation) is a separate topic in this family |
+| Look up an equation or shape | [Recurrent neural networks (reference)](../reference/recurrent-neural-networks.md) |
+| Understand why it works | Recurrent neural networks — this page |
+| Learn by running it | [Recurrent neural networks (tutorial notebook)](../tutorials/01-recurrent-neural-networks.ipynb) |

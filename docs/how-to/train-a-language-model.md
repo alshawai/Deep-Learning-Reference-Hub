@@ -27,9 +27,9 @@ view; both are reachable from the [Crosswalk](#crosswalk).
 - [Scale up to batches and word-level models](#scale-up-to-batches-and-word-level-models)
 - [Diagnose a model that will not learn](#diagnose-a-model-that-will-not-learn)
 - [Implementation Examples](#implementation-examples)
+- [Key Takeaways](#key-takeaways)
 - [References](#references)
 - [Crosswalk](#crosswalk)
-- [Key Takeaways](#key-takeaways)
 
 ## Turn your corpus into a vocabulary
 
@@ -355,32 +355,6 @@ mechanism, which is why this loop is worth understanding before you scale it up.
 
 > #### **[Character-level language model — PyTorch](https://github.com/alshawai/Deep-Learning-Reference-Hub/blob/main/src/dlhub/pytorch/sequence/language_model.py)** - The char-RNN language model built on `torch.nn.RNN` + `nn.Linear`, with `F.cross_entropy` in nats for the loss, `torch.nn.utils.clip_grad_norm_` for global-norm clipping, and a seeded `torch.multinomial` sampler. This topic's canonical implementation — the hub's first framework-canonical module, checked on its own correctness: the $\ln V$ initialisation anchor, a strictly decreasing training loss, byte-for-byte reproducible sampling, a shuffled-target discrimination control, and a `clip_grad_norm_`-versus-NumPy cross-check on a shared gradient dictionary.
 
-## References
-
-- **Bengio, Y., Ducharme, R., Vincent, P. & Jauvin, C. (2003). A Neural Probabilistic Language Model. _Journal of Machine Learning Research_ 3, 1137–1155.** – The neural language-model factorisation and the perplexity objective this guide trains.
-- **Mikolov, T., Karafiát, M., Burget, L., Černocký, J. & Khudanpur, S. (2010). Recurrent neural network based language model. INTERSPEECH 2010.** – The RNN language model, of which this character-level model is an instance.
-- **Sutskever, I., Martens, J. & Hinton, G. (2011). Generating Text with Recurrent Neural Networks. ICML 2011.** – Character-level text generation from a recurrent net.
-- **Graves, A. (2013). Generating Sequences With Recurrent Neural Networks.**  
-  [https://arxiv.org/abs/1308.0850](https://arxiv.org/abs/1308.0850) – Autoregressive sampling and sequence generation, including the temperature knob.
-- **Karpathy, A. (2015). The Unreasonable Effectiveness of Recurrent Neural Networks.**  
-  [https://karpathy.github.io/2015/05/21/rnn-effectiveness/](https://karpathy.github.io/2015/05/21/rnn-effectiveness/) – The char-RNN language model and sampling, in practitioner form.
-- **Pascanu, R., Mikolov, T. & Bengio, Y. (2013). On the difficulty of training Recurrent Neural Networks. ICML.**  
-  [https://arxiv.org/abs/1211.5063](https://arxiv.org/abs/1211.5063) – Exploding gradients and global-norm clipping, the remedy applied here.
-- **Goodfellow, I., Bengio, Y. & Courville, A. (2016). _Deep Learning_, Ch. 10.**  
-  [https://www.deeplearningbook.org/](https://www.deeplearningbook.org/) – Sequence modeling, language models, and the vanishing/exploding-gradient treatment.
-- **Ng, A. (2018). Deep Learning Specialization, Course 5 (Sequence Models), Week 1.**  
-  [https://www.coursera.org/specializations/deep-learning](https://www.coursera.org/specializations/deep-learning) – The notation used here, and the Dinosaur-Island character-LM assignment this guide generalises.
-
-## Crosswalk
-
-| Reader wants to | Go to |
-| --- | --- |
-| Learn it step by step | [Language modeling and sampling (notebook)](../tutorials/03-language-modeling-and-sampling.ipynb) |
-| Do it in a project | Train a language model — *this page* |
-| Look up the factorisation or sampling algorithm | [Language modeling and sampling](../reference/language-modeling-and-sampling.md) |
-| Understand why it works | [Language modeling and sampling](../explanation/language-modeling-and-sampling.md) |
-| Learn by running it | [Language modeling and sampling (notebook)](../tutorials/03-language-modeling-and-sampling.ipynb) |
-
 ## Key Takeaways
 
 1. A language model factorises $P(x^{\langle 1\rangle}, \dots, x^{\langle T\rangle}) = \prod_t P(x^{\langle t\rangle} \mid x^{\langle 1\rangle}, \dots, x^{\langle t-1\rangle})$,
@@ -410,3 +384,29 @@ mechanism, which is why this loop is worth understanding before you scale it up.
    `nn.Embedding` — the shifted-target training and temperature sampling are
    unchanged. Transformer LMs are the modern default (as of 2026); this char-RNN
    is the mechanism they generalise.
+
+## References
+
+- **Bengio, Y., Ducharme, R., Vincent, P. & Jauvin, C. (2003). A Neural Probabilistic Language Model. _Journal of Machine Learning Research_ 3, 1137–1155.** – The neural language-model factorisation and the perplexity objective this guide trains.
+- **Mikolov, T., Karafiát, M., Burget, L., Černocký, J. & Khudanpur, S. (2010). Recurrent neural network based language model. INTERSPEECH 2010.** – The RNN language model, of which this character-level model is an instance.
+- **Sutskever, I., Martens, J. & Hinton, G. (2011). Generating Text with Recurrent Neural Networks. ICML 2011.** – Character-level text generation from a recurrent net.
+- **Graves, A. (2013). Generating Sequences With Recurrent Neural Networks.**  
+  [https://arxiv.org/abs/1308.0850](https://arxiv.org/abs/1308.0850) – Autoregressive sampling and sequence generation, including the temperature knob.
+- **Karpathy, A. (2015). The Unreasonable Effectiveness of Recurrent Neural Networks.**  
+  [https://karpathy.github.io/2015/05/21/rnn-effectiveness/](https://karpathy.github.io/2015/05/21/rnn-effectiveness/) – The char-RNN language model and sampling, in practitioner form.
+- **Pascanu, R., Mikolov, T. & Bengio, Y. (2013). On the difficulty of training Recurrent Neural Networks. ICML.**  
+  [https://arxiv.org/abs/1211.5063](https://arxiv.org/abs/1211.5063) – Exploding gradients and global-norm clipping, the remedy applied here.
+- **Goodfellow, I., Bengio, Y. & Courville, A. (2016). _Deep Learning_, Ch. 10.**  
+  [https://www.deeplearningbook.org/](https://www.deeplearningbook.org/) – Sequence modeling, language models, and the vanishing/exploding-gradient treatment.
+- **Ng, A. (2018). Deep Learning Specialization, Course 5 (Sequence Models), Week 1.**  
+  [https://www.coursera.org/specializations/deep-learning](https://www.coursera.org/specializations/deep-learning) – The notation used here, and the Dinosaur-Island character-LM assignment this guide generalises.
+
+## Crosswalk
+
+| Reader wants to | Go to |
+| --- | --- |
+| Learn it step by step | [Language modeling and sampling (notebook)](../tutorials/03-language-modeling-and-sampling.ipynb) |
+| Do it in a project | Train a language model — *this page* |
+| Look up the factorisation or sampling algorithm | [Language modeling and sampling](../reference/language-modeling-and-sampling.md) |
+| Understand why it works | [Language modeling and sampling](../explanation/language-modeling-and-sampling.md) |
+| Learn by running it | [Language modeling and sampling (notebook)](../tutorials/03-language-modeling-and-sampling.ipynb) |

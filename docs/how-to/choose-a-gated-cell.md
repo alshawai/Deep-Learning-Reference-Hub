@@ -23,9 +23,9 @@ both are reachable from the [Crosswalk](#crosswalk).
 - [Reach for minGRU or minLSTM when the sequence is long](#reach-for-mingru-or-minlstm-when-the-sequence-is-long)
 - [Diagnose a cell that will not train](#diagnose-a-cell-that-will-not-train)
 - [Implementation Examples](#implementation-examples)
+- [Key Takeaways](#key-takeaways)
 - [References](#references)
 - [Crosswalk](#crosswalk)
-- [Key Takeaways](#key-takeaways)
 
 ## Check that gating is the fix you need
 
@@ -387,6 +387,35 @@ Rendered signatures and docstrings for the three NumPy modules are in
 the generated
 [neural-network API reference](../reference/api/nn.md).
 
+## Key Takeaways
+
+1. Gating replaces the vanilla RNN's repeated Jacobian product with an
+   elementwise factor — $\partial c^{\langle t\rangle} / \partial c^{\langle t-1\rangle} = \Gamma_f^{\langle t\rangle}$
+   for the LSTM — which is what carries gradient across many steps. It does
+   nothing about exploding gradients, so keep clipping.
+2. Default to the GRU on cost, and move to the LSTM for a nameable reason:
+   separate memory behind an output gate, a checkpoint to reproduce, or a
+   framework boundary to cross. Chung et al. (2014) found no accuracy verdict
+   between them, and none has arrived since.
+3. Budget $3\,n_a(n_a + n_x + 1)$ parameters for a GRU and
+   $4\,n_a(n_a + n_x + 1)$ for an LSTM, plus the read-out. The cell is quadratic
+   in $n_a$, so hidden width is the expensive knob.
+4. Gradient-check before training, in float64, against central finite
+   differences, to a relative error below `1e-7` — and keep a test that a
+   flipped sign actually fails.
+5. "GRU" names two different functions. The hub, Cho and Ng apply the reset gate
+   **before** the hidden transform; `torch.nn.GRU` and
+   `tf.keras.layers.GRU(reset_after=True)` apply it after. Only
+   `reset_after=False` reproduces this hub, measured to `2.2e-16` against `1.79`
+   for the default.
+6. Porting a GRU to Keras needs a transpose, a split at column $n_a$, the gate
+   order `[z, r, h]`, and one sign flip, because Keras puts its $z$ on the old
+   state: $z = 1 - \Gamma_u$, so $W_z \leftarrow -W_u$ and $dW_u = -dW_z$.
+7. minGRU and minLSTM drop the gates' dependence on $a^{\langle t-1\rangle}$,
+   which makes the recurrence first-order linear and parallel-scannable. They
+   also drop the reset gate, the output gate, and the candidate's $\tanh$ — all
+   deliberately. Test any scan at a length that is odd and not a power of two.
+
 ## References
 
 - **Hochreiter, S. & Schmidhuber, J. (1997). Long Short-Term Memory. _Neural Computation_ 9(8), 1735–1780.** – The original LSTM, and the source of the input gate this hub writes $\Gamma_u$.
@@ -418,32 +447,3 @@ the generated
 | Look up an equation or shape | [LSTM and GRU](../reference/lstm-and-gru.md) |
 | Understand why it works | [LSTM and GRU](../explanation/lstm-and-gru.md) |
 | Learn by running it | [LSTM and GRU (notebook)](../tutorials/02-lstm-and-gru.ipynb) |
-
-## Key Takeaways
-
-1. Gating replaces the vanilla RNN's repeated Jacobian product with an
-   elementwise factor — $\partial c^{\langle t\rangle} / \partial c^{\langle t-1\rangle} = \Gamma_f^{\langle t\rangle}$
-   for the LSTM — which is what carries gradient across many steps. It does
-   nothing about exploding gradients, so keep clipping.
-2. Default to the GRU on cost, and move to the LSTM for a nameable reason:
-   separate memory behind an output gate, a checkpoint to reproduce, or a
-   framework boundary to cross. Chung et al. (2014) found no accuracy verdict
-   between them, and none has arrived since.
-3. Budget $3\,n_a(n_a + n_x + 1)$ parameters for a GRU and
-   $4\,n_a(n_a + n_x + 1)$ for an LSTM, plus the read-out. The cell is quadratic
-   in $n_a$, so hidden width is the expensive knob.
-4. Gradient-check before training, in float64, against central finite
-   differences, to a relative error below `1e-7` — and keep a test that a
-   flipped sign actually fails.
-5. "GRU" names two different functions. The hub, Cho and Ng apply the reset gate
-   **before** the hidden transform; `torch.nn.GRU` and
-   `tf.keras.layers.GRU(reset_after=True)` apply it after. Only
-   `reset_after=False` reproduces this hub, measured to `2.2e-16` against `1.79`
-   for the default.
-6. Porting a GRU to Keras needs a transpose, a split at column $n_a$, the gate
-   order `[z, r, h]`, and one sign flip, because Keras puts its $z$ on the old
-   state: $z = 1 - \Gamma_u$, so $W_z \leftarrow -W_u$ and $dW_u = -dW_z$.
-7. minGRU and minLSTM drop the gates' dependence on $a^{\langle t-1\rangle}$,
-   which makes the recurrence first-order linear and parallel-scannable. They
-   also drop the reset gate, the output gate, and the candidate's $\tanh$ — all
-   deliberately. Test any scan at a length that is odd and not a power of two.

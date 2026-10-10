@@ -30,9 +30,9 @@ view, reachable from the [Crosswalk](#crosswalk).
 - [Fixture and tolerances](#fixture-and-tolerances)
 - [Failure modes](#failure-modes)
 - [Implementation Examples](#implementation-examples)
+- [Key Takeaways](#key-takeaways)
 - [References](#references)
 - [Crosswalk](#crosswalk)
-- [Key Takeaways](#key-takeaways)
 
 ## Notation and shapes
 
@@ -244,6 +244,16 @@ neighbor, and analogy is exact and checkable by reading the numbers.
 > #### **[Word embeddings — from scratch (NumPy)](https://github.com/alshawai/Deep-Learning-Reference-Hub/blob/main/src/dlhub/embeddings/word_embeddings.py)** - The embedding matrix and lookup identity, cosine similarity with its zero-vector guard, deterministic nearest neighbors, 3CosAdd analogies with the inputs excluded, and the from-scratch PCA projection with its sign convention. Exposes `make_fixture`, `one_hot`, `lookup`, `cosine_similarity`, `nearest_neighbors`, `analogy`, and `pca_project_2d`, and is checked against the planted fixture: the lookup identity, the rational cosine anchors ($0.6$, $-1.0$), the full nearest-neighbor table, both exact analogies, and loss-less, byte-identical PCA.
 > #### **[Word embeddings — PyTorch idiom port](https://github.com/alshawai/Deep-Learning-Reference-Hub/blob/main/src/dlhub/pytorch/embeddings/word_embeddings.py)** - The same vectors loaded into a `torch.nn.Embedding`, showing PyTorch's $(V \times d)$ row convention: `weight` equals `E.T`, so a word vector is a *row* `weight[i, :]` rather than a column. An idiom track, not a parity port — it documents the transpose, the `from_pretrained` `freeze=True` default (the opposite of the trainable `nn.Embedding(V, d)` constructor), and weight tying as a forward pointer, and is checked on its own correctness: the gather equals the NumPy `lookup` exactly, for every word, because the fixture's `float64` dtype is preserved. Exposes `embedding_from_reference`, `lookup`, and `tied_readout`.
 
+## Key Takeaways
+
+1. An embedding layer is a bias-free linear layer applied to a one-hot input: $e_w = E\,o_w = E_{:,\,i}$, so a gather by index returns the same column the matrix product would, and the two forms agree exactly.
+2. Cosine similarity, $\cos(u, v) = (u \cdot v) / (\lVert u\rVert_2 \lVert v\rVert_2)$, measures direction in $[-1, 1]$ independent of magnitude; a zero-norm vector returns `0.0` rather than `nan`.
+3. Nearest neighbors are deterministic: rank other words by descending cosine, exclude the query, and break ties by ascending index.
+4. Analogies use 3CosAdd — $t = e_b - e_a + e_c$, then $\arg\max_w \cos(e_w, t)$ over $w \notin \{a, b, c\}$; excluding the three inputs is what stops `king − man + woman` from returning `king`. The multiplicative 3CosMul is more robust on real corpora.
+5. PCA projects to the two highest-variance directions via the SVD of the centered, row-wise data; fixing each component's sign (largest-magnitude entry positive) makes the output byte-identical, and rank-2 data projects without loss.
+6. PyTorch stores the transpose: `nn.Embedding.weight` is $(V \times d)$ with `weight == E.T`, so a word vector is the row `weight[i, :]` — conflating the two conventions transposes the matrix.
+7. One planted `float64` fixture ($d = 4$, $V = 6$) fixes every answer exactly: $\cos(\text{king}, \text{queen}) = 0.6$, $\cos(\text{man}, \text{woman}) = -1.0$, `man : woman :: king : queen`, with cosine/analogy checked to `atol = 1e-12` and PCA to $< 10^{-10}$.
+
 ## References
 
 - **Ng, A. (2018). Deep Learning Specialization, Course 5 (Sequence Models), Week 2 — Natural Language Processing & Word Embeddings.**  
@@ -265,13 +275,3 @@ neighbor, and analogy is exact and checkable by reading the numbers.
 | Look up an equation or rule | Word embeddings — *this page* |
 | Understand why it works | [Word embeddings](../explanation/word-embeddings.md) |
 | Learn by running it | [Word embeddings (notebook)](../tutorials/04-word-embeddings.ipynb) |
-
-## Key Takeaways
-
-1. An embedding layer is a bias-free linear layer applied to a one-hot input: $e_w = E\,o_w = E_{:,\,i}$, so a gather by index returns the same column the matrix product would, and the two forms agree exactly.
-2. Cosine similarity, $\cos(u, v) = (u \cdot v) / (\lVert u\rVert_2 \lVert v\rVert_2)$, measures direction in $[-1, 1]$ independent of magnitude; a zero-norm vector returns `0.0` rather than `nan`.
-3. Nearest neighbors are deterministic: rank other words by descending cosine, exclude the query, and break ties by ascending index.
-4. Analogies use 3CosAdd — $t = e_b - e_a + e_c$, then $\arg\max_w \cos(e_w, t)$ over $w \notin \{a, b, c\}$; excluding the three inputs is what stops `king − man + woman` from returning `king`. The multiplicative 3CosMul is more robust on real corpora.
-5. PCA projects to the two highest-variance directions via the SVD of the centered, row-wise data; fixing each component's sign (largest-magnitude entry positive) makes the output byte-identical, and rank-2 data projects without loss.
-6. PyTorch stores the transpose: `nn.Embedding.weight` is $(V \times d)$ with `weight == E.T`, so a word vector is the row `weight[i, :]` — conflating the two conventions transposes the matrix.
-7. One planted `float64` fixture ($d = 4$, $V = 6$) fixes every answer exactly: $\cos(\text{king}, \text{queen}) = 0.6$, $\cos(\text{man}, \text{woman}) = -1.0$, `man : woman :: king : queen`, with cosine/analogy checked to `atol = 1e-12` and PCA to $< 10^{-10}$.

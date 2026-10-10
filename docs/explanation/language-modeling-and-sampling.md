@@ -30,9 +30,9 @@ Ng's Deep Learning Specialization, Course 5, Week 1 (Ng, 2018).
 - [Why training needs gradient clipping](#why-training-needs-gradient-clipping)
 - [Why there is one implementation, and why it is PyTorch](#why-there-is-one-implementation-and-why-it-is-pytorch)
 - [Implementation Examples](#implementation-examples)
-- [Crosswalk](#crosswalk)
-- [References](#references)
 - [Key Takeaways](#key-takeaways)
+- [References](#references)
+- [Crosswalk](#crosswalk)
 
 ## Why a language model factorises a sequence
 
@@ -299,33 +299,6 @@ reference.
 
 > #### **[Character-level language model — PyTorch (canonical)](https://github.com/alshawai/Deep-Learning-Reference-Hub/blob/main/src/dlhub/pytorch/sequence/language_model.py)** - The char-RNN language model on `torch.nn.RNN` + `nn.Linear`, with per-character cross-entropy and perplexity through `F.cross_entropy`, global-norm clipping through `clip_grad_norm_`, and the seeded temperature sampling loop explained above through `torch.multinomial`. Checked on its own correctness against the shared fixture — the $\approx \ln V$ initialisation anchor, a strictly decreasing training loss, byte-for-byte sampling reproducibility, a shuffled-target discrimination test, and a `clip_grad_norm_`-versus-`clip_gradients` cross-check — because this topic has no from-scratch NumPy reference to hold it to. The docs build installs no framework, so there is no generated API page.
 
-## Crosswalk
-
-| Reader wants to | Go to |
-| --- | --- |
-| Learn it step by step | [Language modeling and sampling (notebook)](../tutorials/03-language-modeling-and-sampling.ipynb) |
-| Do it in a project | [Train a language model](../how-to/train-a-language-model.md) |
-| Look up the factorisation or sampling algorithm | [Language modeling and sampling](../reference/language-modeling-and-sampling.md) |
-| Understand why it works | Language modeling and sampling — *this page* |
-| Learn by running it | [Language modeling and sampling (notebook)](../tutorials/03-language-modeling-and-sampling.ipynb) |
-
-## References
-
-- **Bengio, Y., Ducharme, R., Vincent, P. & Jauvin, C. (2003). A Neural Probabilistic Language Model. _Journal of Machine Learning Research_ 3, 1137–1155.** – The neural language-model factorisation this page derives.
-- **Mikolov, T., Karafiát, M., Burget, L., Černocký, J. & Khudanpur, S. (2010). Recurrent neural network based language model. INTERSPEECH.** – The recurrent realisation of that factorisation.
-- **Sutskever, I., Martens, J. & Hinton, G. (2011). Generating Text with Recurrent Neural Networks. ICML.** – Character-level generation from a recurrent network.
-- **Graves, A. (2013). Generating Sequences With Recurrent Neural Networks.**  
-  [https://arxiv.org/abs/1308.0850](https://arxiv.org/abs/1308.0850) – Sampling, sequence generation, and the temperature-scaled draw.
-- **Karpathy, A. (2015). The Unreasonable Effectiveness of Recurrent Neural Networks.**  
-  [https://karpathy.github.io/2015/05/21/rnn-effectiveness/](https://karpathy.github.io/2015/05/21/rnn-effectiveness/) – The char-RNN language model and sampling, in practitioner form.
-- **Bengio, Y., Simard, P. & Frasconi, P. (1994). Learning long-term dependencies with gradient descent is difficult. _IEEE Transactions on Neural Networks_ 5(2), 157–166.** – The original vanishing/exploding-gradient analysis this page's clipping section rests on.
-- **Pascanu, R., Mikolov, T. & Bengio, Y. (2013). On the difficulty of training Recurrent Neural Networks. ICML.**  
-  [https://arxiv.org/abs/1211.5063](https://arxiv.org/abs/1211.5063) – Exploding gradients and global-norm clipping.
-- **Goodfellow, I., Bengio, Y. & Courville, A. (2016). _Deep Learning_, Ch. 10.**  
-  [https://www.deeplearningbook.org/](https://www.deeplearningbook.org/) – Cross-entropy and perplexity as the language-model training signal.
-- **Ng, A. (2018). Deep Learning Specialization, Course 5 (Sequence Models), Week 1.**  
-  [https://www.coursera.org/specializations/deep-learning](https://www.coursera.org/specializations/deep-learning) – The source of this family's notation, and the _Dinosaur Island_ character-level assignment this topic realises.
-
 ## Key Takeaways
 
 1. The chain rule of probability factorises a sequence *exactly* into a product
@@ -355,3 +328,30 @@ reference.
    to the RNN topic — so it is realised once, canonically, in PyTorch
    (`torch.nn.RNN`, `F.cross_entropy`, `clip_grad_norm_`, `torch.multinomial`),
    checked on its own $\ln V$ anchor rather than a NumPy parity reference.
+
+## References
+
+- **Bengio, Y., Ducharme, R., Vincent, P. & Jauvin, C. (2003). A Neural Probabilistic Language Model. _Journal of Machine Learning Research_ 3, 1137–1155.** – The neural language-model factorisation this page derives.
+- **Mikolov, T., Karafiát, M., Burget, L., Černocký, J. & Khudanpur, S. (2010). Recurrent neural network based language model. INTERSPEECH.** – The recurrent realisation of that factorisation.
+- **Sutskever, I., Martens, J. & Hinton, G. (2011). Generating Text with Recurrent Neural Networks. ICML.** – Character-level generation from a recurrent network.
+- **Graves, A. (2013). Generating Sequences With Recurrent Neural Networks.**  
+  [https://arxiv.org/abs/1308.0850](https://arxiv.org/abs/1308.0850) – Sampling, sequence generation, and the temperature-scaled draw.
+- **Karpathy, A. (2015). The Unreasonable Effectiveness of Recurrent Neural Networks.**  
+  [https://karpathy.github.io/2015/05/21/rnn-effectiveness/](https://karpathy.github.io/2015/05/21/rnn-effectiveness/) – The char-RNN language model and sampling, in practitioner form.
+- **Bengio, Y., Simard, P. & Frasconi, P. (1994). Learning long-term dependencies with gradient descent is difficult. _IEEE Transactions on Neural Networks_ 5(2), 157–166.** – The original vanishing/exploding-gradient analysis this page's clipping section rests on.
+- **Pascanu, R., Mikolov, T. & Bengio, Y. (2013). On the difficulty of training Recurrent Neural Networks. ICML.**  
+  [https://arxiv.org/abs/1211.5063](https://arxiv.org/abs/1211.5063) – Exploding gradients and global-norm clipping.
+- **Goodfellow, I., Bengio, Y. & Courville, A. (2016). _Deep Learning_, Ch. 10.**  
+  [https://www.deeplearningbook.org/](https://www.deeplearningbook.org/) – Cross-entropy and perplexity as the language-model training signal.
+- **Ng, A. (2018). Deep Learning Specialization, Course 5 (Sequence Models), Week 1.**  
+  [https://www.coursera.org/specializations/deep-learning](https://www.coursera.org/specializations/deep-learning) – The source of this family's notation, and the _Dinosaur Island_ character-level assignment this topic realises.
+
+## Crosswalk
+
+| Reader wants to | Go to |
+| --- | --- |
+| Learn it step by step | [Language modeling and sampling (notebook)](../tutorials/03-language-modeling-and-sampling.ipynb) |
+| Do it in a project | [Train a language model](../how-to/train-a-language-model.md) |
+| Look up the factorisation or sampling algorithm | [Language modeling and sampling](../reference/language-modeling-and-sampling.md) |
+| Understand why it works | Language modeling and sampling — *this page* |
+| Learn by running it | [Language modeling and sampling (notebook)](../tutorials/03-language-modeling-and-sampling.ipynb) |
