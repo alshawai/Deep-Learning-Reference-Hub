@@ -175,9 +175,9 @@ expected to preserve:
 
 ## Repository statistics
 
-- **Total Documents**: 34
-- **Code Examples**: 28 implementations
-- **Jupyter Notebooks**: 4
+- **Total Documents**: 37
+- **Code Examples**: 30 implementations
+- **Jupyter Notebooks**: 5
 - **Frameworks Covered**: NumPy, PyTorch, TensorFlow
 
 The framework badges above describe optional example compatibility. The checked

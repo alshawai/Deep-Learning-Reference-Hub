@@ -47,3 +47,5 @@ reader would arrive already wanting the outcome.
   network, a state-space model, and attention, from the sequence's length and what it costs to process.
 - **[How to train a language model and generate text](train-a-language-model.md)** — the training
   loop, what perplexity tells you, and how to sample from the trained distribution.
+- **[How to train word vectors on your own corpus](train-word-vectors.md)** — from tokens to
+  trained, inspected vectors with skip-gram or GloVe, and the knobs,

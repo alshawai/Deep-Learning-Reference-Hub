@@ -11,6 +11,19 @@ API stability — see the versioning policy in
 
 ## [Unreleased]
 
+## [1.6.0] - 2026-10-12
+
+### Added
+- [Word2Vec and GloVe](docs/explanation/word2vec-and-glove.md): how static word
+  vectors are learned from scratch — skip-gram with negative sampling (SGNS),
+  CBOW, and GloVe's weighted least-squares objective on a co-occurrence matrix,
+  each loss paired with its exact gradient and a smoothed-unigram negative
+  sampler — with an explanation, a reference, a how-to for training word
+  vectors, a from-scratch NumPy implementation, a TensorFlow `nce_loss` parity
+  port, and a tutorial notebook. The explanation derives why SGNS implicitly
+  factorizes a shifted-PMI matrix (Levy & Goldberg) and names fastText's
+  subword extension.
+
 ## [1.5.1] - 2026-10-08
 
 ### Fixed
@@ -110,7 +123,8 @@ package rather than a folder of notes.
 - A CI quality gate running ruff, pytest, the `hubcheck` integrity checks, and a
   strict documentation build.
 
-[Unreleased]: https://github.com/alshawai/Deep-Learning-Reference-Hub/compare/v1.5.1...HEAD
+[Unreleased]: https://github.com/alshawai/Deep-Learning-Reference-Hub/compare/v1.6.0...HEAD
+[1.6.0]: https://github.com/alshawai/Deep-Learning-Reference-Hub/compare/v1.5.1...v1.6.0
 [1.5.1]: https://github.com/alshawai/Deep-Learning-Reference-Hub/compare/v1.5.0...v1.5.1
 [1.5.0]: https://github.com/alshawai/Deep-Learning-Reference-Hub/compare/v1.4.0...v1.5.0
 [1.4.0]: https://github.com/alshawai/Deep-Learning-Reference-Hub/compare/v1.3.0...v1.4.0
