@@ -77,8 +77,8 @@ dense within a family and zero across families. Reach it through `make_fixture`:
 from dlhub.embeddings.word2vec_and_glove import make_fixture
 
 fixture = make_fixture()
-sentences = fixture["sentences"]      # 12 sentences of token indices
-vocab = fixture["vocab"]              # the sorted vocabulary, V = 16
+sentences = fixture["sentences"]  # 12 sentences of token indices
+vocab = fixture["vocab"]  # the sorted vocabulary, V = 16
 word_to_ix = fixture["word_to_ix"]
 V = fixture["dims"]["V"]
 ```
@@ -161,11 +161,11 @@ You can see the flattening directly:
 ```python
 from dlhub.embeddings.word2vec_and_glove import unigram_probabilities
 
-raw = unigram_probabilities(sentences, V, exponent=1.0)        # raw frequency
+raw = unigram_probabilities(sentences, V, exponent=1.0)  # raw frequency
 smoothed = unigram_probabilities(sentences, V, exponent=0.75)  # the default
 
 dog, cat = word_to_ix["dog"], word_to_ix["cat"]
-print(raw[dog] / raw[cat])        # 1.5  -- 'dog' occurs 3x, 'cat' 2x
+print(raw[dog] / raw[cat])  # 1.5  -- 'dog' occurs 3x, 'cat' 2x
 print(smoothed[dog] / smoothed[cat])  # ~1.36 -- the gap is pulled toward 1
 ```
 
@@ -203,10 +203,18 @@ Put it together. `train_sgns` returns the two trained tables and the per-epoch l
 `history`; your word vectors are the rows of the center table `W`.
 
 ```python
-from dlhub.embeddings.word2vec_and_glove import make_fixture, train_sgns, nearest_neighbor
+from dlhub.embeddings.word2vec_and_glove import (
+    make_fixture,
+    train_sgns,
+    nearest_neighbor,
+)
 
 fixture = make_fixture()
-sentences, vocab, word_to_ix = fixture["sentences"], fixture["vocab"], fixture["word_to_ix"]
+sentences, vocab, word_to_ix = (
+    fixture["sentences"],
+    fixture["vocab"],
+    fixture["word_to_ix"],
+)
 V = fixture["dims"]["V"]
 
 result = train_sgns(sentences, V, d=8, window=2, k=2, lr=0.05, epochs=200, seed=0)
