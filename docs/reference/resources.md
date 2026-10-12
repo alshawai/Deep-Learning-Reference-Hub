@@ -45,6 +45,11 @@ and documentation in this hub.
 - **Linguistic Regularities in Continuous Space Word Representations (analogies)**: Mikolov, Yih & Zweig (2013) – NAACL-HLT, 746–751.
 - **GloVe: Global Vectors for Word Representation**: Pennington, Socher & Manning (2014) – [https://nlp.stanford.edu/pubs/glove.pdf](https://nlp.stanford.edu/pubs/glove.pdf)
 - **Improving Distributional Similarity with Lessons Learned from Word Embeddings (3CosMul)**: Levy, Goldberg & Dagan (2015) – *TACL* 3, 211–225.
+- **Distributed Representations of Words and Phrases and their Compositionality (negative sampling)**: Mikolov, Sutskever, Chen, Corrado & Dean (2013) – [https://arxiv.org/abs/1310.4546](https://arxiv.org/abs/1310.4546)
+- **Neural Word Embedding as Implicit Matrix Factorization**: Levy & Goldberg (2014) – NeurIPS.
+- **word2vec Parameter Learning Explained**: Rong (2014) – [https://arxiv.org/abs/1411.2738](https://arxiv.org/abs/1411.2738)
+- **Neural Machine Translation of Rare Words with Subword Units (BPE)**: Sennrich, Haddow & Birch (2016) – [https://arxiv.org/abs/1508.07909](https://arxiv.org/abs/1508.07909)
+- **Enriching Word Vectors with Subword Information (fastText)**: Bojanowski, Grave, Joulin & Mikolov (2017) – [https://arxiv.org/abs/1607.04606](https://arxiv.org/abs/1607.04606)
 - **Visualizing Data using t-SNE**: van der Maaten & Hinton (2008) – *JMLR* 9, 2579–2605.
 
 ---

@@ -192,7 +192,7 @@ and, explicitly, GloVe arrange the geometry so that ratios of co-occurrence
 probabilities correspond to vector *differences*, which is exactly what turns an
 analogy into a subtraction and an addition (Pennington, Socher & Manning, 2014;
 Mikolov, Yih & Zweig, 2013). This page relies on that structure; the sibling
-word2vec-and-GloVe topic derives where it comes from.
+[word2vec-and-GloVe](word2vec-and-glove.md) topic derives where it comes from.
 
 ## Projecting the space to two dimensions
 
@@ -272,7 +272,7 @@ Three threads continue, each its own topic.
 objectives (Mikolov, Chen, Corrado & Dean, 2013) and GloVe's weighted least squares over
 co-occurrence counts (Pennington, Socher & Manning, 2014) are the training procedures that
 actually produce embeddings with the geometry this page relied on — including the linear
-substructure that makes analogies work. The word2vec-and-GloVe topic derives them from
+substructure that makes analogies work. The [word2vec-and-GloVe](word2vec-and-glove.md) topic derives them from
 scratch.
 
 **Bias.** The same geometry that yields clean analogies also absorbs the stereotypes
