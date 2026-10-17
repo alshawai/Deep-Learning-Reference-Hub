@@ -11,6 +11,29 @@ API stability — see the versioning policy in
 
 ## [Unreleased]
 
+## [1.7.0] - 2026-10-17
+
+### Added
+- [Debiasing word embeddings](docs/explanation/debiasing-word-embeddings.md): the
+  geometry of gender bias in a static embedding and why removing it is hard —
+  Bolukbasi et al.'s hard debiasing (identify the gender subspace as the top
+  principal component of definitional-pair differences, `neutralize` by
+  projecting out the `g` component and renormalizing, `equalize` to make an
+  equality set symmetric about `g`), with the WEAT association `s`, test
+  statistic, effect size `d` (population std, `ddof = 0`), and an exact
+  enumerated permutation `p` over `C(6, 3) = 20` partitions — used to
+  quantify bias before and after — and the Gonen & Goldberg "Lipstick on a
+  Pig" critique, demonstrated: the direct bias (projection on `g` and WEAT
+  `d`) drops to zero after `neutralize`, yet the indirect bias survives, with
+  the same neutral-neighbour map before and after and a PCA scatter of the
+  debiased matrix still showing the gendered occupation clusters. Ships an
+  explanation, a reference, a tutorial notebook, a from-scratch NumPy
+  implementation with 32 known-answer tests, and three new resources
+  (Bolukbasi et al. 2016, Caliskan et al. 2017, Gonen & Goldberg 2019). Soft
+  debiasing, learning-time debiasing (GN-GloVe, Zhao et al. 2018), and
+  multiclass / racial bias (Manzini et al. 2019) are named in the explanation
+  as "where this goes," not implemented.
+
 ## [1.6.0] - 2026-10-12
 
 ### Added
@@ -123,7 +146,8 @@ package rather than a folder of notes.
 - A CI quality gate running ruff, pytest, the `hubcheck` integrity checks, and a
   strict documentation build.
 
-[Unreleased]: https://github.com/alshawai/Deep-Learning-Reference-Hub/compare/v1.6.0...HEAD
+[Unreleased]: https://github.com/alshawai/Deep-Learning-Reference-Hub/compare/v1.7.0...HEAD
+[1.7.0]: https://github.com/alshawai/Deep-Learning-Reference-Hub/compare/v1.6.0...v1.7.0
 [1.6.0]: https://github.com/alshawai/Deep-Learning-Reference-Hub/compare/v1.5.1...v1.6.0
 [1.5.1]: https://github.com/alshawai/Deep-Learning-Reference-Hub/compare/v1.5.0...v1.5.1
 [1.5.0]: https://github.com/alshawai/Deep-Learning-Reference-Hub/compare/v1.4.0...v1.5.0
