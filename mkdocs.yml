@@ -105,6 +105,7 @@ nav:
       - Language modeling and sampling: tutorials/03-language-modeling-and-sampling.ipynb
       - Word embeddings: tutorials/04-word-embeddings.ipynb
       - Word2Vec and GloVe: tutorials/05-word2vec-and-glove.ipynb
+      - Debiasing word embeddings: tutorials/06-debiasing-word-embeddings.ipynb
   - How-to guides:
       - how-to/index.md
       - Choose an optimizer: how-to/choose-an-optimizer.md
@@ -124,6 +125,7 @@ nav:
       - Language modeling and sampling: reference/language-modeling-and-sampling.md
       - Word embeddings: reference/word-embeddings.md
       - Word2Vec and GloVe: reference/word2vec-and-glove.md
+      - Debiasing word embeddings: reference/debiasing-word-embeddings.md
       - Activation functions: reference/activation-functions.md
       - Parameter update rule: reference/parameter-update-rule.md
       - Optimizer update rules: reference/optimizer-update-rules.md
@@ -154,3 +156,4 @@ nav:
       - Language modeling and sampling: explanation/language-modeling-and-sampling.md
       - Word embeddings: explanation/word-embeddings.md
       - Word2Vec and GloVe: explanation/word2vec-and-glove.md
+      - Debiasing word embeddings: explanation/debiasing-word-embeddings.md

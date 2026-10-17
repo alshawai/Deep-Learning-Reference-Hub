@@ -45,6 +45,9 @@ and documentation in this hub.
 - **Linguistic Regularities in Continuous Space Word Representations (analogies)**: Mikolov, Yih & Zweig (2013) – NAACL-HLT, 746–751.
 - **GloVe: Global Vectors for Word Representation**: Pennington, Socher & Manning (2014) – [https://nlp.stanford.edu/pubs/glove.pdf](https://nlp.stanford.edu/pubs/glove.pdf)
 - **Improving Distributional Similarity with Lessons Learned from Word Embeddings (3CosMul)**: Levy, Goldberg & Dagan (2015) – *TACL* 3, 211–225.
+- **Man is to Computer Programmer as Woman is to Homemaker? Debiasing Word Embeddings (hard debiasing, identify-subspace / neutralize / equalize)**: Bolukbasi, Chang, Zou, Saligrama & Kalai (2016) – [https://arxiv.org/abs/1607.06520](https://arxiv.org/abs/1607.06520)
+- **Semantics derived automatically from language corpora contain human-like biases (WEAT — the Word Embedding Association Test)**: Caliskan, Bryson & Narayanan (2017) – *Science* 356(6334), 183–186.
+- **Lipstick on a Pig: Debiasing Methods Cover up Systematic Gender Biases in Word Embeddings (the "geometric debiasing is cosmetic" critique)**: Gonen & Goldberg (2019) – [https://arxiv.org/abs/1903.03862](https://arxiv.org/abs/1903.03862)
 - **Distributed Representations of Words and Phrases and their Compositionality (negative sampling)**: Mikolov, Sutskever, Chen, Corrado & Dean (2013) – [https://arxiv.org/abs/1310.4546](https://arxiv.org/abs/1310.4546)
 - **Neural Word Embedding as Implicit Matrix Factorization**: Levy & Goldberg (2014) – NeurIPS.
 - **word2vec Parameter Learning Explained**: Rong (2014) – [https://arxiv.org/abs/1411.2738](https://arxiv.org/abs/1411.2738)

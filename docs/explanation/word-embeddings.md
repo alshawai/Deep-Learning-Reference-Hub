@@ -280,7 +280,7 @@ present in the training text. The very kind of gender direction that makes
 $\textit{king} - \textit{man} + \textit{woman} = \textit{queen}$ work is the one Bolukbasi,
 Chang, Zou, Saligrama & Kalai (2016) found aligning *programmer* with men and *homemaker*
 with women — and Gonen & Goldberg (2019) showed that geometric "debiasing" tends to hide
-such bias rather than remove it.
+such bias rather than remove it, [explained here](debiasing-word-embeddings.md).
 
 **Static to contextual.** A static embedding assigns one vector per word *type*, so the
 river *bank* and the money *bank* are forced to share a vector — the ceiling of the whole
@@ -341,7 +341,7 @@ The contextual-embeddings topic surveys that overlay.
 - **Bolukbasi, T., Chang, K.-W., Zou, J., Saligrama, V. & Kalai, A. (2016). Man is to Computer Programmer as Woman is to Homemaker? Debiasing Word Embeddings. NeurIPS.**  
   [https://arxiv.org/abs/1607.06520](https://arxiv.org/abs/1607.06520) – The gender direction and the stereotypes it carries.
 - **Gonen, H. & Goldberg, Y. (2019). Lipstick on a Pig: Debiasing Methods Cover up Systematic Gender Biases in Word Embeddings. NAACL.**  
-  [https://arxiv.org/abs/1903.03862](https://arxiv.org/abs/1903.03862) – Why geometric debiasing hides rather than removes bias.
+  [https://arxiv.org/abs/1903.03862](https://arxiv.org/abs/1903.03862) – Why geometric debiasing hides rather than removes bias. — see also the [explanation page](debiasing-word-embeddings.md).
 - **Peters, M., Neumann, M., Iyyer, M., Gardner, M., Clark, C., Lee, K. & Zettlemoyer, L. (2018). Deep contextualized word representations. NAACL.**  
   [https://arxiv.org/abs/1802.05365](https://arxiv.org/abs/1802.05365) – ELMo: a different vector per occurrence.
 - **Devlin, J., Chang, M.-W., Lee, K. & Toutanova, K. (2019). BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding. NAACL.**  
