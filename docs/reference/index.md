@@ -45,6 +45,14 @@ reader should do.
   loss and gradient, the sampling procedure, and what temperature does to the distribution.
 - **[Word embeddings](word-embeddings.md)** — the embedding matrix and its lookup identity,
   cosine similarity, the analogy arithmetic, and nearest-neighbour ranking.
+- **[Word2Vec and GloVe](word2vec-and-glove.md)** — the SGNS / CBOW objectives, the GloVe
+  weighted-least-squares form and its loss, and the hyperparameters each method exposes.
+- **[Debiasing word embeddings](debiasing-word-embeddings.md)** — the gender-direction
+  estimator, the neutralize and equalize equations, the WEAT statistic with its effect size
+  and permutation test, and the fixture tolerances.
+- **[Contextual embeddings](contextual-embeddings.md)** — the type-versus-token distinction,
+  the encoder / pooling / instruction / normalisation contract, the retrieval regimes,
+  and the method-family comparison with its benchmark taxonomy.
 - **[Modern Sequence Models](modern-sequence-models.md)** — attention, state-space models,
   and the gated linear recurrences that compete with them, with their complexity per layer.
 - **[Activation functions](activation-functions.md)** — each function with its derivative.

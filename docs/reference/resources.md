@@ -54,6 +54,20 @@ and documentation in this hub.
 - **Neural Machine Translation of Rare Words with Subword Units (BPE)**: Sennrich, Haddow & Birch (2016) – [https://arxiv.org/abs/1508.07909](https://arxiv.org/abs/1508.07909)
 - **Enriching Word Vectors with Subword Information (fastText)**: Bojanowski, Grave, Joulin & Mikolov (2017) – [https://arxiv.org/abs/1607.04606](https://arxiv.org/abs/1607.04606)
 - **Visualizing Data using t-SNE**: van der Maaten & Hinton (2008) – *JMLR* 9, 2579–2605.
+- **Deep contextualized word representations (ELMo)**: Peters, Neumann, Iyyer, Gardner, Clark, Lee & Zettlemoyer (2018) – [https://arxiv.org/abs/1802.05365](https://arxiv.org/abs/1802.05365)
+- **BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding**: Devlin, Chang, Lee & Toutanova (2019) – [https://arxiv.org/abs/1810.04805](https://arxiv.org/abs/1810.04805)
+- **RoBERTa: A Robustly Optimized BERT Pretraining Approach**: Liu, Ott, Goyal, Du, Joshi, Chen, Levy, Lewis, Zettlemoyer & Stoyanov (2019) – [https://arxiv.org/abs/1907.11692](https://arxiv.org/abs/1907.11692)
+- **Sentence-BERT: Sentence Embeddings using Siamese BERT-Networks**: Reimers & Gurevych (2019) – [https://arxiv.org/abs/1908.10084](https://arxiv.org/abs/1908.10084)
+- **SimCSE: Simple Contrastive Learning of Sentence Embeddings**: Gao, Yao & Chen (2021) – [https://arxiv.org/abs/2104.08821](https://arxiv.org/abs/2104.08821)
+- **Dense Passage Retrieval for Open-Domain Question Answering (DPR)**: Karpukhin et al. (2020) – [https://arxiv.org/abs/2004.04906](https://arxiv.org/abs/2004.04906)
+- **ColBERT: Efficient and Effective Passage Search via Contextualized Late Interaction over BERT**: Khattab & Zaharia (2020) – [https://arxiv.org/abs/2004.12832](https://arxiv.org/abs/2004.12832)
+- **BEIR: A Heterogeneous Benchmark for Zero-shot Evaluation of Information Retrieval Models**: Thakur, Reimers, Rücklé, Srivastava & Gurevych (2021) – [https://arxiv.org/abs/2104.08663](https://arxiv.org/abs/2104.08663)
+- **MTEB: Massive Text Embedding Benchmark**: Muennighoff, Tazi, Magne & Reimers (2023) – [https://arxiv.org/abs/2210.07316](https://arxiv.org/abs/2210.07316)
+- **Text Embeddings by Weakly-Supervised Contrastive Pre-training (E5)**: Wang et al. (2022) – [https://arxiv.org/abs/2212.03533](https://arxiv.org/abs/2212.03533)
+- **C-Pack: Packed Resources For General Chinese Embeddings (BGE)**: Xiao, Liu, Zhang, Muennighoff, Lian & Nie (2024) – [https://arxiv.org/abs/2309.07597](https://arxiv.org/abs/2309.07597)
+- **Matryoshka Representation Learning**: Kusupati et al. (2022) – [https://arxiv.org/abs/2205.13147](https://arxiv.org/abs/2205.13147)
+- **One Embedder, Any Task: Instruction-Finetuned Text Embeddings (Instructor)**: Su et al. (2022) – [https://arxiv.org/abs/2212.09741](https://arxiv.org/abs/2212.09741)
+- **Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks (RAG)**: Lewis et al. (2020) – [https://arxiv.org/abs/2005.11401](https://arxiv.org/abs/2005.11401)
 
 ---
 

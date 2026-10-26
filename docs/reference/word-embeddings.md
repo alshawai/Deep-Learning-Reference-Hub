@@ -13,7 +13,7 @@ Notation follows Andrew Ng's Deep Learning Specialization, Course 5, Week 2
 a small, hand-planted toy matrix (see [Fixture and tolerances](#fixture-and-tolerances))
 whose every answer is exact. How embeddings are *learned* (skip-gram, CBOW,
 negative sampling, GloVe, fastText) is a separate topic, and so are bias geometry
-and contextual embeddings. The reasoning behind the mechanics catalogued here —
+and [contextual embeddings](contextual-embeddings.md). The reasoning behind the mechanics catalogued here —
 why orthogonal one-hot vectors carry no similarity, why analogies are vector
 arithmetic, and why averaging is order-blind — is in this topic's explanation
 view, reachable from the [Crosswalk](#crosswalk).

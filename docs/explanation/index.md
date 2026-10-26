@@ -61,5 +61,11 @@ consequence.
   it samples from.
 - **[Word embeddings](word-embeddings.md)** — how a discrete symbol becomes a vector, why linear
   structure appears in the geometry, and what the analogy arithmetic is actually computing.
+- **[Word2Vec and GloVe](word2vec-and-glove.md)** — what the training objectives actually estimate,
+  why two such different algorithms recover the same geometry, and what negative sampling buys.
+- **[Debiasing word embeddings](debiasing-word-embeddings.md)** — why bias lives in the geometry,
+  what projecting a direction out removes, and why the structure survives the projection.
+- **[Contextual embeddings](contextual-embeddings.md)** — what changes when a word's vector depends
+  on its sentence, why pooling choices change the answer, and what the retrieval benchmarks measure.
 - **[Modern sequence models](modern-sequence-models.md)** — what attention buys and what it costs,
   and how state-space models and gated linear recurrences recover linear-time inference.

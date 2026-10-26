@@ -319,9 +319,9 @@ adjacent pair into a new subword unit, stopping at a chosen vocabulary size; the
 result is a vocabulary of word pieces in which any string, however unseen, is
 spellable as a sequence of known units. That sidesteps out-of-vocabulary words
 entirely, and it is the tokenisation layer underneath the contextual models that,
-as of 2026, have largely replaced static word vectors for most tasks. The planned
-*contextual embeddings* topic carries that thread; this topic ends where a word
-still has exactly one vector.
+as of 2026, have largely replaced static word vectors for most tasks. The
+[contextual embeddings](contextual-embeddings.md) topic carries that thread; this
+topic ends where a word still has exactly one vector.
 
 ## Implementation Examples
 

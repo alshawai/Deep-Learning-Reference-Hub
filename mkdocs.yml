@@ -116,6 +116,7 @@ nav:
       - Choose a sequence model: how-to/choose-a-sequence-model.md
       - Train a language model: how-to/train-a-language-model.md
       - Train word vectors: how-to/train-word-vectors.md
+      - Choose an embedding model: how-to/choose-an-embedding-model.md
   - Reference:
       - reference/index.md
       - Network shapes and dimensions: reference/network-shapes-and-dimensions.md
@@ -126,6 +127,7 @@ nav:
       - Word embeddings: reference/word-embeddings.md
       - Word2Vec and GloVe: reference/word2vec-and-glove.md
       - Debiasing word embeddings: reference/debiasing-word-embeddings.md
+      - Contextual embeddings: reference/contextual-embeddings.md
       - Activation functions: reference/activation-functions.md
       - Parameter update rule: reference/parameter-update-rule.md
       - Optimizer update rules: reference/optimizer-update-rules.md
@@ -157,3 +159,4 @@ nav:
       - Word embeddings: explanation/word-embeddings.md
       - Word2Vec and GloVe: explanation/word2vec-and-glove.md
       - Debiasing word embeddings: explanation/debiasing-word-embeddings.md
+      - Contextual embeddings: explanation/contextual-embeddings.md

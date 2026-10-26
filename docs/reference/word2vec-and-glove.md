@@ -201,7 +201,7 @@ gets an embedding, which plain Word2Vec and GloVe cannot give.
 vocabulary differently: it merges frequent symbol pairs into subword units, so
 the vocabulary is a learned set of word pieces rather than whole words. BPE and
 its relatives are the tokenization layer under modern contextual models; the
-planned *contextual embeddings* topic carries that thread.
+[contextual embeddings](contextual-embeddings.md) topic carries that thread.
 
 ## Initialization, learning rate, and determinism
 
