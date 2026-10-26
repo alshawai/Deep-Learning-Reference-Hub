@@ -22,7 +22,6 @@ Everything about *performance* is a specific paper's reported result at that
 paper's scale, dated and hedged, never restated as settled truth. The line
 between the two is drawn explicitly in
 [What the revival proves, and what it does not](#what-the-revival-proves-and-what-it-does-not).
-The modern sources were re-verified against arXiv on 2026-09-29.
 
 ## Contents
 
@@ -130,14 +129,13 @@ whole revival turns on.
 
 What differs between the families is *how* they arrange to be a linear recurrence
 you can scan — through a convolution, through input-dependent state-space
-parameters, or through a linearised attention. The reference view tabulates all
-six families on five axes; this page walks the interesting rows as a story.
+parameters, or through a linearized attention.
 
 ## S4: a state space you can convolve
 
 The structured state-space model S4 was the revival's starting point (Gu, Goel &
 Ré, 2022). It models the sequence with a continuous linear state-space system —
-a linear ODE discretised over the steps — whose parameters are **linear
+a linear ODE discretized over the steps — whose parameters are **linear
 time-invariant (LTI)**: they do not depend on $t$. That constraint is the whole
 point. Because the parameters are fixed across time, the entire sequence-to-
 sequence map collapses into a single **global convolution** with one long kernel,
@@ -145,7 +143,7 @@ which an FFT evaluates in $O(T \log T)$ — parallel over $T$ at training time. 
 inference, the very same system runs as a recurrence carrying an $O(1)$ state.
 
 The LTI structure is what makes long range tractable here: with the right
-parameterisation of the state matrix, the convolution kernel can represent
+parameterization of the state matrix, the convolution kernel can represent
 dependencies over very long horizons without the per-step decay a nonlinear
 recurrence suffers, which is why S4 posted strong results on long-sequence
 benchmarks (Gu, Goel & Ré, 2022). S4 established the state-space line as a real
@@ -180,9 +178,9 @@ selective recurrence are not rival species but two coordinates on one map.
 
 ## Linear attention: RWKV and RetNet
 
-A second route to the same destination starts from attention and *linearises* it.
+A second route to the same destination starts from attention and *linearizes* it.
 Standard attention's $O(T^2)$ cost comes from the softmax coupling every query to
-every key. Replace that coupling with a form that factorises, and the attention
+every key. Replace that coupling with a form that factorizes, and the attention
 computation can be rewritten as a **linear recurrence over a fixed-size state** —
 which is exactly the object a scan can train in parallel and a recurrence can run
 in $O(1)$ per token.
@@ -193,7 +191,7 @@ on par with similarly sized Transformers**. RetNet gives the same map three
 interchangeable forms — a **parallel** form for training, a **recurrent** form
 for $O(1)$ inference, and a **chunkwise-recurrent** form that trades between them —
 so one trained model can be served with a flat per-token cost (Sun et al., 2023).
-The trade these make is legible: a fixed-size state summarises history rather than
+The trade these make is legible: a fixed-size state summarizes history rather than
 retaining every token exactly, so they give up attention's exact all-to-all
 recall in exchange for linear cost. Whether that trade costs quality on a given
 task is the open, task-dependent question — not something the architecture
@@ -214,14 +212,12 @@ character.
 
 xLSTM goes the other direction — *extending* the LSTM rather than minimising it.
 It adds **exponential gating** and two memory designs: a scalar-memory sLSTM and a
-matrix-memory mLSTM. The mLSTM is parallelisable (its recurrence admits a
+matrix-memory mLSTM. The mLSTM is parallelizable (its recurrence admits a
 parallel form); the sLSTM is not, and is kept for the representational power its
 memory mixing adds. Beck et al. (2024) report xLSTM performing **favourably
 against state-of-the-art Transformers and state-space models** at the sizes
 tested. Both lines are 2024 results — promising, and stated as reported, not
-settled. Note the boundary of this topic: minGRU/minLSTM *as an implementation*
-belongs to the gated-cell topic; here they are landmarks in the revival narrative,
-not a build.
+settled.
 
 ## Hybrids: keeping a slice of attention
 

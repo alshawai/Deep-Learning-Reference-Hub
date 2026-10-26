@@ -11,6 +11,31 @@ API stability — see the versioning policy in
 
 ## [Unreleased]
 
+## [1.8.0] - 2026-10-26
+
+### Added
+- [Contextual embeddings](docs/explanation/contextual-embeddings.md): the modern
+  overlay that closes the Word Embeddings family — what changes when a word's
+  vector depends on the sentence it sits in. It runs from the static ceiling
+  (one vector per type) through ELMo and BERT (one vector per token occurrence),
+  treats "the embedding" as a pipeline of encoder, pooling (CLS, mean, last
+  token, learned head), instruction prefix, and normalisation, then follows
+  SBERT and SimCSE into practical sentence vectors, the bi-encoder /
+  cross-encoder / late-interaction (ColBERT) retrieval regimes, MTEB and its
+  per-task spread, the modern families (E5, BGE, Instructor, Matryoshka), and
+  RAG as the pattern built on top. Every performance claim is cited and dated
+  rather than asserted. Prose-only by design: ships an explanation, a
+  reference, a how-to for choosing an embedding model, and fourteen new
+  resources. Transformer and attention internals are deferred to
+  [modern sequence models](docs/explanation/modern-sequence-models.md) and the
+  future Transformer topics.
+
+### Changed
+- The three sibling Word Embeddings pages and the debiasing notebook now link
+  the contextual-embeddings topic where they previously called it planned.
+- The modern-sequence-models explanation now uses American spelling throughout
+  and drops three stale asides.
+
 ## [1.7.0] - 2026-10-17
 
 ### Added
@@ -146,7 +171,8 @@ package rather than a folder of notes.
 - A CI quality gate running ruff, pytest, the `hubcheck` integrity checks, and a
   strict documentation build.
 
-[Unreleased]: https://github.com/alshawai/Deep-Learning-Reference-Hub/compare/v1.7.0...HEAD
+[Unreleased]: https://github.com/alshawai/Deep-Learning-Reference-Hub/compare/v1.8.0...HEAD
+[1.8.0]: https://github.com/alshawai/Deep-Learning-Reference-Hub/compare/v1.7.0...v1.8.0
 [1.7.0]: https://github.com/alshawai/Deep-Learning-Reference-Hub/compare/v1.6.0...v1.7.0
 [1.6.0]: https://github.com/alshawai/Deep-Learning-Reference-Hub/compare/v1.5.1...v1.6.0
 [1.5.1]: https://github.com/alshawai/Deep-Learning-Reference-Hub/compare/v1.5.0...v1.5.1

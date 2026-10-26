@@ -48,4 +48,8 @@ reader would arrive already wanting the outcome.
 - **[How to train a language model and generate text](train-a-language-model.md)** — the training
   loop, what perplexity tells you, and how to sample from the trained distribution.
 - **[How to train word vectors on your own corpus](train-word-vectors.md)** — from tokens to
-  trained, inspected vectors with skip-gram or GloVe, and the knobs,
+  trained, inspected vectors with skip-gram or GloVe, and the knobs that decide whether
+  they come out good.
+- **[How to choose an embedding model](choose-an-embedding-model.md)** — from your task,
+  corpus, language, and budget to an embedding family, the consumption contract to pin
+  alongside it, and the measurement that decides whether to keep it.

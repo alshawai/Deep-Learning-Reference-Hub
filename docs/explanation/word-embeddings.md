@@ -289,7 +289,7 @@ which give a word a different vector in every sentence: ELMo (Peters et al., 201
 BERT (Devlin et al., 2019) read the surrounding words, and sentence-level models such as
 SBERT (Reimers & Gurevych, 2019), compared on benchmarks like MTEB (Muennighoff, Tazi,
 Magne & Reimers, 2023), now power search, retrieval, and retrieval-augmented generation.
-The contextual-embeddings topic surveys that overlay.
+The [contextual-embeddings](contextual-embeddings.md) topic surveys that overlay.
 
 ## Implementation Examples
 
